@@ -1,0 +1,49 @@
+{
+  "name": "craftcms/commerce-digitalproducts",
+  "description": "Digital Products for Craft Commerce",
+  "version": "2.0.0",
+  "type": "craft-plugin",
+  "keywords": [
+    "digital",
+    "commerce",
+    "craftcms",
+    "yii2"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pixel & Tonic",
+      "homepage": "https://pixelandtonic.com/"
+    }
+  ],
+  "support": {
+    "email": "support@craftcms.com",
+    "issues": "https://github.com/craftcms/digital-products/issues?state=open",
+    "source": "https://github.com/craftcms/digital-products",
+    "docs": "https://github.com/craftcms/digital-products",
+    "rss": "https://github.com/craftcms/digital-products/commits/master.atom"
+  },
+  "require": {
+    "craftcms/commerce": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "craft\\commerce\\digitalProducts\\": "src/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ],
+  "extra": {
+    "handle": "commerce-digitalproducts",
+    "name": "Digital Products",
+    "description": "Add digital products to Craft Commerce.",
+    "developer": "Pixel & Tonic",
+    "schemaVersion": "1.0.0",
+    "hasCpSection": true,
+    "hasCpSettings": true
+  }
+}
