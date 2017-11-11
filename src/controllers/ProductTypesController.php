@@ -1,5 +1,15 @@
 <?php
-namespace Craft;
+namespace craft\commerce\digitalProducts\controllers;
+
+use Craft;
+use craft\commerce\digitalProducts\elements\Product;
+use craft\commerce\digitalProducts\models\ProductType;
+use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use Craft\ProductTypeSite;
+use craft\web\Controller as BaseController;
+use yii\base\Exception;
+use yii\web\Response;
+
 
 /**
  * Class DigitalProducts_ProductsController
@@ -8,109 +18,132 @@ namespace Craft;
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
 
-class _ProductTypesController extends BaseController
+class ProductTypesController extends BaseController
 {
 
     // Public Methods
     // =========================================================================
 
+
     /**
-     * @inheritDoc BaseController::init()
+     * @inheritdoc
      */
     public function init()
     {
-        if (!craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
-            throw new HttpException(403, Craft::t('You don\'t have permissions to do that.'));
-        }
-
+        $this->requirePermission('digitalProducts-manageProductTypes');
         parent::init();
     }
 
     /**
-     * Create or edit a Product Type
+     * Edit a product type.
      *
-     * @param array $variables
+     * @param int|null         $productTypeId the product type id
+     * @param ProductType|null $productType   the product type
+     *
+     * @return Response
+     * @@throws Exception if product type is not found
      */
-    public function actionEdit(array $variables = [])
+    public function actionEdit(int $productTypeId = null, ProductType $productType = null): Response
     {
+        $variables = [
+            'productTypeId' => $productTypeId,
+            'productType' => $productType,
+        ];
+
         if (empty($variables['productType'])) {
-            if (empty($variables['productTypeId'])) {
-                $productType = new _ProductType();
-            } else {
-                $productType = craft()->digitalProducts_productTypes->getProductTypeById($variables['productTypeId']);
-            }
+            $productType = $productTypeId ? DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($productTypeId) : new ProductType();
+
             if (!$productType) {
-                $productType = new _ProductType();;
+                throw new Exception('Product type not found.');
             }
+
             $variables['productType'] = $productType;
         }
         
-        $variables['title'] = empty($variables['productType']->id) ? Craft::t("Create a new Digital Product Type") : $variables['productType']->name;
+        $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('commerce-digitalproducts', 'Create a new digital product type');
 
-        $this->renderTemplate('digitalproducts/producttypes/_edit', $variables);
+        return $this->renderTemplate('digitalproducts/producttypes/_edit', $variables);
     }
 
     /**
      * Save a Product Type
+     *
+     * @return Response
      */
     public function actionSave()
     {
         $this->requirePostRequest();
 
-        $productType = new _ProductType();
+        $productType = new ProductType();
 
-        $productType->id = craft()->request->getPost('productTypeId');
-        $productType->name = craft()->request->getPost('name');
-        $productType->handle = craft()->request->getPost('handle');
-        $productType->hasUrls = craft()->request->getPost('hasUrls');
-        $productType->skuFormat = craft()->request->getPost('skuFormat');
-        $productType->template = craft()->request->getPost('template');
+        $request = Craft::$app->getRequest();
+        
+        $productType->id = $request->getBodyParam('productTypeId');
+        $productType->name = $request->getBodyParam('name');
+        $productType->handle = $request->getBodyParam('handle');
+        $productType->hasUrls = $request->getBodyParam('hasUrls');
+        $productType->skuFormat = $request->getBodyParam('skuFormat');
+        $productType->template = $request->getBodyParam('template');
 
-        $locales = [];
+        // Site-specific settings
+        $allSiteSettings = [];
 
-        foreach (craft()->i18n->getSiteLocaleIds() as $localeId) {
-            $locales[$localeId] = new DigitalProducts_ProductTypeLocaleModel([
-                'locale' => $localeId,
-                'urlFormat' => craft()->request->getPost('urlFormat.'.$localeId)
-            ]);
+        foreach (Craft::$app->getSites()->getAllSites() as $site) {
+            $postedSettings = $request->getBodyParam('sites.'.$site->handle);
+
+            $siteSettings = new ProductTypeSite();
+            $siteSettings->siteId = $site->id;
+            $siteSettings->hasUrls = !empty($postedSettings['uriFormat']);
+
+            if ($siteSettings->hasUrls) {
+                $siteSettings->uriFormat = $postedSettings['uriFormat'];
+                $siteSettings->template = $postedSettings['template'];
+            } else {
+                $siteSettings->uriFormat = null;
+                $siteSettings->template = null;
+            }
+
+            $allSiteSettings[$site->id] = $siteSettings;
         }
 
-        $productType->setLocales($locales);
+        $productType->setSiteSettings($allSiteSettings);
 
-        $fieldLayout = craft()->fields->assembleLayoutFromPost();
-        $fieldLayout->type = 'DigitalProduct_Product';
-        $productType->asa('productFieldLayout')->setFieldLayout($fieldLayout);
+        // Set the product type field layout
+        $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost();
+        $fieldLayout->type = Product::class;
+        $productType->getBehavior('productFieldLayout')->setFieldLayout($fieldLayout);
 
         // Save it
-        if (craft()->digitalProducts_productTypes->saveProductType($productType)) {
-            craft()->userSession->setNotice(Craft::t('Product type saved.'));
-            $this->redirectToPostedUrl($productType);
-        } else {
-            craft()->userSession->setError(Craft::t('Couldn’t save product type.'));
+        if (DigitalProducts::getInstance()->getProductTypes()->saveProductType($productType)) {
+            Craft::$app->getSession()->setNotice(Craft::t('commerce-digitalproducts', 'Product type saved.'));
+
+            return $this->redirectToPostedUrl($productType);
         }
 
+        Craft::$app->getSession()->setError(Craft::t('commerce', 'Couldn’t save product type.'));
+
         // Send the productType back to the template
-        craft()->urlManager->setRouteVariables([
+        Craft::$app->getUrlManager()->setRouteParams([
             'productType' => $productType
         ]);
+
+        return null;
     }
 
     /**
      * Delete a Product Type.
+     *
+     * @return Response
      */
-    public function actionDelete()
+    public function actionDelete(): Response
     {
         $this->requirePostRequest();
-        $this->requireAjaxRequest();
+        $this->requireAcceptsJson();
 
-        $id = craft()->request->getRequiredPost('id');
+        $productTypeId = Craft::$app->getRequest()->getRequiredParam('id');
+        DigitalProducts::getInstance()->getProductTypes()->deleteProductTypeById($productTypeId);
 
-        try {
-            craft()->digitalProducts_productTypes->deleteProductTypeById($id);
-            $this->returnJson(['success' => true]);
-        } catch (\Exception $e) {
-            $this->returnErrorJson($e->getMessage());
-        }
+        return $this->asJson(['success' => true]);
     }
 
 }

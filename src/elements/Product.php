@@ -1,7 +1,15 @@
 <?php
 namespace craft\commerce\digitalProducts\elements;
 
+use Craft;
 use craft\base\Element;
+use craft\commerce\digitalProducts\elements\db\LicenseQuery;
+use craft\commerce\digitalProducts\models\ProductType;
+use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Query;
+use craft\helpers\ArrayHelper;
+use craft\helpers\DateTimeHelper;
 
 /**
  * Class Commerce_ProductElementType
@@ -15,6 +23,65 @@ use craft\base\Element;
  */
 class Product extends Element
 {
+    // Constants
+    // =========================================================================
+
+    const STATUS_LIVE = 'live';
+    const STATUS_PENDING = 'pending';
+    const STATUS_EXPIRED = 'expired';
+
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var int ID
+     */
+    public $id;
+
+    /**
+     * @var int Product type id
+     */
+    public $typeId;
+
+    /**
+     * @var int Tax category id
+     */
+    public $taxCategoryId;
+
+    /**
+     * @var \DateTime Post date
+     */
+    public $postDate;
+
+    /**
+     * @var \DateTime Expiry date
+     */
+    public $expiryDate;
+
+    /**
+     * @var bool Promotable
+     */
+    public $promotable;
+
+    /**
+     * @var string SKU
+     */
+    public $sku;
+
+    /**
+     * @var int $price
+     */
+    public $price;
+
+    /**
+     * @var ProductType
+     */
+    private $_productType;
+
+    /**
+     * @var bool
+     */
+    private $_isLicensed;
 
     // Public Methods
     // =========================================================================
@@ -24,45 +91,37 @@ class Product extends Element
      */
     public function getName()
     {
-        return Craft::t('Digital Products');
+        return $this->title;
     }
 
     /**
-     * @inheritDoc BaseElementType::hasContent()
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function hasContent()
+    public static function hasContent(): bool
     {
         return true;
     }
 
     /**
-     * @inheritDoc BaseElementType::hasTitles()
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function hasTitles()
+    public static function hasTitles(): bool
     {
         return true;
     }
 
     /**
-     * @inheritDoc BaseElementType::hasStatuses()
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function hasStatuses()
+    public static function hasStatuses(): bool
     {
         return true;
     }
 
     /**
-     * @inheritDoc BaseElementType::isLocalized()
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function isLocalized()
+    public static function isLocalized(): bool
     {
         return true;
     }
@@ -74,13 +133,13 @@ class Product extends Element
      *
      * @return array|bool|false
      */
-    public function getSources($context = null)
+    public function getSources(string $context = null): array
     {
-        if ($context == 'index') {
-            $productTypes = craft()->digitalProducts_productTypes->getEditableProductTypes();
+        if ($context === 'index') {
+            $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
             $editable = true;
         } else {
-            $productTypes = craft()->digitalProducts_productTypes->getAllProductTypes();
+            $productTypes = DigitalProducts::getInstance()->getProductTypes()->getAllProductTypes();
             $editable = false;
         }
 
@@ -90,9 +149,11 @@ class Product extends Element
             $productTypeIds[] = $productType->id;
         }
 
+
         $sources = [
-            '*' => [
-                'label' => Craft::t('All products'),
+            [
+                'key' => '*',
+                'label' => Craft::t('commerce-digitalproducts', 'All products'),
                 'criteria' => [
                     'typeId' => $productTypeIds,
                     'editable' => $editable
@@ -101,73 +162,50 @@ class Product extends Element
             ]
         ];
 
-        $sources[] = ['heading' => Craft::t('Product Types')];
+        $sources[] = ['heading' => Craft::t('commerce-digitalproducts', 'Product Types')];
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
-            $canEditProducts = craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$productType->id);
+            $canEditProducts = Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productType->id);
 
             $sources[$key] = [
+                'key' => 'producttype:'.$productType->id,
                 'label' => $productType->name,
                 'data' => [
                     'handle' => $productType->handle,
                     'editable' => $canEditProducts
                 ],
-                'criteria' => [
-                    'typeId' => $productType->id,
-                    'editable' => $editable
-                ]
+                'criteria' => ['typeId' => $productType->id, 'editable' => $editable]
             ];
         }
-
-        // Allow plugins to modify the sources
-        craft()->plugins->call('digitalProducts_modifyProductSources', [
-            &$sources,
-            $context
-        ]);
 
         return $sources;
     }
 
     /**
-     * @inheritDoc BaseElementType::defineAvailableTableAttributes()
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function defineAvailableTableAttributes()
+    protected static  function defineTableAttributes(): array
     {
-        $attributes = [
-            'title' => ['label' => Craft::t('Title')],
-            'type' => ['label' => Craft::t('Type')],
-            'slug' => ['label' => Craft::t('Slug')],
-            'sku' => ['label' => Craft::t('SKU')],
-            'price' => ['label' => Craft::t('Price')],
-            'postDate' => ['label' => Craft::t('Post Date')],
-            'expiryDate' => ['label' => Craft::t('Expiry Date')],
+        return [
+            'title' => ['label' => Craft::t('commerce-digitalproducts', 'Title')],
+            'type' => ['label' => Craft::t('commerce-digitalproducts', 'Type')],
+            'slug' => ['label' => Craft::t('commerce-digitalproducts', 'Slug')],
+            'sku' => ['label' => Craft::t('commerce-digitalproducts', 'SKU')],
+            'price' => ['label' => Craft::t('commerce-digitalproducts', 'Price')],
+            'postDate' => ['label' => Craft::t('commerce-digitalproducts', 'Post Date')],
+            'expiryDate' => ['label' => Craft::t('commerce-digitalproducts', 'Expiry Date')],
         ];
-
-        // Allow plugins to modify the attributes
-        $pluginAttributes = craft()->plugins->call('digitalProducts_defineAdditionalProductTableAttributes', [], true);
-
-        foreach ($pluginAttributes as $thisPluginAttributes) {
-            $attributes = array_merge($attributes, $thisPluginAttributes);
-        }
-
-        return $attributes;
     }
 
     /**
-     * @inheritDoc BaseElementType::getDefaultTableAttributes()
-     *
-     * @param string|null $source
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getDefaultTableAttributes($source = null)
+    protected static function defineDefaultTableAttributes(string $source): array
     {
         $attributes = [];
 
-        if ($source == '*') {
+        if ($source === '*') {
             $attributes[] = 'type';
         }
 
@@ -178,339 +216,288 @@ class Product extends Element
     }
 
     /**
-     * @inheritDoc BaseElementType::defineSearchableAttributes()
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function defineSearchableAttributes()
+    protected static function defineSearchableAttributes(): array
     {
         return ['title'];
     }
 
 
     /**
-     * @inheritDoc BaseElementType::getTableAttributeHtml()
-     *
-     * @param BaseElementModel $element
-     * @param string           $attribute
-     *
-     * @return mixed|string
+     * @inheritdoc
      */
-    public function getTableAttributeHtml(BaseElementModel $element, $attribute)
+    protected function tableAttributeHtml(string $attribute): string
     {
-        // First give plugins a chance to set this
-        $pluginAttributeHtml = craft()->plugins->callFirst('digitalProducts_getProductTableAttributeHtml', [
-            $element,
-            $attribute
-        ], true);
-
-        if ($pluginAttributeHtml !== null) {
-            return $pluginAttributeHtml;
-        }
-
-        /* @var $productType DigitalProducts_ProductTypeModel */
-        $productType = $element->getProductType();
+        /* @var $productType ProductType */
+        $productType = $this->getType();
 
         switch ($attribute) {
             case 'type': {
-                return ($productType ? Craft::t($productType->name) : '');
+                return ($productType ? Craft::t('site', $productType->name) : '');
             }
 
             case 'taxCategory': {
-                $taxCategory = $element->getTaxCategory();
+                $taxCategory = $this->getTaxCategory();
 
-                return ($taxCategory ? Craft::t($taxCategory->name) : '');
+                return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
             }
             case 'defaultPrice': {
-                $code = craft()->commerce_paymentCurrencies->getPrimaryPaymentCurrencyIso();
+                $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
 
-                return craft()->numberFormatter->formatCurrency($element->$attribute, strtoupper($code));
+                return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
             }
 
             case 'promotable': {
-                return ($element->$attribute ? '<span data-icon="check" title="'.Craft::t('Yes').'"></span>' : '');
+                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('Yes').'"></span>' : '');
             }
+
             default: {
-                return parent::getTableAttributeHtml($element, $attribute);
+                return parent::tableAttributeHtml($attribute);
             }
         }
     }
 
     /**
-     * @inheritDoc BaseElementType::defineSortableAttributes()
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function defineSortableAttributes()
+    protected static function defineSortOptions(): array
     {
-        $attributes = [
-            'title' => Craft::t('Title'),
-            'postDate' => Craft::t('Post Date'),
-            'expiryDate' => Craft::t('Expiry Date'),
-            'price' => Craft::t('Price'),
+        return [
+            'title' => Craft::t('commerce-digitalproducts', 'Title'),
+            'postDate' => Craft::t('commerce-digitalproducts', 'Post Date'),
+            'expiryDate' => Craft::t('commerce-digitalproducts', 'Expiry Date'),
+            'price' => Craft::t('commerce-digitalproducts', 'Price'),
         ];
-
-        // Allow plugins to modify the attributes
-        craft()->plugins->call('digitalProducts_modifyProductSortableAttributes', [&$attributes]);
-
-        return $attributes;
     }
 
 
     /**
-     * @inheritDoc BaseElementType::getStatuses()
-     *
-     * @return array|null
+     * @inheritdoc
      */
     public function getStatuses()
     {
         return [
-            DigitalProducts_ProductModel::LIVE => Craft::t('Live'),
-            DigitalProducts_ProductModel::PENDING => Craft::t('Pending'),
-            DigitalProducts_ProductModel::EXPIRED => Craft::t('Expired'),
-            BaseElementModel::DISABLED => Craft::t('Disabled')
-        ];
-    }
-
-
-    /**
-     * @inheritDoc BaseElement::defineCriteriaAttributes()
-     *
-     * @return array
-     */
-    public function defineCriteriaAttributes()
-    {
-        return [
-            'typeId' => AttributeType::Mixed,
-            'type' => AttributeType::Mixed,
-            'postDate' => AttributeType::Mixed,
-            'expiryDate' => AttributeType::Mixed,
-            'after' => AttributeType::Mixed,
-            'order' => [AttributeType::String, 'default' => 'postDate desc'],
-            'before' => AttributeType::Mixed,
-            'status' => [
-                AttributeType::String,
-                'default' => DigitalProducts_ProductModel::LIVE
-            ],
-            'editable' => AttributeType::Bool,
+            self::STATUS_LIVE => Craft::t('commerce-digitalproducts', 'Live'),
+            self::STATUS_PENDING => Craft::t('commerce-digitalproducts', 'Pending'),
+            self::STATUS_EXPIRED => Craft::t('commerce-digitalproducts', 'Expired'),
+            self::STATUS_DISABLED => Craft::t('commerce-digitalproducts', 'Disabled')
         ];
     }
 
     /**
-     * @inheritDoc BaseElementType::getElementQueryStatusCondition()
-     *
-     * @param DbCommand $query
-     * @param string    $status
-     *
-     * @return array|false|string|void
+     * @inheritdoc
      */
-    public function getElementQueryStatusCondition(DbCommand $query, $status)
+    public function getEditorHtml(): string
     {
-        $currentTimeDb = DateTimeHelper::currentTimeForDb();
-
-        switch ($status) {
-            case Commerce_ProductModel::LIVE: {
-                return [
-                    'and',
-                    'elements.enabled = 1',
-                    'elements_i18n.enabled = 1',
-                    "products.postDate <= '{$currentTimeDb}'",
-                    [
-                        'or',
-                        'products.expiryDate is null',
-                        "products.expiryDate > '{$currentTimeDb}'"
-                    ]
-                ];
-            }
-
-            case Commerce_ProductModel::PENDING: {
-                return [
-                    'and',
-                    'elements.enabled = 1',
-                    'elements_i18n.enabled = 1',
-                    "products.postDate > '{$currentTimeDb}'"
-                ];
-            }
-
-            case Commerce_ProductModel::EXPIRED: {
-                return [
-                    'and',
-                    'elements.enabled = 1',
-                    'elements_i18n.enabled = 1',
-                    'products.expiryDate is not null',
-                    "products.expiryDate <= '{$currentTimeDb}'"
-                ];
-            }
-        }
-    }
-
-
-    /**
-     * @inheritDoc BaseElementType::modifyElementsQuery()
-     *
-     * @param DbCommand $query
-     * @param ElementCriteriaModel $criteria
-     *
-     * @return false|null|void
-     */
-    public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
-    {
-        $query
-            ->addSelect("products.id, products.typeId, products.promotable, products.postDate, products.expiryDate, products.price, products.sku, products.taxCategoryId")
-            ->join('digitalproducts_products products', 'products.id = elements.id')
-            ->join('digitalproducts_producttypes producttypes', 'producttypes.id = products.typeId');
-
-        if ($criteria->postDate) {
-            $query->andWhere(DbHelper::parseDateParam('products.postDate', $criteria->postDate, $query->params));
-        } else {
-            if ($criteria->after) {
-                $query->andWhere(DbHelper::parseDateParam('products.postDate', '>='.$criteria->after, $query->params));
-            }
-
-            if ($criteria->before) {
-                $query->andWhere(DbHelper::parseDateParam('products.postDate', '<'.$criteria->before, $query->params));
-            }
-        }
-
-        if ($criteria->expiryDate) {
-            $query->andWhere(DbHelper::parseDateParam('products.expiryDate', $criteria->expiryDate, $query->params));
-        }
-
-        if ($criteria->type) {
-            if ($criteria->type instanceof DigitalProducts_ProductTypeModel) {
-                $criteria->typeId = $criteria->type->id;
-                $criteria->type = null;
-            } else {
-                $query->andWhere(DbHelper::parseParam('producttypes.handle', $criteria->type, $query->params));
-            }
-        }
-
-        if ($criteria->typeId) {
-            $query->andWhere(DbHelper::parseParam('products.typeId', $criteria->typeId, $query->params));
-        }
-
-        if ($criteria->editable) {
-            $user = craft()->userSession->getUser();
-
-            if (!$user) {
-                return false;
-            }
-
-            // Limit the query to only the sections the user has permission to edit
-            $editableProductTypeIds = craft()->digitalProducts_productTypes->getEditableProductTypeIds();
-
-            if (!$editableProductTypeIds) {
-                return false;
-            }
-
-            $query->andWhere([
-                'in',
-                'products.typeId',
-                $editableProductTypeIds
-            ]);
-        }
-
-        return true;
-    }
-
-
-    /**
-     * @inheritDoc BaseElementType::populateElementModel()
-     *
-     * @param array $row
-     *
-     * @return BaseElementModel|void
-     */
-    public function populateElementModel($row)
-    {
-        return DigitalProducts_ProductModel::populateModel($row);
-    }
-
-    /**
-     * @inheritDoc BaseElementType::getEditorHtml()
-     *
-     * @param BaseElementModel $element
-     *
-     * @return string
-     */
-    public function getEditorHtml(BaseElementModel $element)
-    {
-        /** @ var Commerce_ProductModel $element */
-        $templatesService = craft()->templates;
-        $html = $templatesService->renderMacro('digitalProducts/products/_fields', 'titleField', [$element]);
-        $html .= parent::getEditorHtml($element);
-        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'generalFields', [$element]);
-        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'pricingFields', [$element]);
-        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'behavioralMetaFields', [$element]);
-        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'generalMetaFields', [$element]);
+        $viewService = Craft::$app->getView();
+        $html = $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'titleField', [$this]);
+        $html .= parent::getEditorHtml();
+        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'generalFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'pricingFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'behavioralMetaFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'generalMetaFields', [$this]);
 
         return $html;
     }
 
     /**
-     * @inheritDoc BaseElementType::routeRequestForMatchedElement()
-     *
-     * @param BaseElementModel $element
-     *
-     * @return bool|mixed
+     * @inheritdoc
      */
-    public function routeRequestForMatchedElement(BaseElementModel $element)
+    protected function route()
     {
-        /** @var DigitalProducts_ProductModel $element */
-        if ($element->getStatus() == DigitalProducts_ProductModel::LIVE) {
-            $productType = $element->getProductType();
+        // Make sure the product type is set to have URLs for this site
+        $siteId = Craft::$app->getSites()->currentSite->id;
+        $productTypeSiteSettings = $this->getType()->getSiteSettings();
 
-            if ($productType->hasUrls) {
-                return [
-                    'action' => 'templates/render',
-                    'params' => [
-                        'template' => $productType->template,
-                        'variables' => [
-                            'product' => $element
-                        ]
-                    ]
-                ];
+        if (!isset($productTypeSiteSettings[$siteId]) || !$productTypeSiteSettings[$siteId]->hasUrls) {
+            return null;
+        }
+
+        return [
+            'templates/render', [
+                'template' => $productTypeSiteSettings[$siteId]->template,
+                'variables' => [
+                    'product' => $this,
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    {
+        if ($handle === 'isLicensed') {
+            $userId = Craft::$app->getUser()->getId();
+
+            if ($userId)
+            {
+                $sourceElementIds = ArrayHelper::getColumn($sourceElements, 'id');
+
+                $map = (new Query())
+                    ->select('productId as source, id as target')
+                    ->from('{{%digitalproducts_licenses}}')
+                    ->where(['in', 'productId', $sourceElementIds])
+                    ->andWhere(['userId' => $userId])
+                    ->all();
+
+                return array(
+                    'elementType' => License::class,
+                    'map' => $map
+                );
             }
+        }
+
+        return parent::eagerLoadingMap($sourceElements, $handle);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStatus()
+    {
+        $status = parent::getStatus();
+
+        if ($status === static::STATUS_ENABLED && $this->postDate) {
+            $currentTime = DateTimeHelper::currentTimeStamp();
+            $postDate = $this->postDate->getTimestamp();
+            $expiryDate = $this->expiryDate ? $this->expiryDate->getTimestamp() : null;
+
+            if ($postDate <= $currentTime && (!$expiryDate || $expiryDate > $currentTime)) {
+                return static::STATUS_LIVE;
+            }
+
+            if ($postDate > $currentTime) {
+                return static::STATUS_PENDING;
+            }
+
+            return static::STATUS_EXPIRED;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function datetimeAttributes(): array
+    {
+        $names = parent::datetimeAttributes();
+        $names[] = 'postDate';
+        $names[] = 'expiryDate';
+
+        return $names;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIsEditable(): bool
+    {
+        if ($this->getType()) {
+            $id = $this->getType()->id;
+
+            return Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$id);
         }
 
         return false;
     }
 
     /**
-     * @inheritDoc IElementType::getEagerLoadingMap()
-     *
-     * @param BaseElementModel[]  $sourceElements
-     * @param string $handle
-     *
-     * @return array|false
+     * @inheritdoc
      */
-    public function getEagerLoadingMap($sourceElements, $handle)
+    public function getCpEditUrl()
     {
-        if ($handle == 'isLicensed') {
-            $user = craft()->userSession->getUser();
-            if ($user)
-            {
-                // Get the source element IDs
-                $sourceElementIds = array();
+        $productType = $this->getType();
 
-                foreach ($sourceElements as $sourceElement) {
-                    $sourceElementIds[] = $sourceElement->id;
-                }
+        if ($productType) {
+            return UrlHelper::getCpUrl('digitalproducts/products/'.$productType->handle.'/'.$this->id);
+        } else {
+            return null;
+        }
+    }
 
-                $map = craft()->db->createCommand()
-                    ->select('productId as source, id as target')
-                    ->from('digitalproducts_licenses')
-                    ->where(array('in', 'productId', $sourceElementIds))
-                    ->andWhere('userId = :currentUser', array(':currentUser' => $user->id))
-                    ->queryAll();
+    /**
+     * @inheritdoc
+     */
+    public function getFieldLayout()
+    {
+        $productType = $this->getType();
 
-                return array(
-                    'elementType' => 'DigitalProducts_License',
-                    'map' => $map
-                );
+        if ($productType) {
+            return $productType->getProductFieldLayout();
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUriFormat()
+    {
+        $productType = $this->getType();
+
+        $siteId = $this->siteId ?: Craft::$app->getSites()->currentSite->id;
+
+        if (isset($productType->siteSettings[$siteId]) && $productType->siteSettings[$siteId]->hasUrls) {
+            $productTypeSites = $productType->getSiteSettings();
+
+            if (isset($productTypeSites[$this->siteId])) {
+                return $productTypeSites[$this->siteId]->uriFormat;
             }
         }
 
-        return parent::getEagerLoadingMap($sourceElements, $handle);
+        return null;
+    }
+
+    /**
+     * Returns the product's product type model.
+     *
+     * @return ProductType
+     */
+    public function getProductType()
+    {
+        if ($this->_productType) {
+            return $this->_productType;
+        }
+
+        return $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
+    }
+
+    /**
+     * Returns the product's product type model. Alias of ::getProductType()
+     *
+     * @return ProductType
+     */
+    public function getType()
+    {
+        return $this->getProductType();
+    }
+
+    /**
+     * Return true if the current user has a license for this product.
+     *
+     * @return bool
+     */
+    public function getIsLicensed()
+    {
+        if ($this->_isLicensed === null) {
+            $this->_isLicensed = false;
+            $userId = Craft::$app->getUser()->getId();
+
+            if ($userId) {
+
+                $license = License::find()->ownerId($userId)->one();
+
+                if ($license) {
+                    $this->_isLicensed = true;
+                }
+            }
+        }
+
+        return $this->_isLicensed;
     }
 }

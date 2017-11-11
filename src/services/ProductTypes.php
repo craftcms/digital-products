@@ -375,7 +375,7 @@ class ProductTypes extends Component
      *
      * @param int $productTypeId
      *
-     * @return DigitalProducts_ProductTypeModel|null
+     * @return ProductType|null
      */
     public function getProductTypeById($productTypeId)
     {

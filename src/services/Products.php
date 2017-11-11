@@ -2,6 +2,7 @@
 
 namespace craft\commerce\digitalProducts\services;
 
+use craft\commerce\digitalProducts\elements\Product;
 use yii\base\Component;
 
 /**
@@ -54,7 +55,7 @@ class Products extends Component
      * @throws Exception in case of invalid data
      * @throws \Exception if saving of the Element failed causing a failed transaction
      */
-    public function saveProduct(DigitalProducts_ProductModel $product)
+    public function saveProduct(Product $product)
     {
         if (!$product->id) {
             $record = new DigitalProducts_ProductRecord();

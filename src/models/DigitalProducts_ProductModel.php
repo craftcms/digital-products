@@ -2,6 +2,7 @@
 namespace Craft;
 
 use Commerce\Base\Purchasable as BasePurchasable;
+use Craft;
 
 /**
  * Product model.
@@ -35,81 +36,14 @@ class DigitalProducts_ProductModel extends BasePurchasable
     // =========================================================================
 
     /**
-     * @return null|string
-     */
-    function __toString()
-    {
-        return Craft::t($this->title);
-    }
-
-    /**
-     * @inheritdoc BaseElementModel::getStatus()
-     *
-     * @return string|null
-     */
-    public function getStatus()
-    {
-        $status = parent::getStatus();
-
-        if ($status == static::ENABLED && $this->postDate) {
-            $currentTime = DateTimeHelper::currentTimeStamp();
-            $postDate = $this->postDate->getTimestamp();
-            $expiryDate = ($this->expiryDate ? $this->expiryDate->getTimestamp() : null);
-
-            if ($postDate <= $currentTime && (!$expiryDate || $expiryDate > $currentTime)) {
-                return static::LIVE;
-            } else {
-                if ($postDate > $currentTime) {
-                    return static::PENDING;
-                } else {
-                    return static::EXPIRED;
-                }
-            }
-        }
-
-        return $status;
-    }
-
-    /**
-     * @inheritdoc BaseElementModel::isEditable()
-     *
-     * @return bool
-     */
-    public function isEditable()
-    {
-        if ($this->getProductType()) {
-            $id = $this->getProductType()->id;
-
-            return craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$id);
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLocalized()
-    {
-        return true;
-    }
-
-
-    /**
-     * @inheritdoc BaseElementModel::getCpEditUrl()
-     *
      * @return string
      */
-    public function getCpEditUrl()
+    public function __toString(): string
     {
-        $productType = $this->getProductType();
-
-        if ($productType) {
-            return UrlHelper::getCpUrl('digitalproducts/products/'.$productType->handle.'/'.$this->id);
-        } else {
-            return null;
-        }
+        return (string)$this->title;
     }
+
+
 
     /**
      * @inheritdoc BaseElementModel::getFieldLayout()

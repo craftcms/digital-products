@@ -316,7 +316,7 @@ class License extends Element
                 $criteria->productId = $criteria->product->id;
                 $criteria->product = null;
             } else {
-                $query->andWhere(DbHelper::parseParam('products.sku', $criteria->type, $query->params));
+                $query->andWhere(DbHelper::parseParam('products.sku', $criteria->product, $query->params));
             }
         }
 

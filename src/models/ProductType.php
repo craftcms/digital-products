@@ -2,20 +2,60 @@
 namespace craft\commerce\digitalProducts\models;
 
 use craft\base\Model;
+use craft\behaviors\FieldLayoutBehavior;
+use craft\commerce\digitalProducts\elements\Product;
+use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\helpers\ArrayHelper;
+use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 
 /**
  * Product type model.
  *
+ * @method null setFieldLayout(FieldLayout $fieldLayout)
+ * @method FieldLayout getFieldLayout()
+ * @property string                         $cpEditUrl
+ * @property ProductTypeSite[]              $siteSettings
+ * @property mixed                          $productFieldLayout
+ * @mixin FieldLayoutBehavior
+ *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
+ * @copyright Copyright (c) 2017, Pixel & Tonic, Inc.
  */
 class ProductType extends Model
 {
+    // Properties
+    // =========================================================================
 
     /**
-     * @var LocaleModel[]
+     * @var int ID
      */
-    private $_locales;
+    public $id;
+
+    /**
+     * @var string Name
+     */
+    public $name;
+
+    /**
+     * @var string Handle
+     */
+    public $handle;
+
+    /**
+     * @var bool Has URLs
+     */
+    public $hasUrls;
+
+    /**
+     * @var string SKU format
+     */
+    public $skuFormat;
+
+    /**
+     * @var ProductTypeSite[]
+     */
+    private $_siteSettings;
 
     // Public Methods
     // =========================================================================
@@ -23,79 +63,76 @@ class ProductType extends Model
     /**
      * @return null|string
      */
-    function __toString()
+    public function __toString()
     {
-        return Craft::t($this->handle);
+        return $this->handle;
     }
 
     /**
-     * @inheritDoc BaseElementModel::getCpEditUrl()
-     *
-     * @return string|false
+     * @return string
      */
-    public function getCpEditUrl()
+    public function getCpEditUrl(): string
     {
-        return UrlHelper::getCpUrl('digitalproducts/producttypes/' . $this->id);
+        return UrlHelper::cpUrl('digitalproducts/producttypes/'.$this->id);
     }
 
     /**
-     * Return locales defined for this Product by it's Product Type.
+     * Returns the product types's site-specific settings.
      *
-     * @return array
+     * @return ProductTypeSite[]
      */
-    public function getLocales()
+    public function getSiteSettings(): array
     {
-        if (!isset($this->_locales)) {
-            if ($this->id) {
-                $this->_locales = craft()->digitalProducts_productTypes->getProductTypeLocales($this->id, 'locale');
-            } else {
-                $this->_locales = [];
-            }
+        if ($this->_siteSettings !== null) {
+            return $this->_siteSettings;
         }
 
-        return $this->_locales;
+        if (!$this->id) {
+            return [];
+        }
+
+        $this->setSiteSettings(ArrayHelper::index(DigitalProducts::getInstance()->getProductTypes()->getProductTypeSites($this->id), 'siteId'));
+
+        return $this->_siteSettings;
     }
 
     /**
-     * Sets the locales on the product type
+     * Sets the product type's site-specific settings.
      *
-     * @param $locales
+     * @param ProductTypeSite[] $siteSettings
+     *
+     * @return void
      */
-    public function setLocales($locales)
+    public function setSiteSettings(array $siteSettings)
     {
-        $this->_locales = $locales;
+        $this->_siteSettings = $siteSettings;
+
+        foreach ($this->_siteSettings as $settings) {
+            $settings->setProductType($this);
+        }
     }
 
     /**
-     * @return array
+     * @return FieldLayout
      */
-    public function behaviors()
+    public function getProductFieldLayout(): FieldLayout
     {
-        return [
-            'productFieldLayout' => new FieldLayoutBehavior('DigitalProduct_Product',
-                'fieldLayoutId'),
-        ];
+        /** @var FieldLayoutBehavior $behavior */
+        $behavior = $this->getBehavior('productFieldLayout');
+        return $behavior->getFieldLayout();
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
-     * @inheritdoc BaseModel::defineAttributes()
-     *             
-     * @return array
+     * @inheritdoc
      */
-    protected function defineAttributes()
+    public function behaviors(): array
     {
         return [
-            'id' => AttributeType::Number,
-            'name' => AttributeType::Name,
-            'handle' => AttributeType::Handle,
-            'hasUrls' => AttributeType::Bool,
-            'urlFormat' => AttributeType::String,
-            'skuFormat' => AttributeType::String,
-            'template' => AttributeType::Template,
-            'fieldLayoutId' => AttributeType::Number
+            'productFieldLayout' => [
+                'class' => FieldLayoutBehavior::class,
+                'elementType' => Product::class,
+                'idAttribute' => 'fieldLayoutId'
+            ]
         ];
     }
 }
