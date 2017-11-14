@@ -4,6 +4,7 @@ namespace craft\commerce\digitalProducts\elements\db;
 
 use Craft;
 use craft\commerce\base\Element;
+use craft\commerce\digitalProducts\elements\License;
 use craft\commerce\digitalProducts\elements\Product;
 use craft\commerce\digitalProducts\models\ProductType;
 use craft\db\Query;
@@ -331,7 +332,7 @@ class LicenseQuery extends ElementQuery
     }
 
     /**
-     * Sets the [[typeId]] property.
+     * Sets the [[licenseDate]] property.
      *
      * @param DateTime|string $value The property value
      *
@@ -343,7 +344,7 @@ class LicenseQuery extends ElementQuery
             $value = $value->format(DateTime::W3C);
         }
 
-        $this->typeId = $value;
+        $this->licenseDate = $value;
 
         return $this;
     }
@@ -379,16 +380,36 @@ class LicenseQuery extends ElementQuery
             $this->subQuery->andWhere(['or', ['digitalproducts_licenses.ownerEmail' => $this->email], ['users.email' => $this->email]]);
         }
 
-        if ($this->postDate) {
-            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.postDate', $this->postDate));
+        if ($this->ownerEmail) {
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_licenses.ownerEmail', $this->ownerEmail));
         }
 
-        if ($this->expiryDate) {
-            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.expiryDate', $this->expiryDate));
+        if ($this->userEmail) {
+            $this->subQuery->andWhere(Db::parseParam('users.email', $this->userEmail));
+        }
+
+        if ($this->ownerId) {
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_licenses.userId', $this->ownerId));
+        }
+
+        if ($this->productId) {
+            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.productId', $this->productId));
         }
 
         if ($this->typeId) {
             $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.typeId', $this->typeId));
+        }
+
+        if ($this->licenseDate) {
+            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.dateCreated', $this->licenseDate));
+        }
+
+        if ($this->orderId) {
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.orderId', $this->orderId));
+        }
+
+        if ($this->licenseKey) {
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.licenseKey', $this->licenseKey));
         }
 
         if (!$this->orderBy) {
@@ -403,41 +424,14 @@ class LicenseQuery extends ElementQuery
      */
     protected function statusCondition(string $status)
     {
-        $currentTimeDb = Db::prepareDateForDb(new \DateTime());
-
         switch ($status) {
-            case Product::STATUS_LIVE:
+            case License::STATUS_ENABLED:
                 return [
-                    'and',
-                    [
-                        'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1'
-                    ],
-                    ['<=', 'digitalproducts_products.postDate', $currentTimeDb],
-                    [
-                        'or',
-                        ['digitalproducts_products.expiryDate' => null],
-                        ['>', 'digitalproducts_products.expiryDate', $currentTimeDb]
-                    ]
+                    'elements.enabled' => '1'
                 ];
-            case Product::STATUS_PENDING:
+            case License::STATUS_DISABLED:
                 return [
-                    'and',
-                    [
-                        'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1',
-                    ],
-                    ['>', 'digitalproducts_products.postDate', $currentTimeDb]
-                ];
-            case Product::STATUS_EXPIRED:
-                return [
-                    'and',
-                    [
-                        'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1'
-                    ],
-                    ['not', ['digitalproducts_products.expiryDate' => null]],
-                    ['<=', 'digitalproducts_products.expiryDate', $currentTimeDb]
+                    'elements.disabled' => '1'
                 ];
             default:
                 return parent::statusCondition($status);

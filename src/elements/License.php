@@ -3,6 +3,15 @@ namespace craft\commerce\digitalProducts\elements;
 
 use Craft;
 use craft\base\Element;
+use craft\commerce\digitalProducts\models\ProductType;
+use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\commerce\Plugin as Commerce;
+use craft\commerce\elements\Order;
+use craft\db\Query;
+use craft\elements\db\ElementQueryInterface;
+use craft\elements\User;
+use craft\helpers\ArrayHelper;
+use craft\helpers\UrlHelper;
 
 /**
  * Class Commerce_LicenseElementType
@@ -14,8 +23,178 @@ use craft\base\Element;
 class License extends Element
 {
 
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var int ID
+     */
+    public $id;
+
+    /**
+     * @var int|null Product id
+     */
+    public $productId;
+
+    /**
+     * @var int|null Order id
+     */
+    public $orderId;
+
+    /**
+     * @var string the license key
+     */
+    public $licenseKey;
+
+    /**
+     * @var string|null License owner name
+     */
+    public $ownerName;
+
+    /**
+     * @var string|null License owner email
+     */
+    public $ownerEmail;
+
+    /**
+     * @var int|null License owner user id
+     */
+    public $userId;
+
+    /**
+     * @var string
+     */
+    private $_licensedTo = null;
+
+    /**
+     * @var Product
+     */
+    private $_product = null;
+
+    /**
+     * @var User
+     */
+    private $_user = null;
+
+    /**
+     * @var Order
+     */
+    private $_order = null;
+
     // Public Methods
     // =========================================================================
+
+    /**
+     * @return null|string
+     */
+    public function __toString()
+    {
+        return Craft::t('commerce-digitalproducts', 'License for “{product}”', ['product' => $this->getProductName()]);
+    }
+
+    /**
+     * Return the email tied to the license.
+     *
+     * @return string
+     */
+    public function getLicensedTo(): string
+    {
+        if (null === $this->_licensedTo) {
+            $this->_licensedTo = "";
+
+            if (null !== $this->userId && null === $this->_user) {
+                $this->_user = Craft::$app->getUsers()->getUserById($this->userId);
+            }
+
+            if ($this->_user) {
+                $this->_licensedTo = $this->_user->email;
+            } else {
+                $this->_licensedTo = $this->ownerEmail;
+            }
+        }
+
+        return $this->_licensedTo;
+    }
+
+    /**
+     * Return the product tied to the license.
+     *
+     * @return Product|null
+     */
+    public function getProduct()
+    {
+        if ($this->_product) {
+            return $this->_product;
+        }
+
+        return $this->_product = DigitalProducts::getInstance()->getProducts()->getProductById($this->productId);
+    }
+
+    /**
+     * Return the order tied to the license.
+     *
+     * @return null|Order
+     */
+    public function getOrder()
+    {
+        if ($this->_order) {
+            return $this->_order;
+        }
+
+        if ($this->orderId) {
+            return $this->_order = Commerce::getInstance()->getOrders()->getOrderById($this->orderId);
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the product type for the product tied to the license.
+     *
+     * @return ProductType|null
+     */
+    public function getProductType()
+    {
+        $product = $this->getProduct();
+
+        if ($product) {
+            return $product->getProductType();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductName(): string
+    {
+        return (string) $this->getProduct();
+    }
+
+    /**
+     * @inheritdoc BaseElementModel::getCpEditUrl()
+     *
+     * @return string
+     */
+    public function getCpEditUrl(): string
+    {
+        return UrlHelper::cpUrl('digitalproducts/licenses/'.$this->id);
+    }
+
+    /**
+     * Get the link for editing the order that purchased this license.
+     *
+     * @return string
+     */
+    public function getOrderEditUrl(): string
+    {
+        if ($this->orderId) {
+            return UrlHelper::cpUrl('commerce/orders/'.$this->orderId);
+        }
+
+        return '';
+    }
 
     /**
      * @return null|string
@@ -27,25 +206,19 @@ class License extends Element
     }
 
     /**
-     * @inheritDoc BaseElementType::hasStatuses()
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function hasStatuses()
+    public static function hasStatuses(): bool
     {
         return true;
     }
 
     /**
-     * @inheritDoc BaseElementType::getSources()
-     *
-     * @param null $context
-     *
-     * @return array|bool|false
+     * @inheritdoc
      */
-    public function getSources($context = null)
+    public static function defineSources(string $context = null): array
     {
-        $productTypes = craft()->digitalProducts_productTypes->getProductTypes();
+        $productTypes = DigitalProducts::getInstance()->getProductTypes()->getAllProductTypes();
 
         $productTypeIds = [];
 
@@ -55,13 +228,13 @@ class License extends Element
 
         $sources = [
             '*' => [
-                'label' => Craft::t('All product types'),
-                'criteria' => ['licenseIssueDate' => $productTypeIds],
+                'label' => Craft::t('commerce-digitalproducts', 'All product types'),
+                'criteria' => ['typeId' => $productTypeIds],
                 'defaultSort' => ['dateCreated', 'desc']
             ]
         ];
 
-        $sources[] = ['heading' => Craft::t('Product Types')];
+        $sources[] = ['heading' => Craft::t('commerce-digitalproducts', 'Product Types')];
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
@@ -75,52 +248,31 @@ class License extends Element
             ];
         }
 
-        // Allow plugins to modify the sources
-        craft()->plugins->call('digitalProducts_modifyLicenseSources', [
-            &$sources,
-            $context
-        ]);
-
         return $sources;
     }
 
     /**
-     * @inheritDoc BaseElementType::defineAvailableTableAttributes()
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function defineAvailableTableAttributes()
+    protected static  function defineTableAttributes(): array
     {
-        $attributes = [
-            'product' => ['label' => Craft::t('Licensed Product')],
-            'productType' => ['label' => Craft::t('Product Type')],
-            'dateCreated' => ['label' => Craft::t('License Issue Date')],
-            'licensedTo' => ['label' => Craft::t('Licensed To')],
-            'orderLink' => ['label' => Craft::t('Associated Order')]
+        return [
+            'product' => ['label' => Craft::t('commerce-digitalproducts', 'Licensed Product')],
+            'productType' => ['label' => Craft::t('commerce-digitalproducts', 'Product Type')],
+            'dateCreated' => ['label' => Craft::t('commerce-digitalproducts', 'License Issue Date')],
+            'licensedTo' => ['label' => Craft::t('commerce-digitalproducts', 'Licensed To')],
+            'orderLink' => ['label' => Craft::t('commerce-digitalproducts', 'Associated Order')]
         ];
-
-        // Allow plugins to modify the attributes
-        $pluginAttributes = craft()->plugins->call('digitalProducts_defineAdditionalLicenseTableAttributes', [], true);
-
-        foreach ($pluginAttributes as $thisPluginAttributes) {
-            $attributes = array_merge($attributes, $thisPluginAttributes);
-        }
-
-        return $attributes;
     }
 
     /**
-     * @inheritDoc BaseElementType::getDefaultTableAttributes()
-     *
-     * @param string|null $source
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getDefaultTableAttributes($source = null)
+    protected static function defineDefaultTableAttributes(string $source): array
     {
         $attributes = [];
 
-        if ($source == '*') {
+        if ($source === '*') {
             $attributes[] = 'productType';
         }
 
@@ -134,313 +286,87 @@ class License extends Element
     }
 
     /**
-     * @inheritDoc BaseElementType::defineSearchableAttributes()
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function defineSearchableAttributes()
+    protected static function defineSearchableAttributes(): array
     {
         return ['licensedTo', 'product'];
     }
 
     /**
-     * @inheritDoc BaseElementType::getTableAttributeHtml()
-     *
-     * @param BaseElementModel $element
-     * @param string           $attribute
-     *
-     * @return mixed|string
+     * @inheritdoc
      */
-    public function getTableAttributeHtml(BaseElementModel $element, $attribute)
+    protected function tableAttributeHtml(string $attribute): string
     {
-        // First give plugins a chance to set this
-        $pluginAttributeHtml = craft()->plugins->callFirst('digitalProducts_getLicenseTableAttributeHtml', [
-            $element,
-            $attribute
-        ], true);
-
-        if ($pluginAttributeHtml !== null) {
-            return $pluginAttributeHtml;
-        }
-
-        /**
-         * @var DigitalProducts_LicenseModel $element
-         */
         switch ($attribute) {
-            case 'productType': {
-                return $element->getProductType();
-            }
+            case 'productType':
+                return $this->getProductType();
 
-            case 'licensedTo': {
-                return $element->getLicensedTo();
-            }
+            case 'licensedTo':
+                return $this->getLicensedTo();
 
-            case 'orderLink': {
-                $url = $element->getOrderEditUrl();
+            case 'orderLink':
+                $url = $this->getOrderEditUrl();
 
-                return $url ? '<a href="'.$url.'">'.Craft::t('View order').'</a>' : '';
-            }
+                return $url ? '<a href="'.$url.'">'.Craft::t('commerce-digitalproducts', 'View order').'</a>' : '';
 
             default: {
-                return parent::getTableAttributeHtml($element, $attribute);
+                return parent::tableAttributeHtml($attribute);
             }
         }
     }
 
     /**
-     * @inheritDoc BaseElementType::defineSortableAttributes()
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function defineSortableAttributes()
-    {
-        $attributes = [
-            'slug' => Craft::t('Product name'),
-            'licensedTo' => Craft::t('Owner'),
-            'dateCreated' => Craft::t('License issue date'),
-        ];
-
-        // Allow plugins to modify the attributes
-        craft()->plugins->call('digitalProducts_modifyLicenseSortableAttributes', [&$attributes]);
-
-        return $attributes;
-    }
-
-    /**
-     * @inheritDoc BaseElement::defineCriteriaAttributes()
-     *
-     * @return array
-     */
-    public function defineCriteriaAttributes()
+    protected static function defineSortOptions(): array
     {
         return [
-            'email' => AttributeType::String,
-            'ownerEmail' => AttributeType::String,
-            'userEmail' => AttributeType::String,
-
-            'owner' => AttributeType::Mixed,
-            'ownerId' => AttributeType::Number,
-
-            'product' => AttributeType::Mixed,
-            'productId' => AttributeType::Number,
-
-            'type' => AttributeType::Mixed,
-            'typeId' => AttributeType::Number,
-
-            'licenseDate' => AttributeType::DateTime,
-            'before' => AttributeType::Bool,
-            'after' => AttributeType::Bool,
-
-            'orderId' => AttributeType::Number,
-            'licenseKey' => AttributeType::String,
-
-            'status' => [
-                AttributeType::String,
-                'default' => BaseElementModel::ENABLED
-            ],
-
-            'order' => [AttributeType::String, 'default' => 'dateCreated desc'],
+            'slug' => Craft::t('commerce-digitalproducts', 'Product name'),
+            'licensedTo' => Craft::t('commerce-digitalproducts', 'Owner'),
+            'dateCreated' => Craft::t('commerce-digitalproducts', 'License issue date'),
         ];
     }
 
     /**
-     * @inheritDoc BaseElementType::getElementQueryStatusCondition()
-     *
-     * @param DbCommand $query
-     * @param string    $status
-     *
-     * @return array|false|string|void
+     * @inheritdoc
      */
-    public function getElementQueryStatusCondition(DbCommand $query, $status)
+    public static function eagerLoadingMap(array $sourceElements, string $handle)
     {
-        switch ($status) {
-            case BaseElementModel::ENABLED: {
-                return 'elements.enabled = 1';
-            }
+        $sourceElementIds = ArrayHelper::getColumn($sourceElements, 'id');
 
-            case BaseElementModel::DISABLED: {
-                return 'elements.enabled = 0';
-            }
-        }
-    }
-
-
-    /**
-     * @inheritDoc BaseElementType::modifyElementsQuery()
-     *
-     * @param DbCommand            $query
-     * @param ElementCriteriaModel $criteria
-     *
-     * @return false|null|void
-     */
-    public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
-    {
-        $query
-            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.ownerName, licenses.ownerEmail, licenses.userId, licenses.orderId, products.typeId as productTypeId")
-            ->join('digitalproducts_licenses licenses', 'licenses.id = elements.id')
-            ->leftJoin('digitalproducts_products products', 'products.id = licenses.productId')
-            ->leftJoin('users users', 'users.id = licenses.userId')
-            ->leftJoin('digitalproducts_producttypes producttypes', 'producttypes.id = products.typeId');
-
-        if ($criteria->email) {
-            $query->andWhere([
-                'or',
-                ['licenses.ownerEmail = :email', 'users.email = :email'],
-                [':email' => $criteria->licensedEmail]
-            ]);
-        }
-
-        if ($criteria->ownerEmail) {
-            $query->andWhere(DbHelper::parseParam('licenses.ownerEmail', $criteria->ownerEmail, $query->params));
-        }
-
-        if ($criteria->userEmail) {
-            $query->andWhere(DbHelper::parseParam('users.email', $criteria->userEmail, $query->params));
-        }
-
-        if ($criteria->owner) {
-            if ($criteria->owner instanceof UserModel) {
-                $criteria->ownerId = $criteria->owner->id;
-                $criteria->owner = null;
-            } else {
-                $query->andWhere(DbHelper::parseParam('users.username', $criteria->owner, $query->params));
-            }
-        }
-
-        if ($criteria->ownerId) {
-            $query->andWhere(DbHelper::parseParam('licenses.userId', $criteria->ownerId, $query->params));
-        }
-
-        if ($criteria->product) {
-            if ($criteria->product instanceof DigitalProducts_ProductModel) {
-                $criteria->productId = $criteria->product->id;
-                $criteria->product = null;
-            } else {
-                $query->andWhere(DbHelper::parseParam('products.sku', $criteria->product, $query->params));
-            }
-        }
-
-        if ($criteria->productId) {
-            if ($criteria->productId != ':all:')
-            {
-                $query->andWhere(DbHelper::parseParam('products.id', $criteria->productId, $query->params));
-            }
-        } else {
-            $query->andWhere(DbHelper::parseParam('licenses.productId', ':notempty:', $query->params));
-        }
-
-        if ($criteria->type) {
-            if ($criteria->type instanceof DigitalProducts_ProductTypeModel) {
-                $criteria->typeId = $criteria->type->id;
-                $criteria->type = null;
-            } else {
-                $query->andWhere(DbHelper::parseParam('producttypes.handle', $criteria->type, $query->params));
-            }
-        }
-
-        if ($criteria->typeId) {
-            $query->andWhere(DbHelper::parseParam('products.typeId', $criteria->typeId, $query->params));
-        }
-
-        if ($criteria->licenseDate) {
-            $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', $criteria->licenseDate, $query->params));
-        } else {
-            if ($criteria->after) {
-                $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', '>='.$criteria->after, $query->params));
-            }
-            if ($criteria->before) {
-                $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', '<'.$criteria->before, $query->params));
-            }
-        }
-
-        if ($criteria->orderId)
-        {
-            $query->andWhere(DbHelper::parseParam('licenses.orderId', $criteria->orderId, $query->params));
-        }
-
-        if ($criteria->licenseKey) {
-            $query->andWhere(DbHelper::parseParam('licenses.licenseKey', $criteria->licenseKey, $query->params));
-        }
-
-
-        return true;
-    }
-
-    /**
-     * @inheritDoc BaseElementType::populateElementModel()
-     *
-     * @param array $row
-     *
-     * @return BaseElementModel|void
-     */
-    public function populateElementModel($row)
-    {
-        return DigitalProducts_LicenseModel::populateModel($row);
-    }
-
-    /**
-     * @inheritDoc IElementType::getEagerLoadingMap()
-     *
-     * @param BaseElementModel[]  $sourceElements
-     * @param string $handle
-     *
-     * @return array|false
-     */
-    public function getEagerLoadingMap($sourceElements, $handle)
-    {
-        if ($handle == 'product') {
-            // Get the source element IDs
-            $sourceElementIds = array();
-
-            foreach ($sourceElements as $sourceElement) {
-                $sourceElementIds[] = $sourceElement->id;
-            }
-
-            $map = craft()->db->createCommand()
+        if ($handle === 'product') {
+            $map = (new Query())
                 ->select('id as source, productId as target')
-                ->from('digitalproducts_licenses')
-                ->where(array('in', 'id', $sourceElementIds))
-                ->queryAll();
+                ->from('{{%digitalproducts_licenses}}')
+                ->where(['in', 'id', $sourceElementIds])
+                ->all();
 
             return array(
-                'elementType' => 'DigitalProducts_Product',
+                'elementType' => Product::class,
                 'map' => $map
             );
         }
 
-        if ($handle == 'order') {
-            // Get the source element IDs
-            $sourceElementIds = array();
-
-            foreach ($sourceElements as $sourceElement) {
-                $sourceElementIds[] = $sourceElement->id;
-            }
-
-            $map = craft()->db->createCommand()
+        if ($handle === 'order') {
+            $map = (new Query())
                 ->select('id as source, orderId as target')
-                ->from('digitalproducts_licenses')
-                ->where(array('in', 'id', $sourceElementIds))
-                ->queryAll();
+                ->from('{{%digitalproducts_licenses}}')
+                ->where(['in', 'id', $sourceElementIds])
+                ->all();
 
             return array(
-                'elementType' => 'Commerce_Order',
+                'elementType' => Order::class,
                 'map' => $map
             );
         }
 
-        if ($handle == 'owner') {
-            // Get the source element IDs
-            $sourceElementIds = array();
-
-            foreach ($sourceElements as $sourceElement) {
-                $sourceElementIds[] = $sourceElement->id;
-            }
-
-            $map = craft()->db->createCommand()
+        if ($handle === 'owner') {
+            $map = (new Query())
                 ->select('id as source, userId as target')
-                ->from('digitalproducts_licenses')
-                ->where(array('in', 'id', $sourceElementIds))
-                ->queryAll();
+                ->from('{{%digitalproducts_licenses}}')
+                ->where(['in', 'id', $sourceElementIds])
+                ->all();
 
             return array(
                 'elementType' => 'User',
@@ -448,39 +374,60 @@ class License extends Element
             );
         }
 
-        return parent::getEagerLoadingMap($sourceElements, $handle);
+        return parent::eagerLoadingMap($sourceElements, $handle);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setEagerLoadedElements(string $handle, array $elements)
+    {
+        if ($handle === 'product') {
+            $this->_product = $elements[0] ?? null;
+
+            return;
+        }
+
+        if ($handle === 'owner') {
+            $this->_user = $elements[0] ?? null;
+
+            return;
+        }
+
+        if ($handle === 'order') {
+            $this->_order = $elements[0] ?? null;
+
+            return;
+        }
+
+        parent::setEagerLoadedElements($handle, $elements);
+    }
+
 
     // Protected methods
     // =========================================================================
 
     /**
-     * Preps the element criteria for a given table attribute
-     *
-     * @param ElementCriteriaModel $criteria
-     * @param string               $attribute
-     *
-     * @return void
+     * @inheritdoc
      */
-    protected function prepElementCriteriaForTableAttribute(ElementCriteriaModel $criteria, $attribute)
+    protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, $attribute)
     {
-        if ($attribute == 'product')
+        if ($attribute === 'product')
         {
-            $with = $criteria->with ?: array();
+            $with = $elementQuery->with ?: [];
             $with[] = 'product';
-            $criteria->with = $with;
+            $elementQuery->with = $with;
             return;
         }
 
-        if ($attribute == 'licensedTo')
+        if ($attribute === 'licensedTo')
         {
-            $with = $criteria->with ?: array();
+            $with = $elementQuery->with ?: [];
             $with[] = 'owner';
-            $criteria->with = $with;
+            $elementQuery->with = $with;
             return;
         }
 
-        parent::prepElementCriteriaForTableAttribute($criteria, $attribute);
+        parent::prepElementQueryForTableAttribute($elementQuery, $attribute);
     }
-
 }

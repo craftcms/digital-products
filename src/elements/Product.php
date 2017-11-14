@@ -2,14 +2,14 @@
 namespace craft\commerce\digitalProducts\elements;
 
 use Craft;
-use craft\base\Element;
-use craft\commerce\digitalProducts\elements\db\LicenseQuery;
+use craft\commerce\base\Purchasable;
 use craft\commerce\digitalProducts\models\ProductType;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
+use craft\helpers\UrlHelper;
 
 /**
  * Class Commerce_ProductElementType
@@ -21,7 +21,7 @@ use craft\helpers\DateTimeHelper;
  * @package   craft.plugins.commerce.elementtypes
  * @since     1.0
  */
-class Product extends Element
+class Product extends Purchasable
 {
     // Constants
     // =========================================================================
@@ -87,6 +87,15 @@ class Product extends Element
     // =========================================================================
 
     /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string) $this->title;
+    }
+
+
+    /**
      * @return null|string
      */
     public function getName()
@@ -127,13 +136,9 @@ class Product extends Element
     }
 
     /**
-     * @inheritDoc BaseElementType::getSources()
-     *
-     * @param null $context
-     *
-     * @return array|bool|false
+     * @inheritdoc
      */
-    public function getSources(string $context = null): array
+    public static function defineSources(string $context = null): array
     {
         if ($context === 'index') {
             $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
@@ -233,28 +238,24 @@ class Product extends Element
         $productType = $this->getType();
 
         switch ($attribute) {
-            case 'type': {
+            case 'type':
                 return ($productType ? Craft::t('site', $productType->name) : '');
-            }
 
-            case 'taxCategory': {
+            case 'taxCategory':
                 $taxCategory = $this->getTaxCategory();
 
                 return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
-            }
-            case 'defaultPrice': {
+
+            case 'defaultPrice':
                 $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
 
                 return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
-            }
 
-            case 'promotable': {
+            case 'promotable':
                 return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('Yes').'"></span>' : '');
-            }
 
-            default: {
+            default:
                 return parent::tableAttributeHtml($attribute);
-            }
         }
     }
 
@@ -322,6 +323,77 @@ class Product extends Element
                 ]
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setEagerLoadedElements(string $handle, array $elements)
+    {
+        if ($handle === 'isLicensed') {
+            $this->_isLicensed = isset($elements[0]) ? true : false;
+            return;
+        }
+
+        parent::setEagerLoadedElements($handle, $elements);
+    }
+
+    // Implement Purchasable
+    // =========================================================================
+    /**
+     * @inheritdoc
+     */
+    public function getPurchasableId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSnapshot(): array
+    {
+        return $this->getAttributes();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSku(): string
+    {
+        return $this->sku;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDescription(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTaxCategoryId(): int
+    {
+        return $this->taxCategoryId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasFreeShipping(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIsPromotable(): bool
+    {
+        return $this->promotable;
     }
 
     /**
@@ -413,7 +485,7 @@ class Product extends Element
         $productType = $this->getType();
 
         if ($productType) {
-            return UrlHelper::getCpUrl('digitalproducts/products/'.$productType->handle.'/'.$this->id);
+            return UrlHelper::cpUrl('digitalproducts/products/'.$productType->handle.'/'.$this->id);
         } else {
             return null;
         }
@@ -458,23 +530,13 @@ class Product extends Element
      *
      * @return ProductType
      */
-    public function getProductType()
+    public function getType()
     {
         if ($this->_productType) {
             return $this->_productType;
         }
 
         return $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
-    }
-
-    /**
-     * Returns the product's product type model. Alias of ::getProductType()
-     *
-     * @return ProductType
-     */
-    public function getType()
-    {
-        return $this->getProductType();
     }
 
     /**

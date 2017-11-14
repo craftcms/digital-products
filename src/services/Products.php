@@ -22,7 +22,7 @@ class Products extends Component
      * @param int $id
      * @param int $localeId
      *
-     * @return DigitalProducts_ProductModel
+     * @return Product
      */
     public function getProductById($id, $localeId = null)
     {
