@@ -254,6 +254,84 @@ class License extends Element
     /**
      * @inheritdoc
      */
+    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    {
+        $sourceElementIds = ArrayHelper::getColumn($sourceElements, 'id');
+
+        if ($handle === 'product') {
+            $map = (new Query())
+                ->select('id as source, productId as target')
+                ->from('{{%digitalproducts_licenses}}')
+                ->where(['in', 'id', $sourceElementIds])
+                ->all();
+
+            return array(
+                'elementType' => Product::class,
+                'map' => $map
+            );
+        }
+
+        if ($handle === 'order') {
+            $map = (new Query())
+                ->select('id as source, orderId as target')
+                ->from('{{%digitalproducts_licenses}}')
+                ->where(['in', 'id', $sourceElementIds])
+                ->all();
+
+            return array(
+                'elementType' => Order::class,
+                'map' => $map
+            );
+        }
+
+        if ($handle === 'owner') {
+            $map = (new Query())
+                ->select('id as source, userId as target')
+                ->from('{{%digitalproducts_licenses}}')
+                ->where(['in', 'id', $sourceElementIds])
+                ->all();
+
+            return array(
+                'elementType' => 'User',
+                'map' => $map
+            );
+        }
+
+        return parent::eagerLoadingMap($sourceElements, $handle);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setEagerLoadedElements(string $handle, array $elements)
+    {
+        if ($handle === 'product') {
+            $this->_product = $elements[0] ?? null;
+
+            return;
+        }
+
+        if ($handle === 'owner') {
+            $this->_user = $elements[0] ?? null;
+
+            return;
+        }
+
+        if ($handle === 'order') {
+            $this->_order = $elements[0] ?? null;
+
+            return;
+        }
+
+        parent::setEagerLoadedElements($handle, $elements);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
     protected static  function defineTableAttributes(): array
     {
         return [
@@ -326,81 +404,6 @@ class License extends Element
             'licensedTo' => Craft::t('commerce-digitalproducts', 'Owner'),
             'dateCreated' => Craft::t('commerce-digitalproducts', 'License issue date'),
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function eagerLoadingMap(array $sourceElements, string $handle)
-    {
-        $sourceElementIds = ArrayHelper::getColumn($sourceElements, 'id');
-
-        if ($handle === 'product') {
-            $map = (new Query())
-                ->select('id as source, productId as target')
-                ->from('{{%digitalproducts_licenses}}')
-                ->where(['in', 'id', $sourceElementIds])
-                ->all();
-
-            return array(
-                'elementType' => Product::class,
-                'map' => $map
-            );
-        }
-
-        if ($handle === 'order') {
-            $map = (new Query())
-                ->select('id as source, orderId as target')
-                ->from('{{%digitalproducts_licenses}}')
-                ->where(['in', 'id', $sourceElementIds])
-                ->all();
-
-            return array(
-                'elementType' => Order::class,
-                'map' => $map
-            );
-        }
-
-        if ($handle === 'owner') {
-            $map = (new Query())
-                ->select('id as source, userId as target')
-                ->from('{{%digitalproducts_licenses}}')
-                ->where(['in', 'id', $sourceElementIds])
-                ->all();
-
-            return array(
-                'elementType' => 'User',
-                'map' => $map
-            );
-        }
-
-        return parent::eagerLoadingMap($sourceElements, $handle);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setEagerLoadedElements(string $handle, array $elements)
-    {
-        if ($handle === 'product') {
-            $this->_product = $elements[0] ?? null;
-
-            return;
-        }
-
-        if ($handle === 'owner') {
-            $this->_user = $elements[0] ?? null;
-
-            return;
-        }
-
-        if ($handle === 'order') {
-            $this->_order = $elements[0] ?? null;
-
-            return;
-        }
-
-        parent::setEagerLoadedElements($handle, $elements);
     }
 
 

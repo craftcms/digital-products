@@ -190,92 +190,6 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    protected static  function defineTableAttributes(): array
-    {
-        return [
-            'title' => ['label' => Craft::t('commerce-digitalproducts', 'Title')],
-            'type' => ['label' => Craft::t('commerce-digitalproducts', 'Type')],
-            'slug' => ['label' => Craft::t('commerce-digitalproducts', 'Slug')],
-            'sku' => ['label' => Craft::t('commerce-digitalproducts', 'SKU')],
-            'price' => ['label' => Craft::t('commerce-digitalproducts', 'Price')],
-            'postDate' => ['label' => Craft::t('commerce-digitalproducts', 'Post Date')],
-            'expiryDate' => ['label' => Craft::t('commerce-digitalproducts', 'Expiry Date')],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function defineDefaultTableAttributes(string $source): array
-    {
-        $attributes = [];
-
-        if ($source === '*') {
-            $attributes[] = 'type';
-        }
-
-        $attributes[] = 'postDate';
-        $attributes[] = 'expiryDate';
-
-        return $attributes;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function defineSearchableAttributes(): array
-    {
-        return ['title'];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function tableAttributeHtml(string $attribute): string
-    {
-        /* @var $productType ProductType */
-        $productType = $this->getType();
-
-        switch ($attribute) {
-            case 'type':
-                return ($productType ? Craft::t('site', $productType->name) : '');
-
-            case 'taxCategory':
-                $taxCategory = $this->getTaxCategory();
-
-                return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
-
-            case 'defaultPrice':
-                $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
-
-                return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
-
-            case 'promotable':
-                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('Yes').'"></span>' : '');
-
-            default:
-                return parent::tableAttributeHtml($attribute);
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function defineSortOptions(): array
-    {
-        return [
-            'title' => Craft::t('commerce-digitalproducts', 'Title'),
-            'postDate' => Craft::t('commerce-digitalproducts', 'Post Date'),
-            'expiryDate' => Craft::t('commerce-digitalproducts', 'Expiry Date'),
-            'price' => Craft::t('commerce-digitalproducts', 'Price'),
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getStatuses()
     {
         return [
@@ -285,6 +199,7 @@ class Product extends Purchasable
             self::STATUS_DISABLED => Craft::t('commerce-digitalproducts', 'Disabled')
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -305,29 +220,6 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    protected function route()
-    {
-        // Make sure the product type is set to have URLs for this site
-        $siteId = Craft::$app->getSites()->currentSite->id;
-        $productTypeSiteSettings = $this->getType()->getSiteSettings();
-
-        if (!isset($productTypeSiteSettings[$siteId]) || !$productTypeSiteSettings[$siteId]->hasUrls) {
-            return null;
-        }
-
-        return [
-            'templates/render', [
-                'template' => $productTypeSiteSettings[$siteId]->template,
-                'variables' => [
-                    'product' => $this,
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function setEagerLoadedElements(string $handle, array $elements)
     {
         if ($handle === 'isLicensed') {
@@ -336,64 +228,6 @@ class Product extends Purchasable
         }
 
         parent::setEagerLoadedElements($handle, $elements);
-    }
-
-    // Implement Purchasable
-    // =========================================================================
-    /**
-     * @inheritdoc
-     */
-    public function getPurchasableId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSnapshot(): array
-    {
-        return $this->getAttributes();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSku(): string
-    {
-        return $this->sku;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDescription(): string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTaxCategoryId(): int
-    {
-        return $this->taxCategoryId;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasFreeShipping(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIsPromotable(): bool
-    {
-        return $this->promotable;
     }
 
     /**
@@ -561,5 +395,171 @@ class Product extends Purchasable
         }
 
         return $this->_isLicensed;
+    }
+
+    // Implement Purchasable
+    // =========================================================================
+    /**
+     * @inheritdoc
+     */
+    public function getPurchasableId(): int
+    {
+        return $this->id;
+    }
+    /**
+     * @inheritdoc
+     */
+    public function getSnapshot(): array
+    {
+        return $this->getAttributes();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSku(): string
+    {
+        return $this->sku;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDescription(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTaxCategoryId(): int
+    {
+        return $this->taxCategoryId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasFreeShipping(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIsPromotable(): bool
+    {
+        return $this->promotable;
+    }
+
+    // Protected methods
+    // =========================================================================
+    /**
+     * @inheritdoc
+     */
+    protected function route()
+    {
+        // Make sure the product type is set to have URLs for this site
+        $siteId = Craft::$app->getSites()->currentSite->id;
+        $productTypeSiteSettings = $this->getType()->getSiteSettings();
+
+        if (!isset($productTypeSiteSettings[$siteId]) || !$productTypeSiteSettings[$siteId]->hasUrls) {
+            return null;
+        }
+
+        return [
+            'templates/render', [
+                'template' => $productTypeSiteSettings[$siteId]->template,
+                'variables' => [
+                    'product' => $this,
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineTableAttributes(): array
+    {
+        return [
+            'title' => ['label' => Craft::t('commerce-digitalproducts', 'Title')],
+            'type' => ['label' => Craft::t('commerce-digitalproducts', 'Type')],
+            'slug' => ['label' => Craft::t('commerce-digitalproducts', 'Slug')],
+            'sku' => ['label' => Craft::t('commerce-digitalproducts', 'SKU')],
+            'price' => ['label' => Craft::t('commerce-digitalproducts', 'Price')],
+            'postDate' => ['label' => Craft::t('commerce-digitalproducts', 'Post Date')],
+            'expiryDate' => ['label' => Craft::t('commerce-digitalproducts', 'Expiry Date')],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        $attributes = [];
+
+        if ($source === '*') {
+            $attributes[] = 'type';
+        }
+
+        $attributes[] = 'postDate';
+        $attributes[] = 'expiryDate';
+
+        return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineSearchableAttributes(): array
+    {
+        return ['title'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function tableAttributeHtml(string $attribute): string
+    {
+        /* @var $productType ProductType */
+        $productType = $this->getType();
+
+        switch ($attribute) {
+            case 'type':
+                return ($productType ? Craft::t('site', $productType->name) : '');
+
+            case 'taxCategory':
+                $taxCategory = $this->getTaxCategory();
+
+                return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
+
+            case 'defaultPrice':
+                $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
+
+                return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
+
+            case 'promotable':
+                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('Yes').'"></span>' : '');
+
+            default:
+                return parent::tableAttributeHtml($attribute);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineSortOptions(): array
+    {
+        return [
+            'title' => Craft::t('commerce-digitalproducts', 'Title'),
+            'postDate' => Craft::t('commerce-digitalproducts', 'Post Date'),
+            'expiryDate' => Craft::t('commerce-digitalproducts', 'Expiry Date'),
+            'price' => Craft::t('commerce-digitalproducts', 'Price'),
+        ];
     }
 }
