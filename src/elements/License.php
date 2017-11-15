@@ -3,8 +3,11 @@ namespace craft\commerce\digitalProducts\elements;
 
 use Craft;
 use craft\base\Element;
+use craft\commerce\digitalProducts\elements\db\LicenseQuery;
+use craft\commerce\digitalProducts\events\GenerateKeyEvent;
 use craft\commerce\digitalProducts\models\ProductType;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\commerce\digitalProducts\records\License as LicenseRecord;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\elements\Order;
 use craft\db\Query;
@@ -12,6 +15,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\UrlHelper;
+use Exception;
 
 /**
  * Class Commerce_LicenseElementType
@@ -22,6 +26,14 @@ use craft\helpers\UrlHelper;
  */
 class License extends Element
 {
+
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event GenerateKeyEvent The event that is triggered after a payment request is being built
+     */
+    const EVENT_GENERATE_LICENSE_KEY = 'beforeGenerateLicenseKey';
 
     // Properties
     // =========================================================================
@@ -326,8 +338,102 @@ class License extends Element
         parent::setEagerLoadedElements($handle, $elements);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function rules(): array
+    {
+        $rules = parent::rules();
+
+        $rules[] = [['productId'], 'required'];
+        $rules[] = [
+            'userId',
+            'required',
+            'message' => Craft::t('commerce-digitalproducts', 'A license must have either an email or an owner assigned to it.'),
+            'when' => function ($model) {
+                return empty($model->ownerEmail);
+            }];
+
+        return $rules;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return LicenseQuery The newly created [[LicenseQuery]] instance.
+     */
+    public static function find(): ElementQueryInterface
+    {
+        return new LicenseQuery(static::class);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterSave(bool $isNew)
+    {
+        if (!$isNew) {
+            $licenseRecord = LicenseRecord::findOne($this->id);
+
+            if (!$licenseRecord) {
+                throw new Exception('Invalid license id: '.$this->id);
+            }
+        } else {
+            $licenseRecord = new LicenseRecord();
+            $licenseRecord->id = $this->id;
+        }
+
+        // Assign the license to a user if config allows for it, user id is left null and email matches
+        if (DigitalProducts::getInstance()->getSettings()->autoAssignUserOnPurchase
+            && $this->userId === null
+            && $user = User::find()->email($this->ownerEmail)->one()
+        ) {
+            $this->userId = $user->id;
+        }
+
+        $licenseRecord->ownerName = $this->userId ? null :$this->ownerName;
+        $licenseRecord->ownerEmail = $this->userId ? null :$this->ownerEmail;
+        $licenseRecord->userId = $this->userId;
+
+        // Some properties of the license are immutable
+        if ($isNew) {
+            $licenseRecord->orderId = $this->orderId;
+            $licenseRecord->productId = $this->productId;
+            $licenseRecord->licenseKey = $this->generateKey();
+        }
+
+        $licenseRecord->save(false);
+
+    }
+
     // Protected Methods
     // =========================================================================
+
+    /**
+     * Generate a new license key.
+     *
+     * @return string
+     */
+    protected function generateKey() {
+        $generateKeyEvent = new GenerateKeyEvent(['license' => $this]);
+
+        // Raising the 'afterGenerateLicenseKey' event
+        if ($this->hasEventHandlers(self::EVENT_GENERATE_LICENSE_KEY)) {
+            $this->trigger(self::EVENT_GENERATE_LICENSE_KEY, $generateKeyEvent);
+        }
+
+        // If a plugin provided the license key - use that.
+        if ($generateKeyEvent->licenseKey !== null) {
+            return $generateKeyEvent->licenseKey;
+        }
+
+        do {
+            $licenseKey = DigitalProducts::getInstance()->getLicenses()->generateLicenseKey();
+            $conflict = (bool) static::findByCondition(['licenseKey' => $licenseKey], true);
+        } while ($conflict);
+
+        return $licenseKey;
+    }
 
     /**
      * @inheritdoc

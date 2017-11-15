@@ -5,10 +5,11 @@ namespace craft\commerce\digitalProducts;
 use Craft;
 use craft\base\Plugin as BasePlugin;
 use craft\commerce\digitalProducts\fields\Products;
+use craft\commerce\digitalProducts\models\Settings;
 use craft\commerce\digitalProducts\plugin\Routes;
 use craft\commerce\digitalProducts\plugin\Services;
 use craft\commerce\elements\Order;
-use craft\commerce\services\Payments;
+use craft\commerce\services\Payments as PaymentService;
 use craft\elements\User;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
@@ -104,6 +105,49 @@ class Plugin extends BasePlugin
     }
 
     /**
+     * Get Settings URL
+     */
+    public function getSettingsUrl()
+    {
+        return false;
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    protected function createSettingsModel()
+    {
+        return new Settings();
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Register the event handlers.
+     */
+    private function _registerEventHandlers()
+    {
+        Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
+        Event::on(User::class, User::EVENT_AFTER_DELETE, [$this->getLicenses(), 'handleUserDeletion']);
+        Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER, [$this->getLicenses(), 'handleCompletedOrder']);
+        Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT_EVENT, [$this->getLicenses(), 'maybePreventPayment']);
+    }
+
+    /**
+     * Register Commerce’s fields
+     */
+    private function _registerFieldTypes()
+    {
+        Event::on(Fields::className(), Fields::EVENT_REGISTER_FIELD_TYPES, function(RegisterComponentTypesEvent $event) {
+            $event->types[] = Products::class;
+        });
+    }
+
+    /**
      * Register Digital Product permissions
      */
     private function _registerPermissions()
@@ -125,36 +169,4 @@ class Plugin extends BasePlugin
             ];
         });
     }
-
-    /**
-     * Get Settings URL
-     */
-    public function getSettingsUrl()
-    {
-        return false;
-    }
-
-    // Private Methods
-    // =========================================================================
-
-    /**
-     * Register the event handlers.
-     */
-    private function _registerEventHandlers()
-    {
-        Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
-        Event::on(User::class, User::EVENT_AFTER_DELETE, [$this->getLicenses(), 'handleUserDeletion']);
-        Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER, [$this->getLicenses(), 'handleCompletedOrder']);
-    }
-
-    /**
-     * Register Commerce’s fields
-     */
-    private function _registerFieldTypes()
-    {
-        Event::on(Fields::className(), Fields::EVENT_REGISTER_FIELD_TYPES, function(RegisterComponentTypesEvent $event) {
-            $event->types[] = Products::class;
-        });
-    }
-
 }

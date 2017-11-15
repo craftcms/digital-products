@@ -3,9 +3,11 @@ namespace craft\commerce\digitalProducts\elements;
 
 use Craft;
 use craft\commerce\base\Purchasable;
+use craft\commerce\digitalProducts\elements\db\ProductQuery;
 use craft\commerce\digitalProducts\models\ProductType;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\db\ElementQueryInterface;
 use craft\db\Query;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
@@ -283,6 +285,16 @@ class Product extends Purchasable
         }
 
         return $status;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return ProductQuery The newly created [[ProductQuery]] instance.
+     */
+    public static function find(): ElementQueryInterface
+    {
+        return new ProductQuery(static::class);
     }
 
     /**

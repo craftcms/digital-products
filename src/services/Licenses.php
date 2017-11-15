@@ -2,9 +2,15 @@
 
 namespace craft\commerce\digitalProducts\services;
 
+use Craft;
 use craft\commerce\digitalProducts\elements\License;
 use craft\commerce\digitalProducts\elements\Product;
+use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\commerce\elements\Order;
 use craft\commerce\events\OrderEvent;
+use craft\commerce\events\ProcessPaymentEvent;
+use craft\commerce\models\LineItem;
+use craft\elements\User;
 use craft\events\UserEvent;
 use yii\base\Component;
 use yii\base\Event;
@@ -21,234 +27,64 @@ class Licenses extends Component
     // =========================================================================
 
     /**
-     * Get a License by it's ID.
+     * Returns true if a given license key is unique.
      *
-     * @param int $id
-     *
-     * @return License
-     */
-    public function getLicenseById($id)
-    {
-        return craft()->elements->getElementById($id);
-    }
-
-    /**
-     * Get Licenses by criteria.
-     *
-     * @param array|ElementCriteriaModel $criteria
-     *
-     * @return DigitalProducts_LicenseModel[]
-     */
-    public function getLicenses($criteria = [])
-    {
-        if (!$criteria instanceof ElementCriteriaModel) {
-            $criteria = craft()->elements->getCriteria('DigitalProducts_License', $criteria);
-        }
-
-        return $criteria->find();
-    }
-
-    /**
-     * Save a License.
-     *
-     * @param DigitalProducts_LicenseModel $license
+     * @param string $licenseKey the license key
      *
      * @return bool
-     * @throws Exception in case of invalid data.
-     * @throws \Exception if saving of the Element failed causing a failed transaction
      */
-    public function saveLicense(License $license)
-    {
-        if (!$license->id) {
-            $record = new DigitalProducts_LicenseRecord();
-        } else {
-            $record = DigitalProducts_LicenseRecord::model()->findById($license->id);
-
-            if (!$record) {
-                throw new Exception(Craft::t('No license exists with the ID “{id}”',
-                    ['id' => $license->id]));
-            }
-        }
-
-        $record->ownerName = $license->ownerName;
-        $record->ownerEmail = $license->ownerEmail;
-
-        if (empty($license->productId)) {
-            $license->addError('productId', Craft::t('{attribute} cannot be blank.', ['attribute' => 'Product']));
-        }
-
-        if (empty($license->userId) && empty($license->ownerEmail)) {
-            $license->addError('userId', Craft::t('A license must have either an email or an owner assigned to it.'));
-            $license->addError('ownerEmail', Craft::t('A license must have either an email or an owner assigned to it.'));
-        }
-
-        // Assign license to a User if the email matches the User and User field left empty.
-        if (
-            (craft()->config->get('autoAssignUserOnPurchase', 'digitalProducts'))
-            && empty($license->userId) && !empty($license->ownerEmail) && $user = craft()->users->getUserByEmail($license->ownerEmail)
-        ) {
-            $license->userId = $user->id;
-        }
-
-        // See if we already have issues with provided data.
-        if ($license->hasErrors()) {
-            return false;
-        }
-
-        // If a owner is set, void the name and email fields.
-        if ($license->userId) {
-            $record->ownerName = null;
-            $record->ownerEmail = null;
-        }
-
-        $record->userId = $license->userId;
-
-        if (!$record->id) {
-            do {
-                $licenseKey = $this->generateLicenseKey();
-                $conflict = DigitalProducts_LicenseRecord::model()->findAllByAttributes(['licenseKey' => $licenseKey]);
-            } while ($conflict);
-
-            $modifiedLicenseKey = craft()->plugins->callFirst('digitalProducts_modifyLicenseKey', [
-                $licenseKey,
-                $license
-            ], true);
-
-            // Use the plugin-modified name, if anyone was up to the task.
-            $licenseKey = $modifiedLicenseKey ?: $licenseKey;
-
-            $record->licenseKey = $licenseKey;
-
-            /**
-             * @var $product DigitalProducts_ProductModel
-             */
-            $product = craft()->digitalProducts_products->getProductById($license->productId);
-
-            if (!$product) {
-                throw new Exception(Craft::t('No product exists with the ID “{id}”',
-                    ['id' => $license->productId]));
-            }
-
-            $productType = $product->getProductType();
-
-            if (!$productType) {
-                throw new Exception(Craft::t('No product type exists with the ID “{id}”',
-                    ['id' => $product->typeId]));
-            }
-
-            $record->productId = $license->productId;
-        } else if ($record->productId != $license->productId) {
-            $license->addError('productId', Craft::t('The licensed product cannot be changed once a license has been created.'));
-        }
-
-        $record->validate();
-        $license->addErrors($record->getErrors());
-
-        if ($license->hasErrors()) {
-            return false;
-        }
-
-        $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
-
-        try {
-            $event = new Event($this, [
-                'license' => $license,
-                'isNewLicense' => !$license->id
-            ]);
-            $this->onBeforeSaveLicense($event);
-
-            $success = false;
-
-            if ($event->performAction) {
-                $success = craft()->elements->saveElement($license, false);
-            }
-
-            if (!$success) {
-                if ($transaction !== null) {
-                    $transaction->rollback();
-                }
-
-                return false;
-            }
-
-            $record->id = $license->id;
-            $record->save(false);
-
-            if ($transaction !== null) {
-                $transaction->commit();
-            }
-
-            $event = new Event($this, ['license' => $license]);
-            $this->onSaveLicense($event);
-        } catch (\Exception $e) {
-            if ($transaction !== null) {
-                $transaction->rollback();
-            }
-
-            throw $e;
-        }
-
-        return true;
+    public function isLicenseKeyUnique(string $licenseKey) {
+        return !(bool) License::findOne(['licenseKey' => $licenseKey]);
     }
 
     /**
      * Sort trough the ordered items and generate Licenses for Digital Products.
      *
      * @param OrderEvent $event
+     *
+     * @return void
      */
     public static function handleCompletedOrder(OrderEvent $event)
     {
-        if (empty($event->params['order'])) {
-            return;
-        }
-
         /**
-         * @var Commerce_OrderModel $order
+         * @var Order $order
          */
-        $order = $event->params['order'];
+        $order = $event->order;
         $lineItems = $order->getLineItems();
 
         /**
-         * @var Commerce_LineItemModel $lineItem
+         * @var LineItem $lineItem
          */
         foreach ($lineItems as $lineItem) {
             $itemId = $lineItem->purchasableId;
-            $element = craft()->elements->getElementById($itemId);
+            $element = Craft::$app->getElements()->getElementById($itemId);
             $quantity = $lineItem->qty;
 
-            if ($element->getElementType() == "DigitalProducts_Product") {
+            if ($element instanceof Product) {
                 /**
-                 * @var DigitalProducts_ProductModel $element
+                 * @var Product $element
                  */
                 for ($i = 0; $i < $quantity; $i++) {
-                    craft()->digitalProducts_licenses->licenseProductByOrder($element, $order);
+                   DigitalProducts::getInstance()->getLicenses()->licenseProductByOrder($element, $order);
                 }
             }
         }
     }
 
     /**
-     * Prevent the Order from taking place if the user is not logged in but the
-     * config requires it and the Order contains Digital Products.
+     * Prevent paying for orders with digital products in it if user not logged in when required by config.
      *
-     * @param Event $event
+     * @param ProcessPaymentEvent $event
+     *
+     * @return void
      */
-    public static function maybePreventPayment(Event $event)
+    public static function maybePreventPayment(ProcessPaymentEvent $event)
     {
-        if (!(craft()->config->get('requireLoggedInUser', 'digitalProducts') && craft()->userSession->isGuest())) {
+        if (!DigitalProducts::getInstance()->getSettings()->requireLoggedInUser || !Craft::$app->getUser()->getIsGuest()) {
             return;
         }
 
-        if (empty($event->params['transaction'])) {
-            return;
-        }
-
-        /**
-         * @var Commerce_OrderModel $order
-         * @var Commerce_TransactionModel $transaction
-         */
-        $transaction = $event->params['transaction'];
-        $order = $transaction->order;
+        $order = $event->order;
 
         if (!$order) {
             return;
@@ -256,15 +92,11 @@ class Licenses extends Component
 
         $lineItems = $order->getLineItems();
 
-        /**
-         * @var Commerce_LineItemModel $lineItem
-         */
         foreach ($lineItems as $lineItem) {
             $itemId = $lineItem->purchasableId;
-            $element = craft()->elements->getElementById($itemId);
+            $element = Craft::$app->getElements()->getElementById($itemId);
 
-            if ($element->getElementType() == "DigitalProducts_Product") {
-                $transaction->message = Craft::t("You must be logged in to complete this transaction!");
+            if ($element instanceof Product) {
                 $event->performAction = false;
 
                 return;
@@ -273,36 +105,27 @@ class Licenses extends Component
     }
 
     /**
-     * If a user is activated and a license is assigned to the user's email,
-     * assign it to the user if the config settings do not prevent that.
+     * Assign licenses to a just-activated user, if emails match and config allows it.
      *
      * @param UserEvent $event
+     *
+     * @return void
      */
     public static function handleUserActivation(UserEvent $event)
     {
-        if (empty($event->user)) {
+        if (!DigitalProducts::getInstance()->getSettings()->autoAssignLicensesOnUserRegistration) {
             return;
         }
 
-        if (!craft()->config->get('autoAssignLicensesOnUserRegistration', 'digitalProducts')) {
-            return;
-        }
 
-        /**
-         * @var UserModel $user
-         */
-        $user = $event->params['user'];
-        $email = $user->email;
-        $licenses = craft()->digitalProducts_licenses->getLicenses(['ownerEmail' => $email]);
+        $licenses = License::find()->ownerEmail($event->user->email)->all();
 
-        /**
-         * @var DigitalProducts_LicenseModel $license
-         */
+        /** @var License $license */
         foreach ($licenses as $license) {
             // Only licenses with unassigned users
             if (!$license->userId) {
-                $license->userId = $user->id;
-                craft()->digitalProducts_licenses->saveLicense($license);
+                $license->userId = $event->user->id;
+                Craft::$app->getElements()->saveElement($license);
             }
         }
     }
@@ -311,43 +134,37 @@ class Licenses extends Component
      * If a user is deleted, transfer the licenses.
      *
      * @param Event $event
+     *
+     * @return void
      */
     public static function handleUserDeletion(Event $event)
     {
-        if (empty($event->params['user'])) {
-            return;
-        }
-
         /**
-         * @var UserModel $user
+         * @var User $user
          */
-        $user = $event->params['user'];
-        $licenses = craft()->digitalProducts_licenses->getLicenses(['ownerId' => $user->id, 'productId' => ':all:']);
+        $user = $event->sender;
+        $licenses = License::find()->owner($user)->all();
 
-        /**
-         * @var DigitalProducts_LicenseModel $license
-         */
+        /** @var License $license */
         foreach ($licenses as $license) {
             // Transfer the user's licenses to the user's email.
             $license->ownerEmail = $user->email;
             $license->userId = null;
-            craft()->digitalProducts_licenses->saveLicense($license);
+            DigitalProducts::getInstance()->getLicenses()->saveLicense($license);
         }
     }
 
     /**
      * Generate a license for a Product per Order.
      *
-     * @param DigitalProducts_ProductModel $product
-     * @param Commerce_OrderModel          $order
+     * @param Product $product
+     * @param Order   $order
      *
      * @return bool
-     * @throws Exception
-     * @throws \Exception
      */
-    public function licenseProductByOrder(DigitalProducts_ProductModel $product, Commerce_OrderModel $order)
+    public function licenseProductByOrder(Product $product, Order $order)
     {
-        $license = new DigitalProducts_LicenseModel();
+        $license = new License();
         $license->productId = $product->id;
         $customer = $order->getCustomer();
 
@@ -359,13 +176,9 @@ class Licenses extends Component
             $license->ownerEmail = $order->email;
         }
 
-        $success = $this->saveLicense($license);
+        $license->orderId = $order->id;
 
-        if ($success) {
-            return (bool)craft()->db->createCommand()->update('digitalproducts_licenses', ['orderId' => $order->id], ['id' => $license->id]);
-        }
-
-        return false;
+        return Craft::$app->getElements()->saveElement($license);
     }
 
     /**
@@ -375,85 +188,15 @@ class Licenses extends Component
      */
     public function generateLicenseKey()
     {
-        $codeAlphabet = craft()->config->get('licenseKeyCharacters', 'digitalProducts');
-        $keyLength = craft()->config->get('licenseKeyLength', 'digitalProducts');
+        $codeAlphabet = DigitalProducts::getInstance()->getSettings()->licenseKeyCharacters;
+        $keyLength = DigitalProducts::getInstance()->getSettings()->licenseKeyLength;
 
         $licenseKey = '';
 
         for ($i = 0; $i < $keyLength; $i++) {
-            $licenseKey .= $codeAlphabet[mt_rand(0, strlen($codeAlphabet) - 1)];
+            $licenseKey .= $codeAlphabet[random_int(0, strlen($codeAlphabet) - 1)];
         }
 
         return $licenseKey;
-    }
-
-    /**
-     * Delete a License.
-     *
-     * @param DigitalProducts_LicenseModel $license
-     *
-     * @return bool
-     * @throws \Exception
-     */
-    public function deleteLicense($license)
-    {
-        $event = new Event($this, ['license' => $license]);
-        $this->onBeforeDeleteLicense($event);
-
-        if ($event->performAction && craft()->elements->deleteElementById($license->id)) {
-            $event = new Event($this, ['license' => $license]);
-            $this->onDeleteLicense($event);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Event method
-     *
-     * @param Event $event
-     *
-     * @throws \CException
-     */
-    public function onBeforeSaveLicense(Event $event)
-    {
-        $this->raiseEvent('onBeforeSaveLicense', $event);
-    }
-
-    /**
-     * Event method
-     *
-     * @param Event $event
-     *
-     * @throws \CException
-     */
-    public function onSaveLicense(Event $event)
-    {
-        $this->raiseEvent('onSaveLicense', $event);
-    }
-
-    /**
-     * Event method
-     *
-     * @param Event $event
-     *
-     * @throws \CException
-     */
-    public function onBeforeDeleteLicense(Event $event)
-    {
-        $this->raiseEvent('onBeforeDeleteLicense', $event);
-    }
-
-    /**
-     * Event method
-     *
-     * @param Event $event
-     *
-     * @throws \CException
-     */
-    public function onDeleteLicense(Event $event)
-    {
-        $this->raiseEvent('onDeleteLicense', $event);
     }
 }
