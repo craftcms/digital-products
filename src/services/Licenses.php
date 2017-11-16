@@ -10,10 +10,8 @@ use craft\commerce\elements\Order;
 use craft\commerce\events\OrderEvent;
 use craft\commerce\events\ProcessPaymentEvent;
 use craft\commerce\models\LineItem;
-use craft\elements\User;
 use craft\events\UserEvent;
 use yii\base\Component;
-use yii\base\Event;
 
 /**
  * Licenses service.
@@ -33,7 +31,8 @@ class Licenses extends Component
      *
      * @return bool
      */
-    public function isLicenseKeyUnique(string $licenseKey) {
+    public function isLicenseKeyUnique(string $licenseKey): bool
+    {
         return !(bool) License::findOne(['licenseKey' => $licenseKey]);
     }
 
@@ -127,30 +126,6 @@ class Licenses extends Component
                 $license->userId = $event->user->id;
                 Craft::$app->getElements()->saveElement($license);
             }
-        }
-    }
-
-    /**
-     * If a user is deleted, transfer the licenses.
-     *
-     * @param Event $event
-     *
-     * @return void
-     */
-    public static function handleUserDeletion(Event $event)
-    {
-        /**
-         * @var User $user
-         */
-        $user = $event->sender;
-        $licenses = License::find()->owner($user)->all();
-
-        /** @var License $license */
-        foreach ($licenses as $license) {
-            // Transfer the user's licenses to the user's email.
-            $license->ownerEmail = $user->email;
-            $license->userId = null;
-            DigitalProducts::getInstance()->getLicenses()->saveLicense($license);
         }
     }
 

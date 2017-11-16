@@ -383,16 +383,22 @@ class License extends Element
             $licenseRecord->id = $this->id;
         }
 
+        if ($this->userId) {
+            $user = Craft::$app->getUsers()->getUserById($this->userId);
+        } else {
+            $user = User::find()->email($this->ownerEmail)->one();
+        }
+
         // Assign the license to a user if config allows for it, user id is left null and email matches
         if (DigitalProducts::getInstance()->getSettings()->autoAssignUserOnPurchase
             && $this->userId === null
-            && $user = User::find()->email($this->ownerEmail)->one()
+            && $user
         ) {
             $this->userId = $user->id;
         }
 
-        $licenseRecord->ownerName = $this->userId ? null :$this->ownerName;
-        $licenseRecord->ownerEmail = $this->userId ? null :$this->ownerEmail;
+        $licenseRecord->ownerName = $user ? $user->name : $this->ownerName;
+        $licenseRecord->ownerEmail = $user ? $user->email : $this->ownerEmail;
         $licenseRecord->userId = $this->userId;
 
         // Some properties of the license are immutable
@@ -429,8 +435,8 @@ class License extends Element
 
         do {
             $licenseKey = DigitalProducts::getInstance()->getLicenses()->generateLicenseKey();
-            $conflict = (bool) static::findByCondition(['licenseKey' => $licenseKey], true);
-        } while ($conflict);
+
+        } while (!DigitalProducts::getInstance()->getLicenses()->isLicenseKeyUnique($licenseKey));
 
         return $licenseKey;
     }

@@ -26,16 +26,6 @@ trait Services
     }
 
     /**
-     * Returns the product service.
-     *
-     * @return Products The product service
-     */
-    public function getProducts(): Products
-    {
-        return $this->get('products');
-    }
-
-    /**
      * Returns the product type service.
      *
      * @return ProductTypes The product type service

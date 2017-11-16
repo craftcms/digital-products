@@ -2,8 +2,18 @@
 
 namespace craft\commerce\digitalProducts\services;
 
+use Craft;
+use craft\commerce\digitalProducts\elements\Product;
 use craft\commerce\digitalProducts\models\ProductType;
+use craft\commerce\digitalProducts\models\ProductTypeSite;
+use craft\commerce\digitalProducts\records\ProductType as ProductTypeRecord;
+use craft\commerce\digitalProducts\records\ProductTypeSite as ProductTypeSiteRecord;
+use craft\commerce\events\ProductTypeEvent;
+use craft\db\Query;
+use craft\events\SiteEvent;
+use craft\helpers\App;
 use yii\base\Component;
+use yii\base\Exception;
 
 /**
  * Product Type.
@@ -13,129 +23,87 @@ use yii\base\Component;
  */
 class ProductTypes extends Component
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event ProductTypeEvent The event that is triggered before a category group is saved.
+     */
+    const EVENT_BEFORE_SAVE_PRODUCTTYPE = 'beforeSaveProductType';
+
+    /**
+     * @event ProductTypeEvent The event that is triggered after a product type is saved.
+     */
+    const EVENT_AFTER_SAVE_PRODUCTTYPE = 'afterSaveProductType';
+
+    // Properties
+    // =========================================================================
+
     /**
      * @var bool
      */
     private $_fetchedAllProductTypes = false;
 
     /**
-     * @var
+     * @var ProductType[]
      */
     private $_productTypesById;
 
     /**
-     * @var
+     * @var ProductType[]
+     */
+    private $_productTypesByHandle;
+
+    /**
+     * @var int[]
      */
     private $_allProductTypeIds;
 
     /**
-     * @var
+     * @var int[]
      */
     private $_editableProductTypeIds;
+
+    /**
+     * @var ProductTypeSite[][]
+     */
+    private $_siteSettingsByProductId = [];
 
     // Public Methods
     // =========================================================================
 
     /**
-     * Get Product Types.
+     * Returns all editable product types.
      *
-     * @param array|\CDbCriteria $criteria
-     *
-     * @return DigitalProducts_ProductTypeModel[]
+     * @return ProductType[] An array of all the editable product types.
      */
-    public function getProductTypes($criteria = [])
+    public function getEditableProductTypes(): array
     {
-        $results = DigitalProducts_ProductTypeRecord::model()->findAll($criteria);
+        $editableProductTypeIds = $this->getEditableProductTypeIds();
+        $editableProductTypes = [];
 
-        return DigitalProducts_ProductTypeModel::populateModels($results);
-    }
-
-    /**
-     * Get a Product Type's locales by it's id.
-     *
-     * @param      $productTypeId
-     * @param null $indexBy
-     *
-     * @return array
-     */
-    public function getProductTypeLocales($productTypeId, $indexBy = null)
-    {
-        $records = DigitalProducts_ProductTypeLocaleRecord::model()->findAllByAttributes([
-            'productTypeId' => $productTypeId
-        ]);
-
-        return DigitalProducts_ProductTypeLocaleModel::populateModels($records, $indexBy);
-    }
-
-    /**
-     * Returns all Product Types.
-     *
-     * @param string|null $indexBy
-     *
-     * @return DigitalProducts_ProductTypeModel[]
-     */
-    public function getAllProductTypes($indexBy = null)
-    {
-        return;
-        if (!$this->_fetchedAllProductTypes) {
-            $results = DigitalProducts_ProductTypeRecord::model()->findAll();
-
-            if (!isset($this->_productTypesById)) {
-                $this->_productTypesById = [];
-            }
-
-            foreach ($results as $result) {
-                $productType = DigitalProducts_ProductTypeModel::populateModel($result);
-                $this->_productTypesById[$productType->id] = $productType;
-            }
-
-            $this->_fetchedAllProductTypes = true;
-        }
-
-        if ($indexBy == 'id') {
-            $productTypes = $this->_productTypesById;
-        } else if (!$indexBy) {
-            $productTypes = array_values($this->_productTypesById);
-        } else {
-            $productTypes = [];
-            foreach ($this->_productTypesById as $productType) {
-                $productTypes[$productType->$indexBy] = $productType;
+        foreach ($this->getAllProductTypes() as $productTypes) {
+            if (in_array($productTypes->id, $editableProductTypeIds, false)) {
+                $editableProductTypes[] = $productTypes;
             }
         }
 
-        return $productTypes;
+        return $editableProductTypes;
     }
 
     /**
-     * Returns all of the Product Type IDs.
+     * Returns all of the product type IDs that are editable by the current user.
      *
-     * @return array
+     * @return array An array of all the editable product types’ IDs.
      */
-    public function getAllProductTypeIds()
+    public function getEditableProductTypeIds(): array
     {
-        if (!isset($this->_allProductTypeIds)) {
-            $this->_allProductTypeIds = [];
-
-            foreach ($this->getAllProductTypes() as $productType) {
-                $this->_allProductTypeIds[] = $productType->id;
-            }
-        }
-
-        return $this->_allProductTypeIds;
-    }
-
-    /**
-     * Returns all of the Product Type Ids that are editable by the current user.
-     *
-     * @return array
-     */
-    public function getEditableProductTypeIds()
-    {
-        if (!isset($this->_editableProductTypeIds)) {
+        if (null === $this->_editableProductTypeIds) {
             $this->_editableProductTypeIds = [];
+            $allProductTypeIds = $this->getAllProductTypeIds();
 
-            foreach ($this->getAllProductTypeIds() as $productTypeId) {
-                if (craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$productTypeId)) {
+            foreach ($allProductTypeIds as $productTypeId) {
+                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productTypeId)) {
                     $this->_editableProductTypeIds[] = $productTypeId;
                 }
             }
@@ -145,340 +113,395 @@ class ProductTypes extends Component
     }
 
     /**
-     * Returns all editable Product Types for the current user..
+     * Returns all of the product type IDs.
      *
-     * @param string|null $indexBy
-     *
-     * @return Commerce_ProductTypeModel[]
+     * @return array An array of all the product types’ IDs.
      */
-    public function getEditableProductTypes($indexBy = null)
+    public function getAllProductTypeIds(): array
     {
-        $editableProductTypeIds = $this->getEditableProductTypeIds();
-        $editableProductTypes = [];
+        if (null === $this->_allProductTypeIds) {
+            $this->_allProductTypeIds = [];
+            $productTypes = $this->getAllProductTypes();
 
-        foreach ($this->getAllProductTypes() as $productTypes) {
-            if (in_array($productTypes->id, $editableProductTypeIds)) {
-                if ($indexBy) {
-                    $editableProductTypes[$productTypes->$indexBy] = $productTypes;
-                } else {
-                    $editableProductTypes[] = $productTypes;
-                }
+            foreach ($productTypes as $productType) {
+                $this->_allProductTypeIds[] = $productType->id;
             }
         }
 
-        return $editableProductTypes;
+        return $this->_allProductTypeIds;
     }
 
     /**
-     * Save a Product Type.
+     * Returns all product types.
      *
-     * @param Commerce_ProductTypeModel $productType
-     *
-     * @return bool
-     * @throws Exception in case of invalid data.
-     * @throws \Exception if saving of the Element failed causing a failed transaction
+     * @return ProductType[] An array of all product types.
      */
-    public function saveProductType(DigitalProducts_ProductTypeModel $productType)
+    public function getAllProductTypes(): array
     {
-        if ($productType->id) {
-            $productTypeRecord = DigitalProducts_ProductTypeRecord::model()->findById($productType->id);
-            if (!$productTypeRecord) {
-                throw new Exception(Craft::t('No product type exists with the ID “{id}”',
-                    ['id' => $productType->id]));
+        if (!$this->_fetchedAllProductTypes) {
+            $results = $this->_createProductTypeQuery()->all();
+
+            foreach ($results as $result) {
+                $this->_memoizeProductType(new ProductType($result));
             }
 
-            /** @var DigitalProducts_ProductTypeModel $oldProductType */
-            $oldProductType = DigitalProducts_ProductTypeModel::populateModel($productTypeRecord);
-            $isNewProductType = false;
-        } else {
-            $productTypeRecord = new DigitalProducts_ProductTypeRecord();
-            $isNewProductType = true;
+            $this->_fetchedAllProductTypes = true;
         }
+
+        return $this->_productTypesById ?: [];
+    }
+
+    /**
+     * Get a product type by it's handle.
+     *
+     * @param string $handle The product type's handle.
+     *
+     * @return ProductType|null The product type or `null`.
+     */
+    public function getProductTypeByHandle($handle)
+    {
+        if (isset($this->_productTypesByHandle[$handle])) {
+            return $this->_productTypesByHandle[$handle];
+        }
+
+        if ($this->_fetchedAllProductTypes) {
+            return null;
+        }
+
+        $result = $this->_createProductTypeQuery()
+            ->where(['handle' => $handle])
+            ->one();
+
+        if (!$result) {
+            return null;
+        }
+
+        $this->_memoizeProductType(new ProductType($result));
+
+        return $this->_productTypesByHandle[$handle];
+    }
+
+    /**
+     * Get an array of product type site settings for a product type by it's id.
+     *
+     * @param int $productTypeId The product type id.
+     *
+     * @return array The product type settings.
+     */
+    public function getProductTypeSites($productTypeId): array
+    {
+        if (!isset($this->_siteSettingsByProductId[$productTypeId])) {
+            $rows = (new Query())
+                ->select([
+                    'id',
+                    'productTypeId',
+                    'siteId',
+                    'uriFormat',
+                    'template'
+                ])
+                ->from('{{%digitalproducts_producttypes_sites}}')
+                ->where(['productTypeId' => $productTypeId])
+                ->all();
+
+            $this->_siteSettingsByProductId[$productTypeId] = [];
+
+            foreach ($rows as $row) {
+                $this->_siteSettingsByProductId[$productTypeId][] = new ProductTypeSite($row);
+            }
+        }
+
+        return $this->_siteSettingsByProductId[$productTypeId];
+    }
+
+    /**
+     * Save a product type.
+     *
+     * @param ProductType $productType   The product type model.
+     * @param bool        $runValidation If validation should be ran.
+     *
+     * @return bool Whether the product type was saved successfully.
+     * @throws \Throwable if reasons
+     */
+    public function saveProductType(ProductType $productType, bool $runValidation = true): bool
+    {
+        if ($runValidation && !$productType->validate()) {
+            Craft::info('Product type not saved due to validation error.', __METHOD__);
+
+            return false;
+        }
+
+        $isNewProductType = !$productType->id;
+
+        // Fire a 'beforeSaveProductType' event
+        $this->trigger(self::EVENT_BEFORE_SAVE_PRODUCTTYPE, new ProductTypeEvent([
+            'productType' => $productType,
+            'isNew' => $isNewProductType,
+        ]));
+
+        if (!$isNewProductType) {
+            $productTypeRecord = ProductTypeRecord::findOne($productType->id);
+
+            if (!$productTypeRecord) {
+                throw new Exception("No product type exists with the ID '{$productType->id}'");
+            }
+
+            $oldProductTypeRow = $this->_createProductTypeQuery()
+                ->where(['id' => $productType->id])
+                ->one();
+            $oldProductType = new ProductType($oldProductTypeRow);
+        } else {
+            $productTypeRecord = new ProductTypeRecord();
+        }
+
 
         $productTypeRecord->name = $productType->name;
         $productTypeRecord->handle = $productType->handle;
-        $productTypeRecord->hasUrls = $productType->hasUrls;
         $productTypeRecord->skuFormat = $productType->skuFormat;
-        $productTypeRecord->template = $productType->template;
 
-        // Make sure that all of the URL formats are set properly
-        $productTypeLocales = $productType->getLocales();
+        // Get the site settings
+        $allSiteSettings = $productType->getSiteSettings();
 
-        foreach ($productTypeLocales as $localeId => $productTypeLocale) {
-            if ($productType->hasUrls) {
-                $urlFormatAttributes = ['urlFormat'];
-                $productTypeLocale->urlFormatIsRequired = true;
-
-                foreach ($urlFormatAttributes as $attribute) {
-                    if (!$productTypeLocale->validate([$attribute])) {
-                        $productType->addError($attribute.'-'.$localeId, $productTypeLocale->getError($attribute));
-                    }
-                }
-            } else {
-                $productTypeLocale->urlFormat = null;
+        // Make sure they're all there
+        foreach (Craft::$app->getSites()->getAllSiteIds() as $siteId) {
+            if (!isset($allSiteSettings[$siteId])) {
+                throw new Exception('Tried to save a product type that is missing site settings');
             }
         }
 
-        $productTypeRecord->validate();
-        $productType->addErrors($productTypeRecord->getErrors());
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
 
-        if (!$productType->hasErrors()) {
-            $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
+        try {
+            // Product Field Layout
+            $fieldLayout = $productType->getProductFieldLayout();
+            Craft::$app->getFields()->saveLayout($fieldLayout);
+            $productType->fieldLayoutId = $fieldLayout->id;
+            $productTypeRecord->fieldLayoutId = $fieldLayout->id;
 
-            try {
+            // Save the product type
+            $productTypeRecord->save(false);
 
-                // Drop the old field layout
-                craft()->fields->deleteLayoutById($productType->fieldLayoutId);
+            // Now that we have a product type ID, save it on the model
+            if (!$productType->id) {
+                $productType->id = $productTypeRecord->id;
+            }
 
-                // Save the new one
-                $fieldLayout = $productType->asa('productFieldLayout')->getFieldLayout();
-                craft()->fields->saveLayout($fieldLayout);
-                $productType->fieldLayoutId = $fieldLayout->id;
-                $productTypeRecord->fieldLayoutId = $fieldLayout->id;
+            // Might as well update our cache of the product type while we have it.
+            $this->_productTypesById[$productType->id] = $productType;
 
-                // Save it!
-                $productTypeRecord->save(false);
+            // Update the site settings
+            // -----------------------------------------------------------------
 
-                // Now that we have a product type ID, save it on the model
-                if (!$productType->id) {
-                    $productType->id = $productTypeRecord->id;
+            $sitesNowWithoutUrls = [];
+            $sitesWithNewUriFormats = [];
+
+            if (!$isNewProductType) {
+                // Get the old product type site settings
+                $allOldSiteSettingsRecords = ProductTypeSiteRecord::find()
+                    ->where(['productTypeId' => $productType->id])
+                    ->indexBy('siteId')
+                    ->all();
+            }
+
+            /** @var ProductTypeSiteRecord $siteSettings */
+            foreach ($allSiteSettings as $siteId => $siteSettings) {
+                // Was this already selected?
+                if (!$isNewProductType && isset($allOldSiteSettingsRecords[$siteId])) {
+                    $siteSettingsRecord = $allOldSiteSettingsRecords[$siteId];
+                } else {
+                    $siteSettingsRecord = new ProductTypeSiteRecord();
+                    $siteSettingsRecord->productTypeId = $productType->id;
+                    $siteSettingsRecord->siteId = $siteId;
                 }
 
-                $newLocaleData = [];
+                $siteSettingsRecord->hasUrls = $siteSettings->hasUrls;
+                $siteSettingsRecord->uriFormat = $siteSettings->uriFormat;
+                $siteSettingsRecord->template = $siteSettings->template;
 
-                if (!$isNewProductType) {
-                    // Get the old product type locales
-                    $oldLocaleRecords = DigitalProducts_ProductTypeLocaleRecord::model()->findAllByAttributes([
-                        'productTypeId' => $productType->id
-                    ]);
-                    $oldLocales = DigitalProducts_ProductTypeLocaleModel::populateModels($oldLocaleRecords, 'locale');
+                if (!$siteSettingsRecord->getIsNewRecord()) {
+                    // Did it used to have URLs, but not anymore?
+                    if ($siteSettingsRecord->isAttributeChanged('hasUrls', false) && !$siteSettings->hasUrls) {
+                        $sitesNowWithoutUrls[] = $siteId;
+                    }
 
-                    $changedLocaleIds = [];
-                }
-
-
-                foreach ($productTypeLocales as $localeId => $locale) {
-                    // Was this already selected?
-                    if (!$isNewProductType && isset($oldLocales[$localeId])) {
-                        $oldLocale = $oldLocales[$localeId];
-
-                        // Has the URL format changed?
-                        if ($locale->urlFormat != $oldLocale->urlFormat) {
-                            craft()->db->createCommand()->update('digitalproducts_producttypes_i18n', [
-                                'urlFormat' => $locale->urlFormat
-                            ], [
-                                'id' => $oldLocale->id
-                            ]);
-
-                            $changedLocaleIds[] = $localeId;
-                        }
-                    } else {
-                        $newLocaleData[] = [
-                            $productType->id,
-                            $localeId,
-                            $locale->urlFormat
-                        ];
+                    // Does it have URLs, and has its URI format changed?
+                    if ($siteSettings->hasUrls && $siteSettingsRecord->isAttributeChanged('uriFormat', false)) {
+                        $sitesWithNewUriFormats[] = $siteId;
                     }
                 }
 
-                // Insert the new locales
-                craft()->db->createCommand()->insertAll('digitalproducts_producttypes_i18n',
-                    ['productTypeId', 'locale', 'urlFormat'],
-                    $newLocaleData
-                );
+                $siteSettingsRecord->save(false);
 
-                if (!$isNewProductType) {
-                    // Drop any locales that are no longer being used, as well as the associated element
-                    // locale rows
+                // Set the ID on the model
+                $siteSettings->id = $siteSettingsRecord->id;
+            }
 
-                    $droppedLocaleIds = array_diff(array_keys($oldLocales), array_keys($productTypeLocales));
+            if (!$isNewProductType) {
+                // Drop any site settings that are no longer being used, as well as the associated product/element
+                // site rows
+                $siteIds = array_keys($allSiteSettings);
 
-                    if ($droppedLocaleIds) {
-                        craft()->db->createCommand()->delete('digitalproducts_producttypes_i18n', [
-                            'in',
-                            'locale',
-                            $droppedLocaleIds
-                        ]);
+                /** @noinspection PhpUndefinedVariableInspection */
+                foreach ($allOldSiteSettingsRecords as $siteId => $siteSettingsRecord) {
+                    if (!in_array($siteId, $siteIds, false)) {
+                        $siteSettingsRecord->delete();
                     }
                 }
+            }
 
-                if (!$isNewProductType) {
-                    // Get all of the product IDs in this group
-                    $criteria = craft()->elements->getCriteria('DigitalProducts_Product');
-                    $criteria->typeId = $productType->id;
-                    $criteria->status = null;
-                    $criteria->limit = null;
-                    $productIds = $criteria->ids();
+            // Finally, deal with the existing products...
+            // -----------------------------------------------------------------
 
-                    // Should we be deleting
-                    if ($productIds && $droppedLocaleIds) {
-                        craft()->db->createCommand()->delete('elements_i18n', [
-                            'and',
-                            ['in', 'elementId', $productIds],
-                            ['in', 'locale', $droppedLocaleIds]
-                        ]);
-                        craft()->db->createCommand()->delete('content', [
-                            'and',
-                            ['in', 'elementId', $productIds],
-                            ['in', 'locale', $droppedLocaleIds]
-                        ]);
-                    }
-                    // Are there any locales left?
-                    if ($productTypeLocales) {
-                        // Drop the old productType URIs if the product type no longer has URLs
-                        if (!$productType->hasUrls && $oldProductType->hasUrls) {
-                            craft()->db->createCommand()->update('elements_i18n',
+            if (!$isNewProductType) {
+                // Get all of the product IDs in this group
+                $productTypeIds = Product::find()
+                    ->typeId($productType->id)
+                    ->status(null)
+                    ->limit(null)
+                    ->ids();
+
+                // Are there any sites left?
+                if (!empty($allSiteSettings)) {
+                    // Drop the old product URIs for any site settings that don't have URLs
+                    if (!empty($sitesNowWithoutUrls)) {
+                        $db->createCommand()
+                            ->update(
+                                '{{%elements_sites}}',
                                 ['uri' => null],
-                                ['in', 'elementId', $productIds]
-                            );
-                        } else if ($changedLocaleIds) {
-                            foreach ($productIds as $productId) {
-                                craft()->config->maxPowerCaptain();
+                                [
+                                    'elementId' => $productTypeIds,
+                                    'siteId' => $sitesNowWithoutUrls,
+                                ])
+                            ->execute();
+                    } else if (!empty($sitesWithNewUriFormats)) {
+                        foreach ($productTypeIds as $productTypeId) {
+                            App::maxPowerCaptain();
 
-                                // Loop through each of the changed locales and update all of the products’ slugs and
-                                // URIs
-                                foreach ($changedLocaleIds as $localeId) {
-                                    $criteria = craft()->elements->getCriteria('DigitalProducts_Product');
-                                    $criteria->id = $productId;
-                                    $criteria->locale = $localeId;
-                                    $criteria->status = null;
-                                    $updateProduct = $criteria->first();
+                            // Loop through each of the changed sites and update all of the products’ slugs and
+                            // URIs
+                            foreach ($sitesWithNewUriFormats as $siteId) {
+                                $product = Product::find()
+                                    ->id($productTypeId)
+                                    ->siteId($siteId)
+                                    ->status(null)
+                                    ->one();
 
-                                    // @todo replace the getContent()->id check with 'strictLocale' param once it's added
-                                    if ($updateProduct && $updateProduct->getContent()->id) {
-                                        craft()->elements->updateElementSlugAndUri($updateProduct, false, false);
-                                    }
+                                if ($product) {
+                                    Craft::$app->getElements()->updateElementSlugAndUri($product, false, false);
                                 }
                             }
                         }
                     }
                 }
-
-                if ($transaction !== null) {
-                    $transaction->commit();
-                }
-            } catch (\Exception $e) {
-                if ($transaction !== null) {
-                    $transaction->rollback();
-                }
-
-                throw $e;
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Get a Product Type by it's Id.
-     *
-     * @param int $productTypeId
-     *
-     * @return ProductType|null
-     */
-    public function getProductTypeById($productTypeId)
-    {
-        if (!$this->_fetchedAllProductTypes &&
-            (!isset($this->_productTypesById) || !array_key_exists($productTypeId, $this->_productTypesById))
-        ) {
-            $result = DigitalProducts_ProductTypeRecord::model()->findById($productTypeId);
-
-            if ($result) {
-                $productType = DigitalProducts_ProductTypeModel::populateModel($result);
-            } else {
-                $productType = null;
             }
 
-            $this->_productTypesById[$productTypeId] = $productType;
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            throw $e;
         }
 
-        if (isset($this->_productTypesById[$productTypeId])) {
-            return $this->_productTypesById[$productTypeId];
-        }
+        // Fire an 'afterSaveGroup' event
+        $this->trigger(self::EVENT_AFTER_SAVE_PRODUCTTYPE, new ProductTypeEvent([
+            'productType' => $productType,
+            'isNew' => $isNewProductType,
+        ]));
 
-        return null;
+        return true;
     }
 
     /**
-     * Get a Product Type by it's handle.
+     * Delete a product type by it's id.
      *
-     * @param int $productTypeId
+     * @param int $id The product type's id.
      *
-     * @return ProductType|null
+     * @return bool Whether the product type was deleted successfully.
+     * @throws \Throwable if reasons
      */
-    public function getProductTypeByHandle($handle)
+    public function deleteProductTypeById(int $id): bool
     {
-        $result = DigitalProducts_ProductTypeRecord::model()->findByAttributes(['handle' => $handle]);
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
 
-        if ($result) {
-            $productType = DigitalProducts_ProductTypeModel::populateModel($result);
-            $this->_productTypesById[$productType->id] = $productType;
-
-            return $productType;
-        }
-
-        return null;
-    }
-
-    /**
-     * Delete a Product Type by it's Id.
-     *
-     * @param $id
-     *
-     * @return bool
-     * @throws \Exception if failed to delete the Product Type.
-     */
-    public function deleteProductTypeById($id)
-    {
         try {
-            $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
-
             $productType = $this->getProductTypeById($id);
 
-            $criteria = craft()->elements->getCriteria('DigitalProducts_Product');
+            $criteria = Product::find();
             $criteria->typeId = $productType->id;
             $criteria->status = null;
             $criteria->limit = null;
-            $products = $criteria->find();
+            $products = $criteria->all();
 
             foreach ($products as $product) {
-                craft()->digitalProducts_products->deleteProduct($product);
+                Craft::$app->getElements()->deleteElement($product);
             }
 
-            $fieldLayoutId = $productType->asa('productFieldLayout')->getFieldLayout()->id;
-            craft()->fields->deleteLayoutById($fieldLayoutId);
+            $fieldLayoutId = $productType->getProductFieldLayout()->id;
+            Craft::$app->getFields()->deleteLayoutById($fieldLayoutId);
+            if ($productType->hasVariants) {
+                Craft::$app->getFields()->deleteLayoutById($productType->getVariantFieldLayout()->id);
+            }
 
-            $productTypeRecord = DigitalProducts_ProductTypeRecord::model()->findById($productType->id);
+            $productTypeRecord = ProductTypeRecord::findOne($productType->id);
             $affectedRows = $productTypeRecord->delete();
 
-            if ($transaction !== null) {
+            if ($affectedRows) {
                 $transaction->commit();
             }
 
             return (bool)$affectedRows;
-        } catch (\Exception $e) {
-            if ($transaction !== null) {
-                $transaction->rollback();
-            }
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
             throw $e;
         }
     }
 
     /**
-     * Returns true if Product Type has a valid template set.
+     * Get a product's type by id.
      *
-     * @param DigitalProducts_ProductTypeModel $productType
+     * @param int $productTypeId The product type's id.
      *
-     * @return bool
+     * @return ProductType|null Either the product type or `null`.
      */
-    public function isProductTypeTemplateValid(DigitalProducts_ProductTypeModel $productType)
+    public function getProductTypeById(int $productTypeId)
+    {
+        if (isset($this->_productTypesById[$productTypeId])) {
+            return $this->_productTypesById[$productTypeId];
+        }
+
+        if ($this->_fetchedAllProductTypes) {
+            return null;
+        }
+
+        $result = $this->_createProductTypeQuery()
+            ->where(['id' => $productTypeId])
+            ->one();
+
+        if (!$result) {
+            return null;
+        }
+
+        $this->_memoizeProductType(new ProductType($result));
+
+        return $this->_productTypesById[$productTypeId];
+    }
+
+    /**
+     * Returns whether a product type’s products have URLs, and if the template path is valid.
+     *
+     * @param ProductType $productType The product for which to validate the template.
+     *
+     * @return bool Whether the template is valid.
+     */
+    public function isProductTypeTemplateValid(ProductType $productType): bool
     {
         if ($productType->hasUrls) {
             // Set Craft to the site template mode
-            $templatesService = craft()->templates;
+            $templatesService = Craft::$app->getView();
             $oldTemplateMode = $templatesService->getTemplateMode();
-            $templatesService->setTemplateMode(TemplateMode::Site);
+            $templatesService->setTemplateMode($templatesService::TEMPLATE_MODE_SITE);
 
             // Does the template exist?
             $templateExists = $templatesService->doesTemplateExist($productType->template);
@@ -495,41 +518,73 @@ class ProductTypes extends Component
     }
 
     /**
-     * Add a new locale to all Product Types if one is being added to Craft.
-     * @param Event $event
+     * Add new product type setting rows when a Site is added to Craft.
      *
-     * @return bool
+     * @param SiteEvent $event The event that triggered this.
+     *
+     * @return void
      */
-    public function addLocaleHandler(Event $event)
+    public function addSiteHandler(SiteEvent $event)
     {
-        /** @var Commerce_OrderModel $order */
-        $localeId = $event->params['localeId'];
+        if ($event->isNew) {
+            $allSiteSettings = (new Query())
+                ->select(['productTypeId', 'uriFormat', 'template', 'hasUrls'])
+                ->from(['{{%digitalproducts_producttypes_sites}}'])
+                ->where(['siteId' => Craft::$app->getSites()->getPrimarySite()->id])
+                ->all();
 
-        // Add this locale to each of the category groups
-        $productTypeLocales = craft()->db->createCommand()
-            ->select('productTypeId, urlFormat')
-            ->from('digitalproducts_producttypes_i18n')
-            ->where('locale = :locale', [':locale' => craft()->i18n->getPrimarySiteLocaleId()])
-            ->queryAll();
+            if (!empty($allSiteSettings)) {
+                $newSiteSettings = [];
 
-        if ($productTypeLocales) {
-            $newProductTypeLocales = [];
+                foreach ($allSiteSettings as $siteSettings) {
+                    $newSiteSettings[] = [
+                        $siteSettings['productTypeId'],
+                        $event->site->id,
+                        $siteSettings['uriFormat'],
+                        $siteSettings['template'],
+                        $siteSettings['hasUrls']
+                    ];
+                }
 
-            foreach ($productTypeLocales as $productTypeLocale) {
-                $newProductTypeLocales[] = [
-                    $productTypeLocale['productTypeId'],
-                    $localeId,
-                    $productTypeLocale['urlFormat']
-                ];
+                Craft::$app->getDb()->createCommand()
+                    ->batchInsert(
+                        '{{%digitalproducts_producttypes_sites}}',
+                        ['productTypeId', 'siteId', 'uriFormat', 'template', 'hasUrls'],
+                        $newSiteSettings)
+                    ->execute();
             }
-
-            craft()->db->createCommand()->insertAll('digitalproducts_producttypes_i18n', [
-                'productTypeId',
-                'locale',
-                'urlFormat'
-            ], $newProductTypeLocales);
         }
+    }
 
-        return true;
+    // Private methods
+    // =========================================================================
+
+    /**
+     * Memoize a product type
+     *
+     * @param ProductType $productType The product type to memoize.
+     */
+    private function _memoizeProductType(ProductType $productType)
+    {
+        $this->_productTypesById[$productType->id] = $productType;
+        $this->_productTypesByHandle[$productType->handle] = $productType;
+    }
+
+    /**
+     * Returns a Query object prepped for retrieving purchasables.
+     *
+     * @return Query The query object.
+     */
+    private function _createProductTypeQuery(): Query
+    {
+        return (new Query())
+            ->select([
+                'id',
+                'fieldLayoutId',
+                'name',
+                'handle',
+                'skuFormat'
+            ])
+            ->from(['{{%digitalproducts_producttypes}}']);
     }
 }

@@ -6,12 +6,14 @@ use craft\commerce\base\Purchasable;
 use craft\commerce\digitalProducts\elements\db\ProductQuery;
 use craft\commerce\digitalProducts\models\ProductType;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\commerce\digitalProducts\records\Product as ProductRecord;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\db\ElementQueryInterface;
 use craft\db\Query;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
+use yii\base\Exception;
 
 /**
  * Class Commerce_ProductElementType
@@ -407,6 +409,45 @@ class Product extends Purchasable
         }
 
         return $this->_isLicensed;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterSave(bool $isNew)
+    {
+        if (!$isNew) {
+            $productRecord = ProductRecord::findOne($this->id);
+
+            if (!$productRecord) {
+                throw new Exception('Invalid product id: '.$this->id);
+            }
+        } else {
+            $productRecord = new ProductRecord();
+            $productRecord->id = $this->id;
+        }
+        
+        $productRecord->postDate = $this->postDate;
+        $productRecord->expiryDate = $this->expiryDate;
+        $productRecord->typeId = $this->typeId;
+        $productRecord->promotable = $this->promotable;
+        $productRecord->taxCategoryId = $this->taxCategoryId;
+        $productRecord->price = $this->price;
+
+        // Generate SKU if empty
+        if (empty($this->sku)) {
+            try {
+                $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
+                $this->sku = Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $this);
+            } catch (\Exception $e) {
+                $this->sku = '';
+            }
+        }
+
+        $productRecord->sku = $this->sku;
+
+        $productRecord->save(false);
+
     }
 
     // Implement Purchasable

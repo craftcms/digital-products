@@ -4,7 +4,6 @@ namespace craft\commerce\digitalProducts\controllers;
 use Craft;
 use craft\commerce\digitalProducts\elements\License;
 use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
 use craft\elements\User;
 use craft\web\Controller as BaseController;
 use yii\base\Exception;
@@ -47,7 +46,8 @@ class LicensesController extends BaseController
             if ($licenseId === null) {
                 $license = new License();
             } else {
-                $license = DigitalProducts::getInstance()->getLicenses()->getLicenseById($licenseId);
+                /** @var License $license */
+                $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
                 if (!$license) {
                     $license = new License();
@@ -77,7 +77,8 @@ class LicensesController extends BaseController
         $licenseId = $request->getBodyParam('licenseId');
 
         if ($licenseId) {
-            $license = DigitalProducts::getInstance()->getLicenses()->getLicenseById($licenseId);
+            /** @var License $license */
+            $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
             if (!$license) {
                 throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
@@ -103,7 +104,7 @@ class LicensesController extends BaseController
         $license->ownerEmail = $request->getBodyParam('ownerEmail');
 
         // Save it
-        if (!DigitalProducts::getInstance()->getLicenses()->saveLicense($license)) {
+        if (!Craft::$app->getElements()->saveElement($license)) {
             Craft::$app->getSession()->setError(Craft::t('commerce-digitalproducts', 'Couldn’t save license.'));
             Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
 
@@ -125,13 +126,14 @@ class LicensesController extends BaseController
         $this->requirePostRequest();
 
         $licenseId = Craft::$app->getRequest()->getRequiredBodyParam('licenseId');
-        $license = DigitalProducts::getInstance()->getLicenses()->getLicenseById($licenseId);
+        /** @var License $license */
+        $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
         if(!$license){
             throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
         }
 
-        if (DigitalProducts::getInstance()->getLicenses()->deleteLicense($license)) {
+        if (Craft::$app->getElements()->deleteElement($license)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
                 return $this->asJson(['success' => true]);
             }
