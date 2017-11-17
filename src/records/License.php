@@ -56,7 +56,7 @@ class License extends ActiveRecord
      */
     public function getProduct(): ActiveQueryInterface
     {
-        return $this->hasOne(Product::class, ['id' => 'id']);
+        return $this->hasOne(Product::class, ['id' => 'productId']);
     }
 
     /**
@@ -66,7 +66,7 @@ class License extends ActiveRecord
      */
     public function getOrder(): ActiveQueryInterface
     {
-        return $this->hasOne(Order::class, ['id' => 'id']);
+        return $this->hasOne(Order::class, ['id' => 'orderId']);
     }
 
     /**
@@ -76,6 +76,6 @@ class License extends ActiveRecord
      */
     public function getUser(): ActiveQueryInterface
     {
-        return $this->hasOne(User::class, ['id' => 'id']);
+        return $this->hasOne(User::class, ['id' => 'userId']);
     }
 }
