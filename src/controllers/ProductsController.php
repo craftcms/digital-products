@@ -47,7 +47,7 @@ class ProductsController extends BaseController
      */
     public function actionIndex(): Response
     {
-        return $this->renderTemplate('digitalproducts/products/index');
+        return $this->renderTemplate('commerce-digitalproducts/products/index');
     }
 
     /**
@@ -99,7 +99,7 @@ class ProductsController extends BaseController
         }
 
         // Can't just use the entry's getCpEditUrl() because that might include the site handle when we don't want it
-        $variables['baseCpEditUrl'] = 'digitalproducts/products/'.$variables['productTypeHandle'].'/{id}';
+        $variables['baseCpEditUrl'] = 'commerce-digitalproducts/products/'.$variables['productTypeHandle'].'/{id}';
 
         // Set the "Continue Editing" URL
         $variables['continueEditingUrl'] = $variables['baseCpEditUrl'].
@@ -107,7 +107,7 @@ class ProductsController extends BaseController
 
         $this->_maybeEnableLivePreview($variables);
 
-        return $this->renderTemplate('digitalproducts/products/_edit', $variables);
+        return $this->renderTemplate('commerce-digitalproducts/products/_edit', $variables);
     }
 
     /**
@@ -224,7 +224,7 @@ class ProductsController extends BaseController
 
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
-            'action' => 'digitalProducts/products/viewSharedProduct',
+            'action' => 'commerce-digitalproducts/products/viewSharedProduct',
             'params' => ['productId' => $productId, 'locale' => $product->site]
         ]);
 
@@ -366,7 +366,7 @@ class ProductsController extends BaseController
                     'fields' => '#title-field, #fields > div > div > .field, #sku-field, #price-field',
                     'extraFields' => '#meta-pane .field',
                     'previewUrl' => $variables['product']->getUrl(),
-                    'previewAction' => 'digitalProducts/products/previewProduct',
+                    'previewAction' => 'commerce-digitalproducts/products/previewProduct',
                     'previewParams' => [
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,

@@ -1,12 +1,11 @@
 {% extends "_layouts/elementindex" %}
-{% hook 'digitalProducts.prepCpTemplate' %}
 
-{% set title = "Products"|t %}
+{% set title = "Products"|t('commerce-digitalproducts') %}
 {% set selectedSubnavItem = "products" %}
 
 {% set docTitle = title~' - '~'Digital Products' %}
-{% set elementType = 'DigitalProducts_Product' %}
+{% set elementType = '\\craft\\commerce\\digitalProducts\\elements\\Product' %}
 
 {% if productTypeHandle is defined %}
-	{% includejs 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
+    {% includejs 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
 {% endif %}

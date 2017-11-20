@@ -62,7 +62,7 @@ class ProductTypesController extends BaseController
         
         $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('commerce-digitalproducts', 'Create a new digital product type');
 
-        return $this->renderTemplate('digitalproducts/producttypes/_edit', $variables);
+        return $this->renderTemplate('commerce-digitalproducts/producttypes/_edit', $variables);
     }
 
     /**

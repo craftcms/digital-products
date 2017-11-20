@@ -1,148 +1,189 @@
 {% extends "_layouts/cp" %}
-{% hook 'digitalProducts.prepCpTemplate' %}
-
 {% set selectedSubnavItem = "products" %}
 
 {% set crumbs = [
-	{ label: "Digital Products"|t, url: url('digitalproducts/index') },
-	{ label: productType.name|t, url: url('digitalproducts/products/'~productType.handle) },
+    { label: "Digital Products"|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/index') },
+    { label: productType.name|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/products/'~productType.handle) },
 ] %}
 
 {% set fullPageForm = true %}
 {% set saveShortcutRedirect = continueEditingUrl %}
 
 {% import "_includes/forms" as forms %}
-{% import "digitalProducts/products/_fields" as productFields %}
+{% import "commerce-digitalproducts/products/_fields" as productFields %}
 
+{% block header %}
+    {{ block('pageTitle') }}
+    {{ block('contextMenu') }}
+    <div class="flex-grow"></div>
 
-{% block saveButton %}
-	<div class="btngroup">
-		<input type="submit" class="btn submit" value="{{ 'Save'|t }}">
-		<div class="btn submit menubtn"></div>
-		<div class="menu">
-			<ul>
-				<li><a class="formsubmit" data-redirect="{{ continueEditingUrl }}">
-					{{ "Save and continue editing"|t }}
-					{{ forms.optionShortcutLabel('S') }}
-				</a></li>
-			</ul>
-		</div>
-	</div>
+    {% if showPreviewBtn %}
+        {% include "_includes/previewbtns" %}
+    {% endif %}
 {% endblock %}
 
-{% block main %}
-		<input type="hidden" name="action" value="digitalProducts/products/save">
-		<input type="hidden" name="redirect" value="digitalproducts/products">
-		<input type="hidden" name="typeId" value="{{ productType.id }}">
-		{% if craft.isLocalized() %}<input type="hidden" name="locale" value="{{ product.locale }}">{% endif %}
-		{{ getCsrfInput() }}
-		{% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
+{% block actionButton %}
+    <div class="btngroup">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('commerce-digitalproducts') }}">
+        <div class="btn submit menubtn"></div>
+        <div class="menu">
+            <ul>
+                <li>
+                    <a class="formsubmit" data-redirect="{{ continueEditingUrl|hash }}">
+                        {{ "Save and continue editing"|t('commerce-digitalproducts') }}
+                        {{ forms.optionShortcutLabel('S') }}
+                    </a>
+                </li>
+                {% if product.id %}
+                    <li>
+                        <a class="formsubmit" data-param="productId" data-value="" data-redirect="{{ continueEditingUrl|hash }}">
+                            {{ "Save as a new product"|t('commerce-digitalproducts') }}
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+            {% if product.id %}
+                <hr>
+                <ul>
+                    <li>
+                        <a class="formsubmit error" data-action="digitalproducts/products/delete" data-confirm="{{ 'Are you sure you want to delete this product?'|t('commerce') }}" data-redirect="{{ 'commerce/products'|hash }}">
+                            {{ 'Delete'|t('commerce-digitalproducts') }}
+                        </a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
 
+{% block contextMenu %}
+    {% if craft.app.getIsMultiSite() %}
+        <div class="btn menubtn" data-icon="world">{{ product.site.name|t('site') }}</div>
+        <div class="menu">
+            <ul class="padded">
+                {% for localeId in localeIds %}
+                    {% set site = craft.app.sites.getSiteById(siteId) %}
+                    {% set status = siteId in enabledSiteIds ? 'enabled' : 'disabled' %}
+                    <li>
+                        {% if siteId == product.siteId %}
+                            <a class="sel">
+                                <div class="status {{ status }}"></div>{{ site.name|t('site') }}
+                            </a>
+                        {% else %}
+                            {% set url = url("commerce/products/#{productTypeHandle}/#{craft.app.request.getSegment(4)}/#{site.handle}") %}
+                            <a href="{{ url }}">
+                                <div class="status {{ status }}"></div>{{ site.name|t('site') }}
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}
 
-		<div class="grid first" data-max-cols="3">
-			<div class="item" data-position="left" data-colspan="2">
+{% block content %}
+        <input type="hidden" name="action" value="digitalproducts/products/save">
+        <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/products'|hash }}">
+        <input type="hidden" name="typeId" value="{{ productType.id }}">
+        {% if craft.isLocalized() %}<input type="hidden" name="locale" value="{{ product.locale }}">{% endif %}
+        {{ getCsrfInput() }}
+        {% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
 
-				<div id="fields" class="pane">
-					{% include "_includes/tabs" %}
-					{{ productFields.titleField(product) }}
+            <div id="fields">
+                {% include "_includes/tabs" %}
+                {{ productFields.titleField(product) }}
 
-					<div>
-						{% set allProductTab = productType.asa('productFieldLayout').getFieldLayout().getTabs() %}
+                <div>
+                    {% set allProductTab = productType.getFieldLayout().getTabs() %}
 
-						{% for tab in allProductTab %}
-							<div id="tab{{ loop.index }}" {% if not loop.first %} class="hidden" {% endif %}>
-								{% include "_includes/fields" with {
-								fields: tab.getFields(),
-								element: product,
-								} only %}
-							</div>
-						{% endfor %}
+                    {% for tab in allProductTab %}
+                        <div id="tab{{ loop.index }}" {% if not loop.first %} class="hidden" {% endif %}>
+                            {% include "_includes/fields" with {
+                                fields: tab.getFields(),
+                                element: product,
+                            } only %}
+                        </div>
+                    {% endfor %}
+                </div>
 
+            </div>
 
-					</div>
+    {% if not product.slug %}
+        {% includejs %}
+            window.slugGenerator = new Craft.SlugGenerator('#title', '#slug');
+        {% endincludejs %}
+    {% endif %}
 
-				</div>
-			</div>
+{% endblock %}
 
-			<div id="meta-pane" class="item" data-position="right">
+{% block details %}
+    <div class="meta">
+        {% set statusInput %}
+            <div class="left">
+                {{ forms.lightswitch({
+                    id: 'enabled',
+                    name: 'enabled',
+                    on: product.enabled,
+                    disabled: false
+                }) }}
+            </div>
 
-				{% if showPreviewBtn %}
-					{% include "_includes/previewbtns" %}
-				{% endif %}
+            {% if product.id %}
+                <div class="right">
+                    <input type="button"
+                           class="btn small formsubmit"
+                           value="{{ 'Delete'|t('commerce-digitalproducts') }}"
+                           data-action="digitalProducts/products/deleteProduct"
+                           data-confirm="{{ 'Are you sure you want to delete this product?'|t('commerce-digitalproducts') }}"
+                           data-redirect="digitalproducts/products">
+                </div>
+            {% endif %}
+        {% endset %}
 
-				{% if craft.isLocalized() %}
-					<ul id="locales" class="pane">
-						{% for localeId in localeIds %}
-							{% set localeName = craft.i18n.getLocaleById(localeId).name %}
-							<li{% if localeId == product.locale %} class="sel"{% endif %}>
-								{%- if localeId == product.locale -%}
-									{{ localeName }}
-									{{ forms.lightswitch({
-										name: 'localeEnabled',
-										on:   product.localeEnabled,
-										small: true
-									}) }}
-								{%- else -%}
-									{% set localeUrl = url(
-									'digitalproducts/products/'~productType.handle~'/'~craft.request.getSegment(4)~'/'~localeId
-									) -%}
-									<a href="{{ localeUrl }}">{{ localeName }}</a>
-									<div class="status {{ localeId in enabledLocales ? 'enabled' : 'disabled' }}"></div>
-								{%- endif -%}
-							</li>
-						{% endfor %}
-					</ul>
-				{% endif %}
-
-				<div class="pane meta">
-					{% set statusInput %}
-						<div class="left">
-							{{ forms.lightswitch({
-								id: 'enabled',
-								name: 'enabled',
-								on: product.enabled,
-								disabled: false
-							}) }}
-						</div>
-
-						{% if product.id %}
-							<div class="right">
-								<input type="button"
-									   class="btn small formsubmit"
-									   value="{{ 'Delete'|t }}"
-									   data-action="digitalProducts/products/deleteProduct"
-									   data-confirm="{{ 'Are you sure you want to delete this product?'|t }}"
-									   data-redirect="digitalproducts/products">
-							</div>
-						{% endif %}
-					{% endset %}
-
-					{{ forms.field({
-						id: 'enabled',
-						label: 'Enabled?'|t
-					}, statusInput) }}
-				</div>
-
-				<div class="pane meta">
-					{{ productFields.generalMetaFields(product) }}
-				</div>
-
-				<div class="pane meta">
-					{{ productFields.behavioralMetaFields(product) }}
-				</div>
-
-				<div class="pane meta">
-					{{ productFields.generalFields(product) }}
-					{{ productFields.pricingFields(product) }}
-				</div>
-
-			</div>
-		</div>
-
-	{% if not product.slug %}
-		{% includejs %}
-			window.slugGenerator = new Craft.SlugGenerator('#title', '#slug');
-		{% endincludejs %}
-	{% endif %}
-
+        {{ forms.field({
+            id: 'enabled',
+            label: 'Enabled?'|t('commerce-digitalproducts')
+        }, statusInput) }}
+    </div>
+    <hr>
+    <div class="meta">
+        {{ productFields.generalMetaFields(product) }}
+    </div>
+    <hr>
+    <div class="meta">
+        {{ productFields.behavioralMetaFields(product) }}
+    </div>
+    <hr>
+    <div class="meta">
+        {{ productFields.generalFields(product) }}
+        {{ productFields.pricingFields(product) }}
+    </div>
+    {% if product.id %}
+        <hr>
+        <div class="meta read-only">
+            <div class="data">
+                <h5 class="heading">{{ "Date Created"|t('commerce-digitalproducts') }}</h5>
+                <div class="value">{{ product.dateCreated|date('short') }} {{ product.dateCreated|time('short') }}</div>
+            </div>
+            <div class="data">
+                <h5 class="heading">{{ "Date Updated"|t('commerce-digitalproducts') }}</h5>
+                <div class="value">{{ product.dateUpdated|date('short') }} {{ product.dateUpdated|time('short') }}</div>
+            </div>
+            {% if promotions.sales|length %}
+                <div class="data">
+                    <h5 class="heading">{{ "Associated Sales"|t('commerce-digitalproducts') }}</h5>
+                    <div class="value">
+                        <ul class="commerce-sales">
+                            {% for promotion in promotions.sales %}
+                                <li>
+                                    <a href="{{ promotion.getCpEditUrl() }}"><span>{{ promotion.name }}</span></a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

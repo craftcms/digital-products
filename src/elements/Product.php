@@ -211,12 +211,12 @@ class Product extends Purchasable
     public function getEditorHtml(): string
     {
         $viewService = Craft::$app->getView();
-        $html = $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'titleField', [$this]);
+        $html = $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'titleField', [$this]);
         $html .= parent::getEditorHtml();
-        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'generalFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'pricingFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'behavioralMetaFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digitalProducts/products/_fields', 'generalMetaFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'generalFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'pricingFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'behavioralMetaFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'generalMetaFields', [$this]);
 
         return $html;
     }
@@ -333,7 +333,7 @@ class Product extends Purchasable
         $productType = $this->getType();
 
         if ($productType) {
-            return UrlHelper::cpUrl('digitalproducts/products/'.$productType->handle.'/'.$this->id);
+            return UrlHelper::cpUrl('commerce-digitalproducts/products/'.$productType->handle.'/'.$this->id);
         } else {
             return null;
         }

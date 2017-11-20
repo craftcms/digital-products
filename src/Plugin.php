@@ -83,21 +83,21 @@ class Plugin extends BasePlugin
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
             $navItems['subnav']['products'] = [
                 'label' => Craft::t('commerce-digitalproducts', 'Products'),
-                'url' => 'digitalproducts/products'
+                'url' => 'commerce-digitalproducts/products'
             ];
         }
 
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
             $navItems['subnav']['productTypes'] = [
                 'label' => Craft::t('commerce-digitalproducts', 'Product Types'),
-                'url' => 'digitalproducts/producttypes'
+                'url' => 'commerce-digitalproducts/producttypes'
             ];
         }
 
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageLicenses')) {
             $navItems['subnav']['licenses'] = [
                 'label' => Craft::t('commerce-digitalproducts', 'Licenses'),
-                'url' => 'digitalproducts/licenses'
+                'url' => 'commerce-digitalproducts/licenses'
             ];
         }
 

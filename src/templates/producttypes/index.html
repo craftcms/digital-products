@@ -1,28 +1,27 @@
 {% extends "_layouts/cp" %}
-{% hook ' digitalProducts.prepCpTemplate' %}
 
-{% set title = "Product Types"|t %}
+{% set title = "Product Types"|t('commerce-digitalproducts') %}
 {% set selectedSubnavItem = "productTypes" %}
 
 {% set productTypes = craft.digitalProducts.getAllProductTypes() %}
 {% set content %}
 	<div id="noProductTypes"{% if productTypes %} class="hidden"{% endif %}>
-		<p>{{ "No product types exist yet."|t }}</p>
+		<p>{{ "No product types exist yet."|t('commerce-digitalproducts') }}</p>
 	</div>
 
 	{% if productTypes|length %}
 		<table id="productTypes" class="data fullwidth collapsible">
 			<thead>
-			<th scope="col">{{ "Name"|t }}</th>
-			<th scope="col">{{ "Handle"|t }}</th>
+			<th scope="col">{{ "Name"|t('commerce-digitalproducts') }}</th>
+			<th scope="col">{{ "Handle"|t('commerce-digitalproducts') }}</th>
 			<td class="thin"></td>
 			</thead>
 			<tbody>
 			{% for productType in productTypes %}
-				<tr data-id="{{ productType.id }}" data-name="{{ productType.name|t }}">
-					<th scope="row" data-title="{{ 'Name'|t }}"><a href="{{ url('digitalproducts/producttypes/' ~ productType.id) }}">{{ productType.name|t }}</a></th>
-					<td data-title="{{ 'Handle'|t }}"><code>{{ productType.handle }}</code></td>
-					<td class="thin"><a class="delete icon" title="{{ 'Delete'|t }}" role="button"></a></td>
+				<tr data-id="{{ productType.id }}" data-name="{{ productType.name|t('commerce-digitalproducts') }}">
+					<th scope="row" data-title="{{ 'Name'|t('commerce-digitalproducts') }}"><a href="{{ url('commerce-digitalproducts/producttypes/' ~ productType.id) }}">{{ productType.name|t('commerce-digitalproducts') }}</a></th>
+					<td data-title="{{ 'Handle'|t('commerce-digitalproducts') }}"><code>{{ productType.handle }}</code></td>
+					<td class="thin"><a class="delete icon" title="{{ 'Delete'|t('commerce-digitalproducts') }}" role="button"></a></td>
 				</tr>
 			{% endfor %}
 			</tbody>
@@ -30,7 +29,7 @@
 	{% endif %}
 
 	<div id="newProductType" class="buttons">
-		<a href="{{ url('digitalproducts/producttypes/new') }}" class="btn submit add icon">{{ "New product type"|t }}</a>
+		<a href="{{ url('commerce-digitalproducts/producttypes/new') }}" class="btn submit add icon">{{ "New product type"|t('commerce-digitalproducts') }}</a>
 	</div>
 {% endset %}
 
@@ -40,8 +39,8 @@
 	tableSelector: '#productTypes',
 	noObjectsSelector: '#noProductTypes',
 	newObjectBtnSelector: '#newProductType',
-	deleteAction: 'digitalProducts/productTypes/delete',
-	confirmDeleteMessage: '{{ "Are you sure you want to delete “{name}” and all its products?"|t }}'
+	deleteAction: 'commerce-digitalproducts/producttypes/delete',
+	confirmDeleteMessage: '{{ "Are you sure you want to delete “{name}” and all its products?"|t('commerce-digitalproducts') }}'
 	});
 {% endset %}
 {% includeJs js %}

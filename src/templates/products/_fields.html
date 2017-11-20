@@ -2,12 +2,12 @@
 	{%- import "_includes/forms" as forms -%}
 
 	{{ forms.textField({
-		label: "Title"|t,
+		label: "Title"|t('commerce-digitalproducts'),
 		locale: product.locale,
 		id: 'title',
 		name: 'title',
 		value: product.title,
-		placeholder: 'Enter title'|t,
+		placeholder: 'Enter title'|t('commerce-digitalproducts'),
 		errors: product.getErrors('title'),
 		first: true,
 		autofocus: true,
@@ -21,17 +21,17 @@
 	{%- import "_includes/forms" as forms -%}
 
 	{{ forms.textField({
-		label: "Slug"|t,
+		label: "Slug"|t('commerce-digitalproducts'),
 		locale: product.locale,
 		id: 'slug',
 		name: 'slug',
 		value: product.slug,
-		placeholder: 'Enter slug'|t,
+		placeholder: 'Enter slug'|t('commerce-digitalproducts'),
 		errors: product.getErrors('slug')|merge(product.getErrors('uri'))
 	}) }}
 
 	{{ forms.dateTimeField({
-		label: 'Post Date'|t,
+		label: 'Post Date'|t('commerce-digitalproducts'),
 		id: 'postDate',
 		name: 'postDate',
 		value: product.postDate,
@@ -39,7 +39,7 @@
 	}) }}
 
 	{{ forms.dateTimeField({
-		label: 'Expiry Date'|t,
+		label: 'Expiry Date'|t('commerce-digitalproducts'),
 		id: 'expiryDate',
 		name: 'expiryDate',
 		value: product.expiryDate,
@@ -52,7 +52,7 @@
 	{%- import "_includes/forms" as forms -%}
 
 	{{ forms.selectField({
-		label: 'Tax Category'|t,
+		label: 'Tax Category'|t('commerce-digitalproducts'),
 		name: 'taxCategoryId',
 		value: product.taxCategoryId,
 		required: true,
@@ -61,7 +61,7 @@
 
 	{{ forms.checkboxField({
 		id: 'promotable',
-		fieldLabel: 'Promotable'|t,
+		fieldLabel: 'Promotable'|t('commerce-digitalproducts'),
 		name: 'promotable',
 		checked: product.promotable,
 	}) }}
@@ -73,11 +73,11 @@
 
 	{{ forms.textField({
 		id: 'sku',
-		label: 'SKU'|t,
+		label: 'SKU'|t('commerce-digitalproducts'),
 		required: true,
 		name: 'sku',
 		value: product.sku,
-		placeholder: 'Enter SKU'|t,
+		placeholder: 'Enter SKU'|t('commerce-digitalproducts'),
 		errors: product.getErrors('sku')
 	}) }}
 
@@ -89,10 +89,10 @@
 
 	{{ forms.textField({
 		id: 'price',
-		label: 'Price'|t,
+		label: 'Price'|t('commerce-digitalproducts'),
 		name: 'price',
 		value: (product.price == '0' ? '0'|number : (product.price ?  product.price|number ?: '')),
-		placeholder: 'Enter price'|t,
+		placeholder: 'Enter price'|t('commerce-digitalproducts'),
 		unit: craft.commerce.primaryPaymentCurrency.iso,
 		required: true,
 		errors: product.getErrors('price')

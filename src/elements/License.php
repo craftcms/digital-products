@@ -191,7 +191,7 @@ class License extends Element
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('digitalproducts/licenses/'.$this->id);
+        return UrlHelper::cpUrl('commerce-digitalproducts/licenses/'.$this->id);
     }
 
     /**
@@ -420,7 +420,8 @@ class License extends Element
      *
      * @return string
      */
-    protected function generateKey() {
+    protected function generateKey(): string
+    {
         $generateKeyEvent = new GenerateKeyEvent(['license' => $this]);
 
         // Raising the 'afterGenerateLicenseKey' event
@@ -525,7 +526,7 @@ class License extends Element
     /**
      * @inheritdoc
      */
-    protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, $attribute)
+    protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, string $attribute)
     {
         if ($attribute === 'product')
         {

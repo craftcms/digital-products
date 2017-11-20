@@ -59,7 +59,7 @@ class LicensesController extends BaseController
         $variables['userElementType'] = User::class;
         $variables['productElementType'] = Product::class;
 
-        return $this->renderTemplate('digitalproducts/licenses/_edit', $variables);
+        return $this->renderTemplate('commerce-digitalproducts/licenses/_edit', $variables);
     }
 
     /**
