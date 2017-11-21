@@ -1,11 +1,6 @@
 {% extends "_layouts/cp" %}
 {% set selectedSubnavItem = "productTypes" %}
 
-{% set tabs = {
-    productTypeSettings: { label: "Settings"|t('commerce-digitalproducts'), url: '#product-type-settings' },
-    productFields:       { label: "Product Fields"|t('commerce-digitalproducts'), url: '#product-fields' },
-} %}
-
 {% set crumbs = [
     { label: "Digital Products"|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/index') },
     { label: "Product Types"|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/producttypes/index') }
@@ -21,153 +16,139 @@
     <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/producttypes'|hash }}">
     {% if productType.id %}<input type="hidden" name="productTypeId" value="{{ productType.id }}">{% endif %}
 
-    <div id="product-type-settings">
-        {{ forms.textField({
-            first: true,
-            label: "Name"|t('commerce-digitalproducts'),
-            instructions: "What this product type will be called in the CP."|t('commerce-digitalproducts'),
-            id: 'name',
-            name: 'name',
-            value: productType.name,
-            errors: productType.getErrors('name'),
-            autofocus: true,
-            required: true,
-            translatable: true
-        }) }}
+    {{ forms.textField({
+        first: true,
+        label: "Name"|t('commerce-digitalproducts'),
+        instructions: "What this product type will be called in the CP."|t('commerce-digitalproducts'),
+        id: 'name',
+        name: 'name',
+        value: productType.name,
+        errors: productType.getErrors('name'),
+        autofocus: true,
+        required: true,
+        translatable: true
+    }) }}
 
-        {{ forms.textField({
-            label: "Handle"|t('commerce-digitalproducts'),
-            instructions: "How you’ll refer to this product type in the templates."|t('commerce-digitalproducts'),
-            id: 'handle',
-            class: 'code',
-            name: 'handle',
-            value: productType.handle,
-            errors: productType.getErrors('handle'),
-            required: true
-        }) }}
+    {{ forms.textField({
+        label: "Handle"|t('commerce-digitalproducts'),
+        instructions: "How you’ll refer to this product type in the templates."|t('commerce-digitalproducts'),
+        id: 'handle',
+        class: 'code',
+        name: 'handle',
+        value: productType.handle,
+        errors: productType.getErrors('handle'),
+        required: true
+    }) }}
 
-        {{ forms.textField({
-            label: "Automatic SKU Format"|t('commerce-digitalproducts'),
-            instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t('commerce-digitalproducts',{ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
-            id: 'skuFormat',
+    {{ forms.textField({
+        label: "Automatic SKU Format"|t('commerce-digitalproducts'),
+        instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t('commerce-digitalproducts',{ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
+        id: 'skuFormat',
+        class: 'ltr',
+        name: 'skuFormat',
+        value: productType.skuFormat,
+        errors: productType.getErrors('skuFormat')
+    }) }}
+
+    {% macro hasUrlsField(productType) %}
+        {% from "_includes/forms" import checkboxField %}
+
+        {{ checkboxField({
+            label: "Products of this type have their own URLs"|t('commerce-digitalproducts'),
+            id: 'hasUrls',
+            name: 'hasUrls',
+            checked: productType.hasUrls,
+            toggle: 'url-settings'
+        }) }}
+    {% endmacro %}
+
+    {% macro templateField(productType) %}
+        {% from "_includes/forms" import textField %}
+
+        {{ textField({
+            label: "Product Template"|t('commerce-digitalproducts'),
+            instructions: "The template to use when a product’s URL is requested."|t('commerce-digitalproducts'),
+            id: 'template',
             class: 'ltr',
-            name: 'skuFormat',
-            value: productType.skuFormat,
-            errors: productType.getErrors('skuFormat')
+            name: 'template',
+            value: productType.template,
+            errors: productType.getErrors('template')
         }) }}
+    {% endmacro %}
 
-        {% macro hasUrlsField(productType) %}
-            {% from "_includes/forms" import checkboxField %}
+    {% from _self import hasUrlsField, templateField %}
 
-            {{ checkboxField({
-                label: "Products of this type have their own URLs"|t('commerce-digitalproducts'),
-                id: 'hasUrls',
-                name: 'hasUrls',
-                checked: productType.hasUrls,
-                toggle: 'url-settings'
-            }) }}
-        {% endmacro %}
+    <hr>
 
-        {% macro templateField(productType) %}
-            {% from "_includes/forms" import textField %}
+    {% set siteRows = [] %}
+    {% set siteErrors = productType.getErrors('siteSettings') %}
 
-            {{ textField({
-                label: "Product Template"|t('commerce-digitalproducts'),
-                instructions: "The template to use when a product’s URL is requested."|t('commerce-digitalproducts'),
-                id: 'template',
-                class: 'ltr',
-                name: 'template',
-                value: productType.template,
-                errors: productType.getErrors('template')
-            }) }}
-        {% endmacro %}
+    {% for site in craft.app.sites.getAllSites() %}
+        {% set siteSettings = productType.siteSettings[site.id] ?? null %}
+        {% if siteSettings %}
+            {% for attribute, errors in siteSettings.getErrors() %}
+                {% set siteErrors = siteErrors|merge(errors) %}
+            {% endfor %}
+        {% endif %}
+        {% set siteRows = siteRows|merge({
+        (site.handle): {
+        heading: site.name|t('site'),
+        uriFormat: {
+        value: siteSettings.uriFormat ?? null,
+        hasErrors: siteSettings.hasErrors('uriFormat') ?? false
+        },
+        template: {
+        value: siteSettings.template ?? null,
+        hasErrors: siteSettings.hasErrors('template') ?? false,
+        }
+        }
+        }) %}
+    {% endfor %}
 
-        {% from _self import hasUrlsField, templateField %}
-
-        <hr>
-
-        {% set siteRows = [] %}
-        {% set siteErrors = productType.getErrors('siteSettings') %}
-
-        {% for site in craft.app.sites.getAllSites() %}
-            {% set siteSettings = productType.siteSettings[site.id] ?? null %}
-            {% if siteSettings %}
-                {% for attribute, errors in siteSettings.getErrors() %}
-                    {% set siteErrors = siteErrors|merge(errors) %}
-                {% endfor %}
-            {% endif %}
-            {% set siteRows = siteRows|merge({
-            (site.handle): {
-            heading: site.name|t('site'),
+    {{ forms.editableTableField({
+        label: "Site Settings"|t('app'),
+        instructions: "Configure the product types’s site-specific settings."|t('app'),
+        id: 'sites',
+        name: 'sites',
+        cols: {
+            heading: {
+                type: 'heading',
+                heading: "Site"|t('app'),
+                class: 'thin'
+            },
             uriFormat: {
-            value: siteSettings.uriFormat ?? null,
-            hasErrors: siteSettings.hasErrors('uriFormat') ?? false
+                type: 'singleline',
+                heading: "Product type URI Format"|t('app'),
+                info: "What product type URIs should look like for the site."|t('app'),
+                placeholder: "Leave blank if categories don’t have URLs"|t('app'),
+                code: true
             },
             template: {
-            value: siteSettings.template ?? null,
-            hasErrors: siteSettings.hasErrors('template') ?? false,
-            }
-            }
-            }) %}
-        {% endfor %}
-
-        {{ forms.editableTableField({
-            label: "Site Settings"|t('app'),
-            instructions: "Configure the product types’s site-specific settings."|t('app'),
-            id: 'sites',
-            name: 'sites',
-            cols: {
-                heading: {
-                    type: 'heading',
-                    heading: "Site"|t('app'),
-                    class: 'thin'
-                },
-                uriFormat: {
-                    type: 'singleline',
-                    heading: "Product type URI Format"|t('app'),
-                    info: "What product type URIs should look like for the site."|t('app'),
-                    placeholder: "Leave blank if categories don’t have URLs"|t('app'),
-                    code: true
-                },
-                template: {
-                    type: 'singleline',
-                    heading: "Template"|t('app'),
-                    info: "Which template should be loaded when an entry’s URL is requested."|t('app'),
-                    code: true
-                },
+                type: 'singleline',
+                heading: "Template"|t('app'),
+                info: "Which template should be loaded when an entry’s URL is requested."|t('app'),
+                code: true
             },
-            rows: siteRows,
-            staticRows: true,
-            errors: siteErrors|unique
-        }) }}
+        },
+        rows: siteRows,
+        staticRows: true,
+        errors: siteErrors|unique
+    }) }}
 
-    </div>
+    <hr />
 
-    <div id="product-fields" class="hidden">
-
-        {% include "_includes/fieldlayoutdesigner" with {
-            fieldLayout: productType.getProductFieldLayout(),
-        } only %}
-
-    </div>
+    {% include "_includes/fieldlayoutdesigner" with {
+        fieldLayout: productType.getProductFieldLayout(),
+    } only %}
 
 {% endblock %}
 
 {% includejs %}
     {% if not productType.handle %}new Craft.HandleGenerator('#name', '#handle');{% endif %}
 
-    {% for locale in craft.i18n.getSiteLocales() %}
-        {% if productType.locales[locale.id] is not defined or not productType.locales[locale.id].urlFormat %}
-            new Craft.EntryUrlFormatGenerator('#name', '#urlFormat-{{ locale.id }}', { suffix: '/{slug}' });
-        {% endif %}
+    {% for site in craft.app.sites.getAllSites() %}
+        new Craft.UriFormatGenerator('#name', '#sites tr[data-id="{{ site.handle }}"] textarea[name$="[uriFormat]"]', { suffix: '/{slug}' });
+        new Craft.UriFormatGenerator('#name', '#sites tr[data-id="{{ site.handle }}"] textarea[name$="[template]"]', { suffix: '/_product' });
     {% endfor %}
-
-	$('#hasVariants').on('change', function() {
-		if ($(this).prop('checked')) {
-			$('#tab-variantFields').removeClass('hidden');
-		} else {
-			$('#tab-variantFields').addClass('hidden');
-		}
-	});
 
 {% endincludejs %}
