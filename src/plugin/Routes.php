@@ -20,7 +20,7 @@ trait Routes
     {
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
             $event->rules['commerce-digitalproducts/producttypes/new'] = 'commerce-digitalproducts/product-types/edit';
-            $event->rules['commerce-digitalproducts/producttypes/<productTypeId:\d+>)'] = 'commerce-digitalproducts/product-types/edit';
+            $event->rules['commerce-digitalproducts/producttypes/<productTypeId:\d+>'] = 'commerce-digitalproducts/product-types/edit';
 
             $event->rules['commerce-digitalproducts/products/<productTypeHandle:{handle}>'] = 'commerce-digitalproducts/products/index';
             $event->rules['commerce-digitalproducts/products/<productTypeHandle:{handle}>/new'] = 'commerce-digitalproducts/products/edit';
