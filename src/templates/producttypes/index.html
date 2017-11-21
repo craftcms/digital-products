@@ -3,7 +3,7 @@
 {% set title = "Product Types"|t('commerce-digitalproducts') %}
 {% set selectedSubnavItem = "productTypes" %}
 
-{% set productTypes = craft.digitalProducts.getAllProductTypes() %}
+{% set productTypes = craft.digitalProducts.getProductTypes() %}
 {% set content %}
 	<div id="noProductTypes"{% if productTypes %} class="hidden"{% endif %}>
 		<p>{{ "No product types exist yet."|t('commerce-digitalproducts') }}</p>

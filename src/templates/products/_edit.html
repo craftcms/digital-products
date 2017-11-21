@@ -83,7 +83,7 @@
 {% endblock %}
 
 {% block content %}
-        <input type="hidden" name="action" value="digitalproducts/products/save">
+        <input type="hidden" name="action" value="commerce-digitalproducts/products/save">
         <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/products'|hash }}">
         <input type="hidden" name="typeId" value="{{ productType.id }}">
         {% if craft.isLocalized() %}<input type="hidden" name="locale" value="{{ product.locale }}">{% endif %}

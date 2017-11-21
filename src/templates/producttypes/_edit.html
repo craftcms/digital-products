@@ -13,11 +13,11 @@
 
 {% set fullPageForm = true %}
 
-{% set selectedTab = 'settings' %}
+{% set selectedTab = 'product-type-settings' %}
 {% import "_includes/forms" as forms %}
 
 {% block content %}
-    <input type="hidden" name="action" value="digitalproducts/product-types/save">
+    <input type="hidden" name="action" value="commerce-digitalproducts/product-types/save">
     <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/producttypes'|hash }}">
     {% if productType.id %}<input type="hidden" name="productTypeId" value="{{ productType.id }}">{% endif %}
 
@@ -48,7 +48,7 @@
 
         {{ forms.textField({
             label: "Automatic SKU Format"|t('commerce-digitalproducts'),
-            instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t('commerce-digitalproducts')({ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
+            instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t('commerce-digitalproducts',{ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
             id: 'skuFormat',
             class: 'ltr',
             name: 'skuFormat',
@@ -111,7 +111,6 @@
             }) %}
         {% endfor %}
 
-
         {{ forms.editableTableField({
             label: "Site Settings"|t('app'),
             instructions: "Configure the product types’s site-specific settings."|t('app'),
@@ -125,8 +124,8 @@
                 },
                 uriFormat: {
                     type: 'singleline',
-                    heading: "Category URI Format"|t('app'),
-                    info: "What category URIs should look like for the site."|t('app'),
+                    heading: "Product type URI Format"|t('app'),
+                    info: "What product type URIs should look like for the site."|t('app'),
                     placeholder: "Leave blank if categories don’t have URLs"|t('app'),
                     code: true
                 },

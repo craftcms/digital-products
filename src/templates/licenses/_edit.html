@@ -8,7 +8,7 @@
 {% set statusOptions = [{label: 'Active'|t('commerce-digitalproducts'), value: 1}, {label: 'Disabled'|t('commerce-digitalproducts'), value: 0}] %}
 
 {% block content %}
-    <input type="hidden" name="action" value="digitalproducts/licenses/save">
+    <input type="hidden" name="action" value="commerce-digitalproducts/licenses/save">
     <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/licenses'|hash }}">
     {% if license.id %}<input type="hidden" name="licenseId" value="{{ license.id }}">{% endif %}
 

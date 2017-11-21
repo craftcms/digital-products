@@ -29,7 +29,7 @@ class ProductTypeSite extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function getTableName(): string
+    public static function tableName(): string
     {
         return '{{%digitalproducts_producttypes_sites}}';
     }

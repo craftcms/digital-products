@@ -33,7 +33,7 @@ class Product extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function getTableName(): string
+    public static function tableName(): string
     {
         return '{{%digitalproducts_products}}';
     }

@@ -33,6 +33,11 @@ class ProductType extends Model
     public $id;
 
     /**
+     * @var int Field layout id
+     */
+    public $fieldLayoutId;
+
+    /**
      * @var string Name
      */
     public $name;

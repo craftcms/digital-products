@@ -4,8 +4,8 @@ namespace craft\commerce\digitalProducts\controllers;
 use Craft;
 use craft\commerce\digitalProducts\elements\Product;
 use craft\commerce\digitalProducts\models\ProductType;
+use craft\commerce\digitalProducts\models\ProductTypeSite;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
-use Craft\ProductTypeSite;
 use craft\web\Controller as BaseController;
 use yii\base\Exception;
 use yii\web\Response;
@@ -83,7 +83,6 @@ class ProductTypesController extends BaseController
         $productType->handle = $request->getBodyParam('handle');
         $productType->hasUrls = $request->getBodyParam('hasUrls');
         $productType->skuFormat = $request->getBodyParam('skuFormat');
-        $productType->template = $request->getBodyParam('template');
 
         // Site-specific settings
         $allSiteSettings = [];

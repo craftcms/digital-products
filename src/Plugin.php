@@ -8,14 +8,15 @@ use craft\commerce\digitalProducts\fields\Products;
 use craft\commerce\digitalProducts\models\Settings;
 use craft\commerce\digitalProducts\plugin\Routes;
 use craft\commerce\digitalProducts\plugin\Services;
+use craft\commerce\digitalProducts\variables\DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
-use craft\elements\User;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\services\Fields;
 use craft\services\UserPermissions;
 use craft\services\Users as UsersService;
+use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 
 /**
@@ -53,6 +54,7 @@ class Plugin extends BasePlugin
         $this->_setPluginComponents();
         $this->_registerCpRoutes();
         $this->_registerFieldTypes();
+        $this->_registerVariable();
         $this->_registerEventHandlers();
         $this->_registerCpRoutes();
         $this->_registerPermissions();
@@ -167,5 +169,18 @@ class Plugin extends BasePlugin
                 'digitalProducts-manageLicenses' => ['label' => Craft::t('commerce-digitalproducts', 'Manage licenses')],
             ];
         });
+    }
+
+    /**
+     * Register Digital Product template variable
+     */
+    private function _registerVariable()
+    {
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
+            /** @var CraftVariable $variable */
+            $variable = $event->sender;
+            $variable->set('digitalProducts', DigitalProducts::class);
+        });
+
     }
 }
