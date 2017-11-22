@@ -2,7 +2,6 @@
 
 namespace craft\commerce\digitalProducts\elements\db;
 
-use Craft;
 use craft\commerce\base\Element;
 use craft\commerce\digitalProducts\elements\License;
 use craft\commerce\digitalProducts\elements\Product;
@@ -13,8 +12,15 @@ use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use DateTime;
+use yii\db\Connection;
 
 /**
+ * LicenseQuery represents a SELECT SQL statement for products in a way that is independent of DBMS.
+ *
+ * @method License[]|array all($db = null)
+ * @method License|array|false one($db = null)
+ * @method License|array|false nth(int $n, Connection $db = null)
+ *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since  2.0
  */
