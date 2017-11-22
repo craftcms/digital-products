@@ -1,10 +1,10 @@
 (function($){
 
-if (typeof Craft.DigitalProducts === typeof undefined) {
+if (typeof Craft.DigitalProducts === 'undefined') {
 	Craft.DigitalProducts = {};
 }
 
-var elementTypeClass = 'DigitalProducts_Product';
+var elementTypeClass = 'craft\\commerce\\digitalProducts\\elements\\Product';
 
 /**
  * Product index class
@@ -21,6 +21,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 	afterInit: function() {
 		// Find which product types are being shown as sources
 		this.productTypes = [];
+
 
 		for (var i = 0; i < this.$sources.length; i++) {
 			var $source = this.$sources.eq(i),
@@ -46,10 +47,10 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 
 	getDefaultSourceKey: function() {
 		// Did they request a specific product type in the URL?
-		if (this.settings.context == 'index' && typeof defaultProductTypeHandle != typeof undefined) {
+		if (this.settings.context === 'index' && typeof defaultProductTypeHandle !== 'undefined') {
 			for (var i = 0; i < this.$sources.length; i++) {
 				var $source = $(this.$sources[i]);
-				if ($source.data('handle') == defaultProductTypeHandle) {
+				if ($source.data('handle') === defaultProductTypeHandle) {
 					return $source.data('key');
 				}
 			}
@@ -74,7 +75,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 		var selectedProductType;
 		if (selectedSourceHandle) {
 			for (var i = 0; i < this.productTypes.length; i++) {
-				if (this.productTypes[i].handle == selectedSourceHandle) {
+				if (this.productTypes[i].handle === selectedSourceHandle) {
 					selectedProductType = this.productTypes[i];
 					break;
 				}
@@ -90,10 +91,10 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 			// Otherwise only show a menu button
 			if (selectedProductType) {
 				var href = this._getProductTypeTriggerHref(selectedProductType),
-					label = (this.settings.context == 'index' ? Craft.t('New product') : Craft.t('New {productType} product', {productType: selectedProductType.name}));
+					label = (this.settings.context === 'index' ? Craft.t('commerce-digitalProducts', 'New product') : Craft.t('commerce-digitalProducts', 'New {productType} product', {productType: selectedProductType.name}));
 				this.$newProductBtn = $('<a class="btn submit add icon" '+href+'>'+label+'</a>').appendTo(this.$newProductBtnGroup);
 
-				if (this.settings.context != 'index') {
+				if (this.settings.context !== 'index') {
 					this.addListener(this.$newProductBtn, 'click', function(ev) {
 						this._openCreateProductModal(ev.currentTarget.getAttribute('data-id'));
 					});
@@ -103,7 +104,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 					$menuBtn = $('<div class="btn submit menubtn"></div>').appendTo(this.$newProductBtnGroup);
 				}
 			} else {
-				this.$newProductBtn = $menuBtn = $('<div class="btn submit add icon menubtn">'+Craft.t('New product')+'</div>').appendTo(this.$newProductBtnGroup);
+				this.$newProductBtn = $menuBtn = $('<div class="btn submit add icon menubtn">'+Craft.t('commerce-digitalProducts', 'New product')+'</div>').appendTo(this.$newProductBtnGroup);
 			}
 
 			if ($menuBtn) {
@@ -112,9 +113,9 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 				for (var i = 0; i < this.productTypes.length; i++) {
 					var productType = this.productTypes[i];
 
-					if (this.settings.context == 'index' || productType != selectedProductType) {
+					if (this.settings.context === 'index' || productType !== selectedProductType) {
 						var href = this._getProductTypeTriggerHref(productType),
-							label = (this.settings.context == 'index' ? productType.name : Craft.t('New {productType} product', {productType: productType.name}));
+							label = (this.settings.context === 'index' ? productType.name : Craft.t('commerce-digitalProducts', 'New {productType} product', {productType: productType.name}));
 						menuHtml += '<li><a '+href+'">'+label+'</a></li>';
 					}
 				}
@@ -124,7 +125,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 				var $menu = $(menuHtml).appendTo(this.$newProductBtnGroup),
 					menuBtn = new Garnish.MenuBtn($menuBtn);
 
-				if (this.settings.context != 'index') {
+				if (this.settings.context !== 'index') {
 					menuBtn.on('optionSelect', $.proxy(function(ev) {
 						this._openCreateProductModal(ev.option.getAttribute('data-id'));
 					}, this));
@@ -137,8 +138,8 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 		// Update the URL if we're on the Products index
 		// ---------------------------------------------------------------------
 
-		if (this.settings.context == 'index' && typeof history != typeof undefined) {
-			var uri = 'digitalproducts/products';
+		if (this.settings.context === 'index' && typeof history !== 'undefined') {
+			var uri = 'commerce-digitalproducts/products';
 			if (selectedSourceHandle) {
 				uri += '/'+selectedSourceHandle;
 			}
@@ -150,8 +151,8 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 
 	_getProductTypeTriggerHref: function(productType)
 	{
-		if (this.settings.context == 'index') {
-			return 'href="'+Craft.getUrl('digitalproducts/products/'+productType.handle+'/new')+'"';
+		if (this.settings.context === 'index') {
+			return 'href="'+Craft.getUrl('commerce-digitalproducts/products/'+productType.handle+'/new')+'"';
 		} else {
 			return 'data-id="'+productType.id+'"';
 		}
@@ -167,7 +168,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 		var productType;
 
 		for (var i = 0; i < this.productTypes.length; i++) {
-			if (this.productTypes[i].id == productTypeId) {
+			if (this.productTypes[i].id === productTypeId) {
 				productType = this.productTypes[i];
 				break;
 			}
@@ -179,7 +180,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 
 		this.$newProductBtn.addClass('inactive');
 		var newProductBtnText = this.$newProductBtn.text();
-		this.$newProductBtn.text(Craft.t('New {productType} product', {productType: productType.name}));
+		this.$newProductBtn.text(Craft.t('commerce-digitalProducts', 'New {productType} product', {productType: productType.name}));
 
 		new Craft.ElementEditor({
 			hudTrigger: this.$newProductBtnGroup,
@@ -201,7 +202,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 				// Make sure the right product type is selected
 				var productTypeSourceKey = 'productType:'+productTypeId;
 
-				if (this.sourceKey != productTypeSourceKey) {
+				if (this.sourceKey !== productTypeSourceKey) {
 					this.selectSourceByKey(productTypeSourceKey);
 				}
 

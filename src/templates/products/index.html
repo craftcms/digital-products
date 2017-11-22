@@ -4,8 +4,10 @@
 {% set selectedSubnavItem = "products" %}
 
 {% set docTitle = title~' - '~'Digital Products' %}
-{% set elementType = '\\craft\\commerce\\digitalProducts\\elements\\Product' %}
+{% set elementType = 'craft\\commerce\\digitalProducts\\elements\\Product' %}
 
 {% if productTypeHandle is defined %}
     {% includejs 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
 {% endif %}
+
+{% do view.registerAssetBundle('craft\\commerce\\digitalProducts\\web\\assets\\cp\\Bundle') -%}

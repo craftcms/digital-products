@@ -252,6 +252,7 @@ class License extends Element
             $key = 'productType:'.$productType->id;
 
             $sources[$key] = [
+                'key' => $key,
                 'label' => $productType->name,
                 'data' => [
                     'handle' => $productType->handle

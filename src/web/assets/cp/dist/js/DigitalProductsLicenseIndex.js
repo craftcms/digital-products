@@ -1,10 +1,10 @@
 (function($){
 
-if (typeof Craft.DigitalProducts === typeof undefined) {
+if (typeof Craft.DigitalProducts === 'undefined') {
 	Craft.DigitalProducts = {};
 }
 
-var elementTypeClass = 'DigitalProducts_License';
+var elementTypeClass = 'craft\\commerce\\digitalProducts\\elements\\License';
 
 /**
  * Product index class
@@ -15,7 +15,6 @@ Craft.DigitalProducts.LicenseIndex = Craft.BaseElementIndex.extend({
 
 
 		this.$btnGroup = $('<div class="btngroup submit"/>');
-		var $menuBtn;
 		var href = 'href="'+Craft.getUrl('digitalproducts/licenses/new')+'"',
 			label = Craft.t('New license');
 

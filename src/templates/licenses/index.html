@@ -4,8 +4,6 @@
 {% set selectedSubnavItem = "licenses" %}
 
 {% set docTitle = title~' - '~'Digital Products' %}
-{% set elementType = '\\craft\\commerce\\digitalProducts\\elements\\License' %}
+{% set elementType = 'craft\\commerce\\digitalProducts\\elements\\License' %}
 
-{% block content %}
-    {{ parent() }}
-{% endblock %}
+{% do view.registerAssetBundle('craft\\commerce\\digitalProducts\\web\\assets\\cp\\Bundle') -%}

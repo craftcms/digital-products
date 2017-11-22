@@ -178,7 +178,7 @@ class Product extends Purchasable
             $canEditProducts = Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productType->id);
 
             $sources[$key] = [
-                'key' => 'producttype:'.$productType->id,
+                'key' => $key,
                 'label' => $productType->name,
                 'data' => [
                     'handle' => $productType->handle,
@@ -304,11 +304,11 @@ class Product extends Purchasable
      */
     public function datetimeAttributes(): array
     {
-        $names = parent::datetimeAttributes();
-        $names[] = 'postDate';
-        $names[] = 'expiryDate';
+        $attributes = parent::datetimeAttributes();
+        $attributes[] = 'postDate';
+        $attributes[] = 'expiryDate';
 
-        return $names;
+        return $attributes;
     }
 
     /**
