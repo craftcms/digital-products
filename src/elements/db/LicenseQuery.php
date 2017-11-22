@@ -370,7 +370,7 @@ class LicenseQuery extends ElementQuery
 
         $this->joinElementTable('digitalproducts_licenses');
         $this->subQuery->innerJoin('{{%digitalproducts_products}} digitalproducts_products', '[[digitalproducts_licenses.productId]] = [[digitalproducts_products.id]]');
-        $this->subQuery->innerJoin('{{%users}} digitalproducts_products', '[[digitalproducts_licenses.userId]] = [[users.id]]');
+        $this->subQuery->innerJoin('{{%users}} users', '[[digitalproducts_licenses.userId]] = [[users.id]]');
 
         $this->query->select([
             'digitalproducts_licenses.id',

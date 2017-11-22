@@ -88,6 +88,7 @@ class Install extends Migration
             'licenseKey' => $this->string()->notNull(),
             'ownerName' => $this->string(),
             'ownerEmail' => $this->string()->notNull(),
+            'userId' => $this->integer()->null(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
@@ -179,6 +180,7 @@ class Install extends Migration
         $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'id'), '{{%digitalproducts_licenses}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'orderId'), '{{%digitalproducts_licenses}}', 'orderId', '{{%commerce_orders}}', 'id', 'SET NULL', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'productId'), '{{%digitalproducts_licenses}}', 'productId', '{{%digitalproducts_products}}', 'id', 'SET NULL', null);
+        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'userId'), '{{%digitalproducts_licenses}}', 'userId', '{{%users}}', 'id', 'SET NULL', null);
 
         $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_products}}', 'id'), '{{%digitalproducts_products}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_products}}', 'taxCategoryId'), '{{%digitalproducts_products}}', 'taxCategoryId', '{{%commerce_taxcategories}}', 'id', 'RESTRICT', null);
