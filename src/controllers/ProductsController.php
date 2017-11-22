@@ -2,6 +2,7 @@
 namespace craft\commerce\digitalProducts\controllers;
 
 use Craft;
+use craft\commerce\Plugin as Commerce;
 use craft\commerce\digitalProducts\elements\Product;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
 use craft\helpers\DateTimeHelper;
@@ -82,6 +83,7 @@ class ProductsController extends BaseController
         }
 
         $this->requirePermission('digitalProducts-manageProducts:'.$productType->id);
+        $variables['productType'] = $productType;
 
         if ($siteHandle !== null) {
             $variables['site'] = Craft::$app->getSites()->getSiteByHandle($siteHandle);
@@ -107,6 +109,8 @@ class ProductsController extends BaseController
             (Craft::$app->getIsMultiSite() && Craft::$app->getSites()->currentSite->id !== $variables['site']->id ? '/'.$variables['site']->handle : '');
 
         $this->_maybeEnableLivePreview($variables);
+
+        //$variables['promotions']['sales'] = Commerce::getInstance()->getSales()->getSalesForProduct($variables['product']);
 
         return $this->renderTemplate('commerce-digitalproducts/products/_edit', $variables);
     }
@@ -157,7 +161,7 @@ class ProductsController extends BaseController
      *
      * @return Response
      */
-    public function actionSave(): Response
+    public function actionSave()
     {
         $this->requirePostRequest();
 
@@ -427,13 +431,8 @@ class ProductsController extends BaseController
             $product = new Product();
         }
 
-        if (isset($data['typeId'])) {
-            $product->typeId = $request->getBodyParam('typeId');
-        }
-
-        if (isset($data['enabled'])) {
-            $product->enabled = $request->getBodyParam('enabled');
-        }
+        $product->typeId = $request->getBodyParam('typeId');
+        $product->enabled = $request->getBodyParam('enabled');
 
         $product->price = Localization::normalizeNumber($request->getBodyParam('price'));
         $product->sku = $request->getBodyParam('sku');
@@ -441,13 +440,23 @@ class ProductsController extends BaseController
         $product->postDate = (($date = $request->getParam('postDate')) !== false ? (DateTimeHelper::toDateTime($date) ?: null) : $product->postDate);
         $product->expiryDate = (($date = $request->getParam('expiryDate')) !== false ? (DateTimeHelper::toDateTime($date) ?: null) : $product->expiryDate);
 
-        $product->promotable = $request->getBodyParam('promotable');
+        $product->promotable = (bool)$request->getBodyParam('promotable');
         $product->taxCategoryId = $request->getBodyParam('taxCategoryId');
         $product->slug = $request->getBodyParam('slug');
 
         $product->enabledForSite = (bool)$request->getBodyParam('enabledForSite', $product->enabledForSite);
         $product->title = $request->getBodyParam('title', $product->title);
         $product->setFieldValuesFromRequest('fields');
+
+        // Last checks
+        if (empty($product->sku)) {
+            $productType = $product->getType();
+            $product->sku = Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $product);
+        }
+
+        if (!$product->postDate) {
+            $product->postDate = new \DateTime();
+        }
 
         return $product;
     }

@@ -3,7 +3,7 @@
 
 	{{ forms.textField({
 		label: "Title"|t('commerce-digitalproducts'),
-		locale: product.locale,
+        site: product.site,
 		id: 'title',
 		name: 'title',
 		value: product.title,
@@ -22,7 +22,6 @@
 
 	{{ forms.textField({
 		label: "Slug"|t('commerce-digitalproducts'),
-		locale: product.locale,
 		id: 'slug',
 		name: 'slug',
 		value: product.slug,

@@ -7,6 +7,7 @@ use craft\commerce\digitalProducts\elements\db\ProductQuery;
 use craft\commerce\digitalProducts\models\ProductType;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
 use craft\commerce\digitalProducts\records\Product as ProductRecord;
+use craft\commerce\models\TaxCategory;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\db\ElementQueryInterface;
 use craft\db\Query;
@@ -291,6 +292,20 @@ class Product extends Purchasable
 
     /**
      * @inheritdoc
+     */
+    public function rules(): array
+    {
+        $rules = parent::rules();
+
+        $rules[] = [['typeId', 'sku', 'price'], 'required'];
+        $rules[] = [['sku'], 'string'];
+
+        return $rules;
+    }
+
+
+    /**
+     * @inheritdoc
      *
      * @return ProductQuery The newly created [[ProductQuery]] instance.
      */
@@ -346,11 +361,7 @@ class Product extends Purchasable
     {
         $productType = $this->getType();
 
-        if ($productType) {
-            return $productType->getProductFieldLayout();
-        }
-
-        return null;
+        return $productType ? $productType->getProductFieldLayout() : null;
     }
 
     /**
@@ -384,7 +395,21 @@ class Product extends Purchasable
             return $this->_productType;
         }
 
-        return $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
+        return $this->typeId ? $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId) : null;
+    }
+
+    /**
+     * Gets the tax category
+     *
+     * @return TaxCategory|null
+     */
+    public function getTaxCategory()
+    {
+        if ($this->taxCategoryId) {
+            return Commerce::getInstance()->getTaxCategories()->getTaxCategoryById($this->taxCategoryId);
+        }
+
+        return null;
     }
 
     /**
@@ -392,7 +417,7 @@ class Product extends Purchasable
      *
      * @return bool
      */
-    public function getIsLicensed()
+    public function getIsLicensed(): bool
     {
         if ($this->_isLicensed === null) {
             $this->_isLicensed = false;
@@ -448,6 +473,7 @@ class Product extends Purchasable
 
         $productRecord->save(false);
 
+        return parent::afterSave($isNew);
     }
 
     // Implement Purchasable
@@ -596,7 +622,7 @@ class Product extends Purchasable
                 return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
 
             case 'promotable':
-                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('Yes').'"></span>' : '');
+                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('commerce-digitalproducts', 'Yes').'"></span>' : '');
 
             default:
                 return parent::tableAttributeHtml($attribute);

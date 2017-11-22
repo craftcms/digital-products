@@ -20,6 +20,7 @@
     {% if showPreviewBtn %}
         {% include "_includes/previewbtns" %}
     {% endif %}
+    {{ block('actionButton') }}
 {% endblock %}
 
 {% block actionButton %}
@@ -61,7 +62,7 @@
         <div class="btn menubtn" data-icon="world">{{ product.site.name|t('site') }}</div>
         <div class="menu">
             <ul class="padded">
-                {% for localeId in localeIds %}
+                {% for siteId in siteIds %}
                     {% set site = craft.app.sites.getSiteById(siteId) %}
                     {% set status = siteId in enabledSiteIds ? 'enabled' : 'disabled' %}
                     <li>
@@ -86,12 +87,10 @@
         <input type="hidden" name="action" value="commerce-digitalproducts/products/save">
         <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/products'|hash }}">
         <input type="hidden" name="typeId" value="{{ productType.id }}">
-        {% if craft.isLocalized() %}<input type="hidden" name="locale" value="{{ product.locale }}">{% endif %}
         {{ getCsrfInput() }}
         {% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
 
             <div id="fields">
-                {% include "_includes/tabs" %}
                 {{ productFields.titleField(product) }}
 
                 <div>
@@ -170,7 +169,7 @@
                 <h5 class="heading">{{ "Date Updated"|t('commerce-digitalproducts') }}</h5>
                 <div class="value">{{ product.dateUpdated|date('short') }} {{ product.dateUpdated|time('short') }}</div>
             </div>
-            {% if promotions.sales|length %}
+            {% if promotion is defined and promotions.sales|length %}
                 <div class="data">
                     <h5 class="heading">{{ "Associated Sales"|t('commerce-digitalproducts') }}</h5>
                     <div class="value">
