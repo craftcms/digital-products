@@ -12,7 +12,7 @@ var elementTypeClass = 'craft\\commerce\\digitalProducts\\elements\\License';
 Craft.DigitalProducts.LicenseIndex = Craft.BaseElementIndex.extend({
 
 	afterInit: function() {
-		var href = 'href="'+Craft.getUrl('digitalproducts/licenses/new')+'"',
+		var href = 'href="'+Craft.getUrl('commerce-digitalproducts/licenses/new')+'"',
 			label = Craft.t('commerce-digitalProducts', 'New license');
 
 		this.$newProductBtnGroup = $('<div class="btngroup submit"/>');
