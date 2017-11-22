@@ -13,6 +13,7 @@ use craft\web\Controller as BaseController;
 use yii\base\Exception;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Class DigitalProducts_ProductsController
@@ -116,12 +117,12 @@ class ProductsController extends BaseController
      * @return Response
      * @throws Exception if no product found
      */
-    public function actionDeleteProduct()
+    public function actionDeleteProduct(): Response
     {
         $this->requirePostRequest();
 
         $productId = Craft::$app->getRequest()->getRequiredParam('productId');
-        $product = DigitalProducts::getInstance()->getProducts()->getProductById($productId);
+        $product = Product::findOne($productId);
 
         if (!$product) {
             throw new Exception(Craft::t('commerce-digitalproducts', 'No product exists with the ID “{id}”.',['id' => $productId]));
@@ -129,7 +130,7 @@ class ProductsController extends BaseController
 
         $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
 
-        if (!DigitalProducts::getInstance()->getProducts()->deleteProduct($product)) {
+        if (Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
                 $this->asJson(['success' => false]);
             }
@@ -156,7 +157,7 @@ class ProductsController extends BaseController
      *
      * @return Response
      */
-    public function actionSave()
+    public function actionSave(): Response
     {
         $this->requirePostRequest();
 
@@ -166,7 +167,7 @@ class ProductsController extends BaseController
 
         $existingProduct = (bool)$product->id;
 
-        if (!DigitalProducts::getInstance()->getProducts()->saveProduct($product)) {
+        if (!Craft::$app->getElements()->saveElement($product)) {
             if (!$existingProduct) {
                 $product->id = null;
             }
@@ -211,12 +212,10 @@ class ProductsController extends BaseController
      */
     public function actionShareProduct(int $productId, int $siteId = null): Response
     {
-        /**
-         * @var $product Product
-         */
-        $product = DigitalProducts::getInstance()->getProducts()->getProductById($productId, $siteId);
+        /** @var Product $product */
+        $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
-        if (!$product || DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($product->getProductType())) {
+        if (!$product || DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($product->getType())) {
             throw new Exception();
         }
 
@@ -225,7 +224,7 @@ class ProductsController extends BaseController
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
             'action' => 'commerce-digitalproducts/products/viewSharedProduct',
-            'params' => ['productId' => $productId, 'locale' => $product->site]
+            'params' => ['productId' => $productId, 'locale' => $product->getSite()]
         ]);
 
         $url = UrlHelper::urlWithToken($product->getUrl(), $token);
@@ -246,7 +245,8 @@ class ProductsController extends BaseController
     {
         $this->requireToken();
 
-        $product = DigitalProducts::getInstance()->getProducts()->getProductById($productId, $siteId);
+        /** @var Product $product */
+        $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
         if (!$product) {
             throw new Exception('Product not found.');
@@ -268,24 +268,36 @@ class ProductsController extends BaseController
      */
     private function _showProduct(Product $product): Response
     {
-        $productType = $product->getProductType();
+
+        $productType = $product->getType();
 
         if (!$productType) {
-            throw new Exception('Product type not found.');
+            throw new ServerErrorHttpException('Product type not found.');
         }
 
-        Craft::$app->language = $product->site;
+        $siteSettings = $productType->getSiteSettings();
+
+        if (!isset($siteSettings[$product->siteId]) || !$siteSettings[$product->siteId]->hasUrls) {
+            throw new ServerErrorHttpException('The product '.$product->id.' doesn\'t have a URL for the site '.$product->siteId.'.');
+        }
+
+        $site = Craft::$app->getSites()->getSiteById($product->siteId);
+
+        if (!$site) {
+            throw new ServerErrorHttpException('Invalid site ID: '.$product->siteId);
+        }
+
+        Craft::$app->language = $site->language;
 
         // Have this product override any freshly queried products with the same ID/site
         Craft::$app->getElements()->setPlaceholderElement($product);
 
         $this->getView()->getTwig()->disableStrictVariables();
 
-        return $this->renderTemplate($productType->template, [
+        return $this->renderTemplate($siteSettings[$product->siteId]->template, [
             'product' => $product
         ]);
     }
-
 
     /**
      * Prepare $variable array for editing a Product
@@ -310,10 +322,10 @@ class ProductsController extends BaseController
         }
 
         if (empty($variables['site'])) {
-            $variables['site'] = Craft::$app->getSites()->currentSite;
+            $site = $variables['site'] = Craft::$app->getSites()->currentSite;
 
             if (!in_array($variables['site']->id, $variables['siteIds'], false)) {
-                $variables['site'] = Craft::$app->getSites()->getSiteById($variables['siteIds'][0]);
+                $site = $variables['site'] = Craft::$app->getSites()->getSiteById($variables['siteIds'][0]);
             }
         } else {
             // Make sure they were requesting a valid site
@@ -327,7 +339,7 @@ class ProductsController extends BaseController
         // Product related checks
         if (empty($variables['product'])) {
             if (!empty($variables['productId'])) {
-                $variables['product'] = DigitalProducts::getInstance()->getProducts()->getProductById($variables['productId'], $variables['localeId']);
+                $variables['product'] = Craft::$app->getElements()->getElementById($variables['productId'], Product::class, $site->id);
 
                 if (!$variables['product']) {
                     throw new Exception('Missing product data.');
@@ -406,7 +418,7 @@ class ProductsController extends BaseController
         $site = $request->getParam('site');
 
         if ($productId) {
-            $product = DigitalProducts::getInstance()->getProducts()->getProductById($productId, $site);
+            $product = Craft::$app->getElements()->getElementById($productId, Product::class, $site);
 
             if (!$product) {
                 throw new Exception('No product found with that id.');
