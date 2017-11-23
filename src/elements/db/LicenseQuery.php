@@ -370,7 +370,7 @@ class LicenseQuery extends ElementQuery
 
         $this->joinElementTable('digitalproducts_licenses');
         $this->subQuery->innerJoin('{{%digitalproducts_products}} digitalproducts_products', '[[digitalproducts_licenses.productId]] = [[digitalproducts_products.id]]');
-        $this->subQuery->innerJoin('{{%users}} users', '[[digitalproducts_licenses.userId]] = [[users.id]]');
+        $this->subQuery->leftJoin('{{%users}} users', '[[digitalproducts_licenses.userId]] = [[users.id]]');
 
         $this->query->select([
             'digitalproducts_licenses.id',
@@ -415,11 +415,11 @@ class LicenseQuery extends ElementQuery
         }
 
         if ($this->licenseKey) {
-            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.licenseKey', $this->licenseKey));
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_licenses.licenseKey', $this->licenseKey));
         }
 
         if (!$this->orderBy) {
-            $this->orderBy = 'postDate desc';
+            $this->orderBy = ['digitalproducts_licenses.dateCreated' => SORT_DESC];
         }
 
         return parent::beforePrepare();

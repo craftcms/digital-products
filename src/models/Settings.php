@@ -2,7 +2,6 @@
 
 namespace craft\commerce\digitalProducts\models;
 
-use Craft;
 use craft\commerce\base\Model;
 
 /**
@@ -35,12 +34,12 @@ class Settings extends Model
     /**
      * @var string The available characters that can be used in license key generation.
      */
-    public $licenseKeyCharacters = true;
+    public $licenseKeyCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
     /**
      * @var int The length of generated license keys.
      */
-    public $licenseKeyLength = true;
+    public $licenseKeyLength = 24;
 
     /**
      * @var bool Whether a user must be logged in when completing an order with at least one digital product in the cart.

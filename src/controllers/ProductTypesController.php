@@ -110,7 +110,7 @@ class ProductTypesController extends BaseController
         // Set the product type field layout
         $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost();
         $fieldLayout->type = Product::class;
-        $productType->getBehavior('productFieldLayout')->setFieldLayout($fieldLayout);
+        $productType->setFieldLayout($fieldLayout);
 
         // Save it
         if (DigitalProducts::getInstance()->getProductTypes()->saveProductType($productType)) {

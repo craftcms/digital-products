@@ -4,36 +4,8 @@ namespace craft\commerce\digitalProducts\migrations;
 
 use craft\commerce\elements\Order;
 use craft\commerce\elements\Product;
-use craft\commerce\elements\Variant;
-use craft\commerce\gateways\Dummy;
-use craft\commerce\Plugin;
-use craft\commerce\records\Country;
-use craft\commerce\records\Gateway;
-use craft\commerce\records\OrderSettings;
-use craft\commerce\records\OrderStatus;
-use craft\commerce\records\PaymentCurrency;
-use craft\commerce\records\Product as ProductRecord;
-use craft\commerce\records\ProductType;
-use craft\commerce\records\ProductTypeSite;
-use craft\commerce\records\ShippingCategory;
-use craft\commerce\records\ShippingMethod;
-use craft\commerce\records\ShippingRule;
-use craft\commerce\records\State;
-use craft\commerce\records\TaxCategory;
-use craft\commerce\records\Variant as VariantRecord;
-use craft\db\ActiveRecord;
 use craft\db\Migration;
-use craft\db\Query;
-use craft\helpers\DateTimeHelper;
-use craft\helpers\ElementHelper;
-use craft\helpers\Json;
 use craft\helpers\MigrationHelper;
-use craft\helpers\StringHelper;
-use craft\records\Element;
-use craft\records\Element_SiteSettings;
-use craft\records\FieldLayout;
-use craft\records\Plugin as PluginRecord;
-use craft\records\Site;
 
 /**
  * Installation Migration
@@ -49,7 +21,7 @@ class Install extends Migration
     /**
      * @inheritdoc
      */
-    public function safeUp()
+    public function safeUp(): bool
     {
         $this->createTables();
         $this->createIndexes();
@@ -61,7 +33,7 @@ class Install extends Migration
     /**
      * @inheritdoc
      */
-    public function safeDown()
+    public function safeDown(): bool
     {
         $this->dropForeignKeys();
         $this->dropTables();

@@ -14,7 +14,7 @@ trait Routes
     /**
      * Control Panel routes.
      *
-     * @return mixed
+     * @return void
      */
     public function _registerCpRoutes()
     {
@@ -31,7 +31,6 @@ trait Routes
             $event->rules['commerce-digitalproducts/licenses/new'] = 'commerce-digitalproducts/licenses/edit';
             $event->rules['commerce-digitalproducts/licenses/<licenseId:\d+>'] = 'commerce-digitalproducts/licenses/edit';
         });
-
     }
 }
 

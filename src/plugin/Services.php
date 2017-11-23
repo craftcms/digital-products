@@ -3,7 +3,6 @@
 namespace craft\commerce\digitalProducts\plugin;
 
 use craft\commerce\digitalProducts\services\Licenses;
-use craft\commerce\digitalProducts\services\Products;
 use craft\commerce\digitalProducts\services\ProductTypes;
 
 /**
@@ -45,7 +44,6 @@ trait Services
     {
         $this->setComponents([
             'licenses' => Licenses::class,
-            'products' => Products::class,
             'productTypes' => ProductTypes::class,
         ]);
     }

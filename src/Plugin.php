@@ -109,7 +109,7 @@ class Plugin extends BasePlugin
     /**
      * Get Settings URL
      */
-    public function getSettingsUrl()
+    public function getSettingsUrl(): bool
     {
         return false;
     }

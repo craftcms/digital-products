@@ -96,7 +96,7 @@ class Licenses extends Component
             $element = Craft::$app->getElements()->getElementById($itemId);
 
             if ($element instanceof Product) {
-                $event->performAction = false;
+                $event->isValid = false;
 
                 return;
             }
@@ -137,7 +137,7 @@ class Licenses extends Component
      *
      * @return bool
      */
-    public function licenseProductByOrder(Product $product, Order $order)
+    public function licenseProductByOrder(Product $product, Order $order): bool
     {
         $license = new License();
         $license->productId = $product->id;
@@ -161,7 +161,7 @@ class Licenses extends Component
      *
      * @return string
      */
-    public function generateLicenseKey()
+    public function generateLicenseKey(): string
     {
         $codeAlphabet = DigitalProducts::getInstance()->getSettings()->licenseKeyCharacters;
         $keyLength = DigitalProducts::getInstance()->getSettings()->licenseKeyLength;

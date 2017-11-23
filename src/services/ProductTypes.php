@@ -245,10 +245,6 @@ class ProductTypes extends Component
                 throw new Exception("No product type exists with the ID '{$productType->id}'");
             }
 
-            $oldProductTypeRow = $this->_createProductTypeQuery()
-                ->where(['id' => $productType->id])
-                ->one();
-            $oldProductType = new ProductType($oldProductTypeRow);
         } else {
             $productTypeRecord = new ProductTypeRecord();
         }
@@ -294,6 +290,7 @@ class ProductTypes extends Component
 
             $sitesNowWithoutUrls = [];
             $sitesWithNewUriFormats = [];
+            $allOldSiteSettingsRecords = [];
 
             if (!$isNewProductType) {
                 // Get the old product type site settings
@@ -439,9 +436,6 @@ class ProductTypes extends Component
 
             $fieldLayoutId = $productType->getProductFieldLayout()->id;
             Craft::$app->getFields()->deleteLayoutById($fieldLayoutId);
-            if ($productType->hasVariants) {
-                Craft::$app->getFields()->deleteLayoutById($productType->getVariantFieldLayout()->id);
-            }
 
             $productTypeRecord = ProductTypeRecord::findOne($productType->id);
             $affectedRows = $productTypeRecord->delete();

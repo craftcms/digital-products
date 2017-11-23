@@ -27,7 +27,6 @@ class Bundle extends AssetBundle
         ];
 
         $this->js = [
-            'js/DigitalProducts.js',
             'js/DigitalProductsLicenseIndex.js',
             'js/DigitalProductsProductIndex.js',
         ];

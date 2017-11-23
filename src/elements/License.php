@@ -11,11 +11,13 @@ use craft\commerce\digitalProducts\records\License as LicenseRecord;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\elements\Order;
 use craft\db\Query;
+use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\UrlHelper;
 use Exception;
+use yii\base\InvalidConfigException;
 
 /**
  * Class Commerce_LicenseElementType
@@ -76,22 +78,22 @@ class License extends Element
     /**
      * @var string
      */
-    private $_licensedTo = null;
+    private $_licensedTo;
 
     /**
      * @var Product
      */
-    private $_product = null;
+    private $_product;
 
     /**
      * @var User
      */
-    private $_user = null;
+    private $_user;
 
     /**
      * @var Order
      */
-    private $_order = null;
+    private $_order;
 
     // Public Methods
     // =========================================================================
@@ -112,7 +114,7 @@ class License extends Element
     public function getLicensedTo(): string
     {
         if (null === $this->_licensedTo) {
-            $this->_licensedTo = "";
+            $this->_licensedTo = '';
 
             if (null !== $this->userId && null === $this->_user) {
                 $this->_user = Craft::$app->getUsers()->getUserById($this->userId);
@@ -139,7 +141,7 @@ class License extends Element
             return $this->_product;
         }
 
-        return $this->_product = DigitalProducts::getInstance()->getProducts()->getProductById($this->productId);
+        return $this->_product = static::findOne($this->productId);
     }
 
     /**
@@ -170,7 +172,7 @@ class License extends Element
         $product = $this->getProduct();
 
         if ($product) {
-            return $product->getProductType();
+            return $product->getType();
         }
 
         return null;
@@ -302,10 +304,11 @@ class License extends Element
                 ->select('id as source, userId as target')
                 ->from('{{%digitalproducts_licenses}}')
                 ->where(['in', 'id', $sourceElementIds])
+                ->andWhere(['not', ['userId' => null]])
                 ->all();
 
             return array(
-                'elementType' => 'User',
+                'elementType' => User::class,
                 'map' => $map
             );
         }
@@ -377,7 +380,7 @@ class License extends Element
             $licenseRecord = LicenseRecord::findOne($this->id);
 
             if (!$licenseRecord) {
-                throw new Exception('Invalid license id: '.$this->id);
+                throw new InvalidConfigException('Invalid license id: '.$this->id);
             }
         } else {
             $licenseRecord = new LicenseRecord();
@@ -391,10 +394,7 @@ class License extends Element
         }
 
         // Assign the license to a user if config allows for it, user id is left null and email matches
-        if (DigitalProducts::getInstance()->getSettings()->autoAssignUserOnPurchase
-            && $this->userId === null
-            && $user
-        ) {
+        if (DigitalProducts::getInstance()->getSettings()->autoAssignUserOnPurchase && $this->userId === null && $user) {
             $this->userId = $user->id;
         }
 
@@ -529,6 +529,7 @@ class License extends Element
      */
     protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, string $attribute)
     {
+        /** @var ElementQuery $elementQuery */
         if ($attribute === 'product')
         {
             $with = $elementQuery->with ?: [];

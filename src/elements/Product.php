@@ -195,7 +195,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getStatuses()
+    public function getStatuses(): array
     {
         return [
             self::STATUS_LIVE => Craft::t('commerce-digitalproducts', 'Live'),
@@ -349,9 +349,9 @@ class Product extends Purchasable
 
         if ($productType) {
             return UrlHelper::cpUrl('commerce-digitalproducts/products/'.$productType->handle.'/'.$this->id);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

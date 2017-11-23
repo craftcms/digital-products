@@ -2,7 +2,6 @@
 namespace craft\commerce\digitalProducts\controllers;
 
 use Craft;
-use craft\commerce\Plugin as Commerce;
 use craft\commerce\digitalProducts\elements\Product;
 use craft\commerce\digitalProducts\Plugin as DigitalProducts;
 use craft\helpers\DateTimeHelper;

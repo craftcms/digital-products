@@ -46,7 +46,6 @@ class LicensesController extends BaseController
             if ($licenseId === null) {
                 $license = new License();
             } else {
-                /** @var License $license */
                 $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
                 if (!$license) {
@@ -55,7 +54,8 @@ class LicensesController extends BaseController
             }
         }
 
-        $variables['title'] = $license->id ? Craft::t('commerce-digitalproducts', 'Create a new License') : (string) $license;
+        $variables['title'] = $license->id ? (string) $license : Craft::t('commerce-digitalproducts', 'Create a new License');
+        $variables['license'] = $license;
         $variables['userElementType'] = User::class;
         $variables['productElementType'] = Product::class;
 
@@ -139,17 +139,17 @@ class LicensesController extends BaseController
             }
 
             Craft::$app->getSession()->setNotice(Craft::t('commerce-digitalproducts', 'License deleted.'));
-            $this->redirectToPostedUrl($license);
-        } else {
-            if (Craft::$app->getRequest()->getAcceptsJson()) {
-                return $this->asJson(['success' => false]);
-            }
-
-            Craft::$app->getSession()->setError(Craft::t('commerce-digitalproducts', 'Couldn’t delete license.'));
-            Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
-
-            return null;
+            return $this->redirectToPostedUrl($license);
         }
+
+        if (Craft::$app->getRequest()->getAcceptsJson()) {
+            return $this->asJson(['success' => false]);
+        }
+
+        Craft::$app->getSession()->setError(Craft::t('commerce-digitalproducts', 'Couldn’t delete license.'));
+        Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
+
+        return null;
     }
 
 }

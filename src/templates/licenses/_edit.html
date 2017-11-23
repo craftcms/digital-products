@@ -34,9 +34,9 @@
                     <input type="button"
                            class="btn small formsubmit"
                            value="{{ 'Delete'|t('commerce-digitalproducts') }}"
-                           data-action="digitalProducts/licenses/delete"
+                           data-action="commerce-digitalproducts/licenses/delete"
                            data-confirm="{{ 'Are you sure you want to delete this license?'|t('commerce-digitalproducts') }}"
-                           data-redirect="digitalproducts/licenses">
+                           data-redirect="{{ 'commerce-digitalproducts/licenses'|hash }}">
                 </div>
             {% endif %}
         {% endset %}
