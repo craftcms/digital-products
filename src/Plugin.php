@@ -103,6 +103,13 @@ class Plugin extends BasePlugin
             ];
         }
 
+        if (Craft::$app->getUser()->getIsAdmin()) {
+            $navItems['subnav']['settings'] = [
+                'label' => Craft::t('commerce-digitalproducts', 'Settings'),
+                'url' => 'commerce-digitalproducts/settings'
+            ];
+        }
+
         return $navItems;
     }
 

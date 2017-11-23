@@ -46,4 +46,14 @@ class DigitalProducts
     {
         return Product::find();
     }
+
+    /**
+     * Get the plugin instance.
+     *
+     * @return DigitalProductsPlugin
+     */
+    public function getPlugin(): DigitalProductsPlugin
+    {
+        return DigitalProductsPlugin::getInstance();
+    }
 }

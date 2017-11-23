@@ -24,7 +24,7 @@ class Settings extends Model
     /**
      * @var bool Whether license should automatically be assigned to existing users if the emails match.
      */
-    public $autoAssignUserOnPurchase = false;
+    public $autoAssignUserOnPurchase = true;
 
     /**
      * @var bool Whether licenses should be automatically assigned to newly-registered users if the emails match.
@@ -46,4 +46,12 @@ class Settings extends Model
      */
     public $requireLoggedInUser = true;
 
+    public function rules() {
+        $rules = parent::rules();
+
+        $rules[] = [['licenseKeyCharacters', 'licenseKeyLength'], 'required'];
+        $rules[] = ['licenseKeyLength', 'number', 'min' => 1, 'max' => 255];
+
+        return $rules;
+    }
 }
