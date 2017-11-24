@@ -183,7 +183,6 @@ class License extends Element
      */
     public function getProductName(): string
     {
-        $p = $this->getProduct();
         return (string) $this->getProduct();
     }
 
