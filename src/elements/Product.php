@@ -74,7 +74,7 @@ class Product extends Purchasable
     public $sku;
 
     /**
-     * @var int $price
+     * @var float $price
      */
     public $price;
 
