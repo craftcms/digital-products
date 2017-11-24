@@ -84,9 +84,9 @@ class Product extends Purchasable
     private $_productType;
 
     /**
-     * @var bool
+     * @var License[]
      */
-    private $_isLicensed;
+    private $_existingLicenses;
 
     // Public Methods
     // =========================================================================
@@ -227,8 +227,9 @@ class Product extends Purchasable
      */
     public function setEagerLoadedElements(string $handle, array $elements)
     {
-        if ($handle === 'isLicensed') {
-            $this->_isLicensed = isset($elements[0]) ? true : false;
+        if ($handle === 'existingLicenses') {
+            $this->_existingLicenses = $elements;
+
             return;
         }
 
@@ -240,7 +241,7 @@ class Product extends Purchasable
      */
     public static function eagerLoadingMap(array $sourceElements, string $handle)
     {
-        if ($handle === 'isLicensed') {
+        if ($handle === 'existingLicenses') {
             $userId = Craft::$app->getUser()->getId();
 
             if ($userId)
@@ -413,27 +414,22 @@ class Product extends Purchasable
     }
 
     /**
-     * Return true if the current user has a license for this product.
+     * Return all the licenses for this product for the current user.
      *
-     * @return bool
+     * @return License[]
      */
-    public function getIsLicensed(): bool
+    public function getExistingLicenses(): array
     {
-        if ($this->_isLicensed === null) {
-            $this->_isLicensed = false;
+        if ($this->_existingLicenses === null) {
+            $this->_existingLicenses = [];
             $userId = Craft::$app->getUser()->getId();
 
             if ($userId) {
-
-                $license = License::find()->ownerId($userId)->one();
-
-                if ($license) {
-                    $this->_isLicensed = true;
-                }
+                $this->_existingLicenses = License::find()->ownerId($userId)->all();
             }
         }
 
-        return $this->_isLicensed;
+        return $this->_existingLicenses;
     }
 
     /**
