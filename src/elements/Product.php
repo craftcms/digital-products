@@ -496,6 +496,14 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSku(): string
     {
         return $this->sku;
