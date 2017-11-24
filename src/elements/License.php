@@ -141,7 +141,7 @@ class License extends Element
             return $this->_product;
         }
 
-        return $this->_product = static::findOne($this->productId);
+        return $this->_product = Product::findOne($this->productId);
     }
 
     /**
@@ -183,6 +183,7 @@ class License extends Element
      */
     public function getProductName(): string
     {
+        $p = $this->getProduct();
         return (string) $this->getProduct();
     }
 
