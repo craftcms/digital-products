@@ -482,7 +482,7 @@ class License extends Element
      */
     protected static function defineSearchableAttributes(): array
     {
-        return ['licensedTo', 'product'];
+        return ['licensedTo', 'productName'];
     }
 
     /**
