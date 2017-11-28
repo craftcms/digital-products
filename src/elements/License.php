@@ -425,7 +425,7 @@ class License extends Element
     {
         $generateKeyEvent = new GenerateKeyEvent(['license' => $this]);
 
-        // Raising the 'afterGenerateLicenseKey' event
+        // Raising the 'beforeGenerateLicenseKey' event
         if ($this->hasEventHandlers(self::EVENT_GENERATE_LICENSE_KEY)) {
             $this->trigger(self::EVENT_GENERATE_LICENSE_KEY, $generateKeyEvent);
         }
