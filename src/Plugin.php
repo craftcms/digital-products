@@ -33,13 +33,6 @@ class Plugin extends BasePlugin
     use Services;
     use Routes;
 
-    // Constants
-    // =========================================================================
-
-    /**
-     * @event \yii\base\Event The event that is triggered after the plugin has been initialized
-     */
-    const EVENT_AFTER_INIT = 'afterInit';
 
     // Public Methods
     // =========================================================================
@@ -58,9 +51,6 @@ class Plugin extends BasePlugin
         $this->_registerEventHandlers();
         $this->_registerCpRoutes();
         $this->_registerPermissions();
-
-        // Fire an 'afterInit' event
-        $this->trigger(Plugin::EVENT_AFTER_INIT);
     }
 
     /**
