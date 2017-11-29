@@ -1,6 +1,6 @@
 <?php
 
-namespace craft\commerce\digitalProducts\models;
+namespace craft\digitalproducts\models;
 
 use craft\commerce\base\Model;
 

@@ -16,7 +16,7 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require craftcms/commerce-digital-products
+        composer require craftcms/digital-products
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Digital Products.
 
@@ -27,8 +27,8 @@ To install the plugin, follow these instructions.
 Plugins can be notified right before or right after a product type is saved in case your plugin needs to do something at that point:
 
 ```php
-use craft\commerce\digitalProducts\events\ProductTypeEvent;
-use craft\commerce\digitalProducts\services\ProductTypes;
+use craft\digitalproducts\events\ProductTypeEvent;
+use craft\digitalproducts\services\ProductTypes;
 use yii\base\Event;
 
 // ...
@@ -43,9 +43,9 @@ Event::on(ProductTypes::class, ProductTypes::EVENT_BEFORE_SAVE_PRODUCTTYPE, func
 Plugins get a chance to provide a license key instead of relying on Digital Products to generate one.
 
 ```php
-use craft\commerce\digitalProducts\elements\License;
-use craft\commerce\digitalProducts\events\GenerateKeyEvent;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\events\GenerateKeyEvent;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use yii\base\Event;
 
 // ...

@@ -1,13 +1,13 @@
 {% extends "_layouts/elementindex" %}
 
-{% set title = "Products"|t('commerce-digital-products') %}
+{% set title = "Products"|t('digital-products') %}
 {% set selectedSubnavItem = "products" %}
 
 {% set docTitle = title~' - '~'Digital Products' %}
-{% set elementType = 'craft\\commerce\\digitalProducts\\elements\\Product' %}
+{% set elementType = 'craft\\digitalproducts\\elements\\Product' %}
 
 {% if productTypeHandle is defined %}
     {% includejs 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
 {% endif %}
 
-{% do view.registerAssetBundle('craft\\commerce\\digitalProducts\\web\\assets\\cp\\Bundle') -%}
+{% do view.registerAssetBundle('craft\\digitalproducts\\web\\assets\\cp\\Bundle') -%}

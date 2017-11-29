@@ -1,11 +1,11 @@
 <?php
 
-namespace craft\commerce\digitalProducts\elements\db;
+namespace craft\digitalproducts\elements\db;
 
 use craft\commerce\base\Element;
-use craft\commerce\digitalProducts\elements\License;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\models\ProductType;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\models\ProductType;
 use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\User;

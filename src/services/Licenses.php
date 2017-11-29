@@ -1,11 +1,11 @@
 <?php
 
-namespace craft\commerce\digitalProducts\services;
+namespace craft\digitalproducts\services;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\License;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\events\OrderEvent;
 use craft\commerce\events\ProcessPaymentEvent;

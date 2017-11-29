@@ -1,11 +1,11 @@
 <?php
 
-namespace craft\commerce\digitalProducts\elements\db;
+namespace craft\digitalproducts\elements\db;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\models\ProductType;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\models\ProductType;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\db\Query;
 use craft\db\QueryAbortedException;
 use craft\elements\db\ElementQuery;

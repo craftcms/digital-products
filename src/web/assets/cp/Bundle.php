@@ -5,7 +5,7 @@
  * @license   https://craftcms.com/license
  */
 
-namespace craft\commerce\digitalProducts\web\assets\cp;
+namespace craft\digitalproducts\web\assets\cp;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;

@@ -1,9 +1,9 @@
 <?php
 
-namespace craft\commerce\digitalProducts\fields;
+namespace craft\digitalproducts\fields;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\Product;
+use craft\digitalproducts\elements\Product;
 use craft\fields\BaseRelationField;
 
 /**

@@ -1,10 +1,10 @@
 <?php
-namespace craft\commerce\digitalProducts\models;
+namespace craft\digitalproducts\models;
 
 use craft\base\Model;
 use craft\behaviors\FieldLayoutBehavior;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\helpers\ArrayHelper;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
@@ -78,7 +78,7 @@ class ProductType extends Model
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('commerce-digital-products/producttypes/'.$this->id);
+        return UrlHelper::cpUrl('digital-products/producttypes/'.$this->id);
     }
 
     /**

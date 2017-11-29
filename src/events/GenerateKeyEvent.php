@@ -1,8 +1,8 @@
 <?php
 
-namespace craft\commerce\digitalProducts\events;
+namespace craft\digitalproducts\events;
 
-use craft\commerce\digitalProducts\elements\License;
+use craft\digitalproducts\elements\License;
 use yii\base\Event;
 
 /**

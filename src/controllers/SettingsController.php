@@ -1,10 +1,10 @@
 <?php
 
-namespace craft\commerce\digitalProducts\controllers;
+namespace craft\digitalproducts\controllers;
 
 use Craft;
-use craft\commerce\digitalProducts\models\Settings as SettingsModel;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\models\Settings as SettingsModel;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\web\Controller as BaseController;
 use yii\web\Response;
 

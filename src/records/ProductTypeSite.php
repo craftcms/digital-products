@@ -1,5 +1,5 @@
 <?php
-namespace craft\commerce\digitalProducts\records;
+namespace craft\digitalproducts\records;
 
 use craft\db\ActiveRecord;
 use craft\records\Site;

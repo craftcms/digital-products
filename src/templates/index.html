@@ -1,9 +1,9 @@
 {% if currentUser.can('digitalProducts-manageLicenses') %}
-    {% redirect 'commerce-digital-products/licenses' %}
+    {% redirect 'digital-products/licenses' %}
 {% endif %}
 
 {% if currentUser.can('digitalProducts-manageProducts') %}
-    {% redirect 'commerce-digital-products/products' %}
+    {% redirect 'digital-products/products' %}
 {% endif %}
 
 {% extends "403" %}

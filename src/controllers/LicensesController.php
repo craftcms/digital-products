@@ -1,9 +1,9 @@
 <?php
-namespace craft\commerce\digitalProducts\controllers;
+namespace craft\digitalproducts\controllers;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\License;
-use craft\commerce\digitalProducts\elements\Product;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
 use craft\elements\User;
 use craft\web\Controller as BaseController;
 use yii\base\Exception;
@@ -54,12 +54,12 @@ class LicensesController extends BaseController
             }
         }
 
-        $variables['title'] = $license->id ? (string) $license : Craft::t('commerce-digital-products', 'Create a new License');
+        $variables['title'] = $license->id ? (string) $license : Craft::t('digital-products', 'Create a new License');
         $variables['license'] = $license;
         $variables['userElementType'] = User::class;
         $variables['productElementType'] = Product::class;
 
-        return $this->renderTemplate('commerce-digital-products/licenses/_edit', $variables);
+        return $this->renderTemplate('digital-products/licenses/_edit', $variables);
     }
 
     /**
@@ -105,13 +105,13 @@ class LicensesController extends BaseController
 
         // Save it
         if (!Craft::$app->getElements()->saveElement($license)) {
-            Craft::$app->getSession()->setError(Craft::t('commerce-digital-products', 'Couldn’t save license.'));
+            Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t save license.'));
             Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
 
             return null;
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('commerce-digital-products', 'License saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('digital-products', 'License saved.'));
         return $this->redirectToPostedUrl($license);
     }
 
@@ -138,7 +138,7 @@ class LicensesController extends BaseController
                 return $this->asJson(['success' => true]);
             }
 
-            Craft::$app->getSession()->setNotice(Craft::t('commerce-digital-products', 'License deleted.'));
+            Craft::$app->getSession()->setNotice(Craft::t('digital-products', 'License deleted.'));
             return $this->redirectToPostedUrl($license);
         }
 
@@ -146,7 +146,7 @@ class LicensesController extends BaseController
             return $this->asJson(['success' => false]);
         }
 
-        Craft::$app->getSession()->setError(Craft::t('commerce-digital-products', 'Couldn’t delete license.'));
+        Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete license.'));
         Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
 
         return null;

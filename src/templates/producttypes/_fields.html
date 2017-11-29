@@ -6,15 +6,15 @@
     {% endset %}
 
     {{ forms.field({
-        label: "Product"|t('commerce-digital-products'),
-        instructions: "A deleted digital product"|t('commerce-digital-products')
+        label: "Product"|t('digital-products'),
+        instructions: "A deleted digital product"|t('digital-products')
     }, productInput) }}
 {% else %}
     {{ forms.elementSelectField({
         elementType: productElementType,
         elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
-        instructions: "The digital product that this license should be associated with"|t('commerce-digital-products'),
-        label: "Product"|t('commerce-digital-products'),
+        instructions: "The digital product that this license should be associated with"|t('digital-products'),
+        label: "Product"|t('digital-products'),
         id: 'product',
         errors: license.getErrors('productId'),
         class: 'ltr',
@@ -24,8 +24,8 @@
 {% endif %}
 
 {{ forms.textAreaField({
-	label: "License key"|t('commerce-digital-products'),
-	instructions: "The license key is generated automatically"|t('commerce-digital-products'),
+	label: "License key"|t('digital-products'),
+	instructions: "The license key is generated automatically"|t('digital-products'),
 	id: 'licenseKey',
 	class: 'code',
 	name: 'licenseKey',
@@ -36,18 +36,18 @@
 {{ forms.elementSelectField({
 	elementType: userElementType,
 	elements: license.userId ? craft.users.id(license.userId).find() : null,
-	label: "Owner"|t('commerce-digital-products'),
+	label: "Owner"|t('digital-products'),
 	id: 'owner',
 	class: 'ltr',
 	name: 'owner',
 	limit: 1,
 	errors: license.getErrors('userId'),
 	required: true,
-	instructions: "Required, if Owner Email field is blank."|t('commerce-digital-products')
+	instructions: "Required, if Owner Email field is blank."|t('digital-products')
 }) }}
 
 {{ forms.textField({
-	label: "Owner Name"|t('commerce-digital-products'),
+	label: "Owner Name"|t('digital-products'),
 	id: 'ownerName',
 	class: 'ltr',
 	name: 'ownerName',
@@ -56,12 +56,12 @@
 }) }}
 
 {{ forms.textField({
-	label: "Owner Email"|t('commerce-digital-products'),
+	label: "Owner Email"|t('digital-products'),
 	id: 'ownerEmail',
 	class: 'ltr',
 	name: 'ownerEmail',
 	value: license.ownerEmail,
 	errors: license.getErrors('ownerEmail'),
 	required: true,
-	instructions: "Required, if Owner field is blank."|t('commerce-digital-products'),
+	instructions: "Required, if Owner field is blank."|t('digital-products'),
 }) }}

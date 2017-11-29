@@ -1,5 +1,5 @@
 <?php
-namespace craft\commerce\digitalProducts\records;
+namespace craft\digitalproducts\records;
 
 use craft\commerce\records\TaxCategory;
 use craft\db\ActiveRecord;

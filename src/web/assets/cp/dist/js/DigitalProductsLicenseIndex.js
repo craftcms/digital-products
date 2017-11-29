@@ -6,7 +6,7 @@ if (typeof Craft.DigitalProducts === 'undefined') {
     Craft.DigitalProducts = {};
 }
 
-var elementTypeClass = 'craft\\commerce\\digitalProducts\\elements\\License';
+var elementTypeClass = 'craft\\digitalproducts\\elements\\License';
 
 /**
  * Product index class
@@ -14,8 +14,8 @@ var elementTypeClass = 'craft\\commerce\\digitalProducts\\elements\\License';
 Craft.DigitalProducts.LicenseIndex = Craft.BaseElementIndex.extend({
 
     afterInit: function() {
-        var href = 'href="'+Craft.getUrl('commerce-digital-products/licenses/new')+'"',
-            label = Craft.t('commerce-digital-products', 'New license');
+        var href = 'href="'+Craft.getUrl('digital-products/licenses/new')+'"',
+            label = Craft.t('digital-products', 'New license');
 
         this.$newProductBtnGroup = $('<div class="btngroup submit"/>');
         this.$newProductBtn = $('<a class="btn submit add icon" '+href+'>'+label+'</a>').appendTo(this.$newProductBtnGroup);

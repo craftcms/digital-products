@@ -1,9 +1,9 @@
 {% extends "_layouts/elementindex" %}
 
-{% set title = "Licenses"|t('commerce-digital-products') %}
+{% set title = "Licenses"|t('digital-products') %}
 {% set selectedSubnavItem = "licenses" %}
 
 {% set docTitle = title~' - '~'Digital Products' %}
-{% set elementType = 'craft\\commerce\\digitalProducts\\elements\\License' %}
+{% set elementType = 'craft\\digitalproducts\\elements\\License' %}
 
-{% do view.registerAssetBundle('craft\\commerce\\digitalProducts\\web\\assets\\cp\\Bundle') -%}
+{% do view.registerAssetBundle('craft\\digitalproducts\\web\\assets\\cp\\Bundle') -%}

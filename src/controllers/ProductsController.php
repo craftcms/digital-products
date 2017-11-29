@@ -1,9 +1,9 @@
 <?php
-namespace craft\commerce\digitalProducts\controllers;
+namespace craft\digitalproducts\controllers;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\helpers\Localization;

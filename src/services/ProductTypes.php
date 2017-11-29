@@ -1,13 +1,13 @@
 <?php
 
-namespace craft\commerce\digitalProducts\services;
+namespace craft\digitalproducts\services;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\models\ProductType;
-use craft\commerce\digitalProducts\models\ProductTypeSite;
-use craft\commerce\digitalProducts\records\ProductType as ProductTypeRecord;
-use craft\commerce\digitalProducts\records\ProductTypeSite as ProductTypeSiteRecord;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\models\ProductType;
+use craft\digitalproducts\models\ProductTypeSite;
+use craft\digitalproducts\records\ProductType as ProductTypeRecord;
+use craft\digitalproducts\records\ProductTypeSite as ProductTypeSiteRecord;
 use craft\commerce\events\ProductTypeEvent;
 use craft\db\Query;
 use craft\events\SiteEvent;

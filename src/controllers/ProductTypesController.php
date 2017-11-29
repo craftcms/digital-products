@@ -1,11 +1,11 @@
 <?php
-namespace craft\commerce\digitalProducts\controllers;
+namespace craft\digitalproducts\controllers;
 
 use Craft;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\models\ProductType;
-use craft\commerce\digitalProducts\models\ProductTypeSite;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\models\ProductType;
+use craft\digitalproducts\models\ProductTypeSite;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\web\Controller as BaseController;
 use yii\base\Exception;
 use yii\web\Response;
@@ -60,9 +60,9 @@ class ProductTypesController extends BaseController
             $variables['productType'] = $productType;
         }
         
-        $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('commerce-digital-products', 'Create a new digital product type');
+        $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('digital-products', 'Create a new digital product type');
 
-        return $this->renderTemplate('commerce-digital-products/producttypes/_edit', $variables);
+        return $this->renderTemplate('digital-products/producttypes/_edit', $variables);
     }
 
     /**
@@ -114,7 +114,7 @@ class ProductTypesController extends BaseController
 
         // Save it
         if (DigitalProducts::getInstance()->getProductTypes()->saveProductType($productType)) {
-            Craft::$app->getSession()->setNotice(Craft::t('commerce-digital-products', 'Product type saved.'));
+            Craft::$app->getSession()->setNotice(Craft::t('digital-products', 'Product type saved.'));
 
             return $this->redirectToPostedUrl($productType);
         }

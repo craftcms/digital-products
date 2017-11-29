@@ -1,8 +1,8 @@
 <?php
-namespace craft\commerce\digitalProducts\models;
+namespace craft\digitalproducts\models;
 
 use craft\base\Model;
-use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use yii\base\InvalidConfigException;
 
 /**

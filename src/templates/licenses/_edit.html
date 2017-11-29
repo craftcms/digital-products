@@ -5,15 +5,15 @@
 
 {% import "_includes/forms" as forms %}
 
-{% set statusOptions = [{label: 'Active'|t('commerce-digital-products'), value: 1}, {label: 'Disabled'|t('commerce-digital-products'), value: 0}] %}
+{% set statusOptions = [{label: 'Active'|t('digital-products'), value: 1}, {label: 'Disabled'|t('digital-products'), value: 0}] %}
 
 {% block content %}
-    <input type="hidden" name="action" value="commerce-digital-products/licenses/save">
-    <input type="hidden" name="redirect" value="{{ 'commerce-digital-products/licenses'|hash }}">
+    <input type="hidden" name="action" value="digital-products/licenses/save">
+    <input type="hidden" name="redirect" value="{{ 'digital-products/licenses'|hash }}">
     {% if license.id %}<input type="hidden" name="licenseId" value="{{ license.id }}">{% endif %}
 
     <div id="fields">
-        {% include 'commerce-digital-products/licenses/_fields' %}
+        {% include 'digital-products/licenses/_fields' %}
     </div>
 {% endblock %}
 
@@ -33,17 +33,17 @@
                 <div class="right">
                     <input type="button"
                            class="btn small formsubmit"
-                           value="{{ 'Delete'|t('commerce-digital-products') }}"
-                           data-action="commerce-digital-products/licenses/delete"
-                           data-confirm="{{ 'Are you sure you want to delete this license?'|t('commerce-digital-products') }}"
-                           data-redirect="{{ 'commerce-digital-products/licenses'|hash }}">
+                           value="{{ 'Delete'|t('digital-products') }}"
+                           data-action="digital-products/licenses/delete"
+                           data-confirm="{{ 'Are you sure you want to delete this license?'|t('digital-products') }}"
+                           data-redirect="{{ 'digital-products/licenses'|hash }}">
                 </div>
             {% endif %}
         {% endset %}
 
         {{ forms.field({
             id: 'enabled',
-            label: 'Enabled?'|t('commerce-digital-products')
+            label: 'Enabled?'|t('digital-products')
         }, statusInput) }}
     </div>
     <hr />
@@ -58,11 +58,11 @@
             {% endset %}
         {% endif %}
         {{ forms.field({
-            label: "Product order"|t('commerce-digital-products')
+            label: "Product order"|t('digital-products')
         }, productInput) }}
 
         {{ forms.dateTimeField({
-            label: 'License issue date'|t('commerce-digital-products'),
+            label: 'License issue date'|t('digital-products'),
             id: 'dateCreated',
             name: 'dateCreated',
             value: license.dateCreated,

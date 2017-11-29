@@ -1,8 +1,8 @@
 <?php
 
-namespace craft\commerce\digitalProducts\events;
+namespace craft\digitalproducts\events;
 
-use craft\commerce\digitalProducts\models\ProductType;
+use craft\digitalproducts\models\ProductType;
 use yii\base\Event;
 
 /**

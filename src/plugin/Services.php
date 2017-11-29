@@ -1,9 +1,9 @@
 <?php
 
-namespace craft\commerce\digitalProducts\plugin;
+namespace craft\digitalproducts\plugin;
 
-use craft\commerce\digitalProducts\services\Licenses;
-use craft\commerce\digitalProducts\services\ProductTypes;
+use craft\digitalproducts\services\Licenses;
+use craft\digitalproducts\services\ProductTypes;
 
 /**
  * Service trait

@@ -1,12 +1,12 @@
 <?php
-namespace craft\commerce\digitalProducts\variables;
+namespace craft\digitalproducts\variables;
 
-use craft\commerce\digitalProducts\elements\db\LicenseQuery;
-use craft\commerce\digitalProducts\elements\db\ProductQuery;
-use craft\commerce\digitalProducts\elements\License;
-use craft\commerce\digitalProducts\elements\Product;
-use craft\commerce\digitalProducts\models\ProductType;
-use craft\commerce\digitalProducts\Plugin as DigitalProductsPlugin;
+use craft\digitalproducts\elements\db\LicenseQuery;
+use craft\digitalproducts\elements\db\ProductQuery;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\models\ProductType;
+use craft\digitalproducts\Plugin as DigitalProductsPlugin;
 
 /**
  * Variable class.
