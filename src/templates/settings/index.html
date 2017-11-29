@@ -6,7 +6,7 @@
 
 {% import "_includes/forms" as forms %}
 
-{% set title = "Settings"|t('commerce-digitalproducts') %}
+{% set title = "Settings"|t('commerce-digital-products') %}
 
 {% block content %}
 
@@ -15,29 +15,29 @@
     {% endif %}
 
     <form action="" method="post" accept-charset="UTF-8">
-        <input type="hidden" name="action" value="commerce-digitalproducts/settings/save-settings">
-        {{ redirectInput('commerce-digitalproducts/settings') }}
+        <input type="hidden" name="action" value="commerce-digital-products/settings/save-settings">
+        {{ redirectInput('commerce-digital-products/settings') }}
         {{ csrfInput() }}
 
         {{ forms.lightswitchField({
             label: 'Auto-assign licenses on purchase'|t('commerce'),
-            instructions: "Whether license should automatically be assigned to existing users if the emails match."|t('commerce-digitalproducts'),
+            instructions: "Whether license should automatically be assigned to existing users if the emails match."|t('commerce-digital-products'),
             id: 'autoAssignUserOnPurchase',
             name: 'settings[autoAssignUserOnPurchase]',
             on: settings.autoAssignUserOnPurchase,
         }) }}
 
         {{ forms.lightswitchField({
-            label: 'Auto-assign licenses on registration'|t('commerce-digitalproducts'),
-            instructions: "Whether licenses should be automatically assigned to newly-registered users if the emails match."|t('commerce-digitalproducts'),
+            label: 'Auto-assign licenses on registration'|t('commerce-digital-products'),
+            instructions: "Whether licenses should be automatically assigned to newly-registered users if the emails match."|t('commerce-digital-products'),
             id: 'autoAssignLicensesOnUserRegistration',
             name: 'settings[autoAssignLicensesOnUserRegistration]',
             on: settings.autoAssignLicensesOnUserRegistration,
         }) }}
 
         {{ forms.textField({
-            label: 'License key characters'|t('commerce-digitalproducts'),
-            instructions: "The available characters that can be used in license key generation."|t('commerce-digitalproducts'),
+            label: 'License key characters'|t('commerce-digital-products'),
+            instructions: "The available characters that can be used in license key generation."|t('commerce-digital-products'),
             id: 'licenseKeyCharacters',
             name: 'settings[licenseKeyCharacters]',
             value: settings.licenseKeyCharacters,
@@ -45,8 +45,8 @@
         }) }}
 
         {{ forms.textField({
-            label: 'Key length'|t('commerce-digitalproducts'),
-            instructions: 'The length of generated license keys. Must be between 0 and 256.'|t('commerce-digitalproducts'),
+            label: 'Key length'|t('commerce-digital-products'),
+            instructions: 'The length of generated license keys. Must be between 0 and 256.'|t('commerce-digital-products'),
             id: 'licenseKeyLength',
             name: 'settings[licenseKeyLength]',
             value: settings.licenseKeyLength,
@@ -54,8 +54,8 @@
         }) }}
 
         {{ forms.lightswitchField({
-            label: 'Require a logged in user.'|t('commerce-digitalproducts'),
-            instructions: "Whether a user must be logged in when completing an order with at least one digital product in the cart."|t('commerce-digitalproducts'),
+            label: 'Require a logged in user.'|t('commerce-digital-products'),
+            instructions: "Whether a user must be logged in when completing an order with at least one digital product in the cart."|t('commerce-digital-products'),
             id: 'requireLoggedInUser',
             name: 'settings[requireLoggedInUser]',
             on: settings.requireLoggedInUser,

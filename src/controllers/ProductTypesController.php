@@ -60,9 +60,9 @@ class ProductTypesController extends BaseController
             $variables['productType'] = $productType;
         }
         
-        $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('commerce-digitalproducts', 'Create a new digital product type');
+        $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('commerce-digital-products', 'Create a new digital product type');
 
-        return $this->renderTemplate('commerce-digitalproducts/producttypes/_edit', $variables);
+        return $this->renderTemplate('commerce-digital-products/producttypes/_edit', $variables);
     }
 
     /**
@@ -114,7 +114,7 @@ class ProductTypesController extends BaseController
 
         // Save it
         if (DigitalProducts::getInstance()->getProductTypes()->saveProductType($productType)) {
-            Craft::$app->getSession()->setNotice(Craft::t('commerce-digitalproducts', 'Product type saved.'));
+            Craft::$app->getSession()->setNotice(Craft::t('commerce-digital-products', 'Product type saved.'));
 
             return $this->redirectToPostedUrl($productType);
         }

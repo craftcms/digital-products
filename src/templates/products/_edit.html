@@ -2,15 +2,15 @@
 {% set selectedSubnavItem = "products" %}
 
 {% set crumbs = [
-    { label: "Digital Products"|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/index') },
-    { label: productType.name|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/products/'~productType.handle) },
+    { label: "Digital Products"|t('commerce-digital-products'), url: url('commerce-digital-products/index') },
+    { label: productType.name|t('commerce-digital-products'), url: url('commerce-digital-products/products/'~productType.handle) },
 ] %}
 
 {% set fullPageForm = true %}
 {% set saveShortcutRedirect = continueEditingUrl %}
 
 {% import "_includes/forms" as forms %}
-{% import "commerce-digitalproducts/products/_fields" as productFields %}
+{% import "commerce-digital-products/products/_fields" as productFields %}
 
 {% block header %}
     {{ block('pageTitle') }}
@@ -25,20 +25,20 @@
 
 {% block actionButton %}
     <div class="btngroup">
-        <input type="submit" class="btn submit" value="{{ 'Save'|t('commerce-digitalproducts') }}">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('commerce-digital-products') }}">
         <div class="btn submit menubtn"></div>
         <div class="menu">
             <ul>
                 <li>
                     <a class="formsubmit" data-redirect="{{ continueEditingUrl|hash }}">
-                        {{ "Save and continue editing"|t('commerce-digitalproducts') }}
+                        {{ "Save and continue editing"|t('commerce-digital-products') }}
                         {{ forms.optionShortcutLabel('S') }}
                     </a>
                 </li>
                 {% if product.id %}
                     <li>
                         <a class="formsubmit" data-param="productId" data-value="" data-redirect="{{ continueEditingUrl|hash }}">
-                            {{ "Save as a new product"|t('commerce-digitalproducts') }}
+                            {{ "Save as a new product"|t('commerce-digital-products') }}
                         </a>
                     </li>
                 {% endif %}
@@ -48,7 +48,7 @@
                 <ul>
                     <li>
                         <a class="formsubmit error" data-action="digitalproducts/products/delete" data-confirm="{{ 'Are you sure you want to delete this product?'|t('commerce') }}" data-redirect="{{ 'commerce/products'|hash }}">
-                            {{ 'Delete'|t('commerce-digitalproducts') }}
+                            {{ 'Delete'|t('commerce-digital-products') }}
                         </a>
                     </li>
                 </ul>
@@ -84,8 +84,8 @@
 {% endblock %}
 
 {% block content %}
-        <input type="hidden" name="action" value="commerce-digitalproducts/products/save">
-        <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/products'|hash }}">
+        <input type="hidden" name="action" value="commerce-digital-products/products/save">
+        <input type="hidden" name="redirect" value="{{ 'commerce-digital-products/products'|hash }}">
         <input type="hidden" name="typeId" value="{{ productType.id }}">
         {{ getCsrfInput() }}
         {% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
@@ -132,9 +132,9 @@
                 <div class="right">
                     <input type="button"
                            class="btn small formsubmit"
-                           value="{{ 'Delete'|t('commerce-digitalproducts') }}"
+                           value="{{ 'Delete'|t('commerce-digital-products') }}"
                            data-action="digitalProducts/products/deleteProduct"
-                           data-confirm="{{ 'Are you sure you want to delete this product?'|t('commerce-digitalproducts') }}"
+                           data-confirm="{{ 'Are you sure you want to delete this product?'|t('commerce-digital-products') }}"
                            data-redirect="digitalproducts/products">
                 </div>
             {% endif %}
@@ -142,7 +142,7 @@
 
         {{ forms.field({
             id: 'enabled',
-            label: 'Enabled?'|t('commerce-digitalproducts')
+            label: 'Enabled?'|t('commerce-digital-products')
         }, statusInput) }}
     </div>
     <hr>
@@ -162,16 +162,16 @@
         <hr>
         <div class="meta read-only">
             <div class="data">
-                <h5 class="heading">{{ "Date Created"|t('commerce-digitalproducts') }}</h5>
+                <h5 class="heading">{{ "Date Created"|t('commerce-digital-products') }}</h5>
                 <div class="value">{{ product.dateCreated|date('short') }} {{ product.dateCreated|time('short') }}</div>
             </div>
             <div class="data">
-                <h5 class="heading">{{ "Date Updated"|t('commerce-digitalproducts') }}</h5>
+                <h5 class="heading">{{ "Date Updated"|t('commerce-digital-products') }}</h5>
                 <div class="value">{{ product.dateUpdated|date('short') }} {{ product.dateUpdated|time('short') }}</div>
             </div>
             {% if promotion is defined and promotions.sales|length %}
                 <div class="data">
-                    <h5 class="heading">{{ "Associated Sales"|t('commerce-digitalproducts') }}</h5>
+                    <h5 class="heading">{{ "Associated Sales"|t('commerce-digital-products') }}</h5>
                     <div class="value">
                         <ul class="commerce-sales">
                             {% for promotion in promotions.sales %}

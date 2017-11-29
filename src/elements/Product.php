@@ -163,7 +163,7 @@ class Product extends Purchasable
         $sources = [
             [
                 'key' => '*',
-                'label' => Craft::t('commerce-digitalproducts', 'All products'),
+                'label' => Craft::t('commerce-digital-products', 'All products'),
                 'criteria' => [
                     'typeId' => $productTypeIds,
                     'editable' => $editable
@@ -172,7 +172,7 @@ class Product extends Purchasable
             ]
         ];
 
-        $sources[] = ['heading' => Craft::t('commerce-digitalproducts', 'Product Types')];
+        $sources[] = ['heading' => Craft::t('commerce-digital-products', 'Product Types')];
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
@@ -198,10 +198,10 @@ class Product extends Purchasable
     public function getStatuses(): array
     {
         return [
-            self::STATUS_LIVE => Craft::t('commerce-digitalproducts', 'Live'),
-            self::STATUS_PENDING => Craft::t('commerce-digitalproducts', 'Pending'),
-            self::STATUS_EXPIRED => Craft::t('commerce-digitalproducts', 'Expired'),
-            self::STATUS_DISABLED => Craft::t('commerce-digitalproducts', 'Disabled')
+            self::STATUS_LIVE => Craft::t('commerce-digital-products', 'Live'),
+            self::STATUS_PENDING => Craft::t('commerce-digital-products', 'Pending'),
+            self::STATUS_EXPIRED => Craft::t('commerce-digital-products', 'Expired'),
+            self::STATUS_DISABLED => Craft::t('commerce-digital-products', 'Disabled')
         ];
     }
 
@@ -212,12 +212,12 @@ class Product extends Purchasable
     public function getEditorHtml(): string
     {
         $viewService = Craft::$app->getView();
-        $html = $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'titleField', [$this]);
+        $html = $viewService->renderTemplateMacro('commerce-digital-products/products/_fields', 'titleField', [$this]);
         $html .= parent::getEditorHtml();
-        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'generalFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'pricingFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'behavioralMetaFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('commerce-digitalproducts/products/_fields', 'generalMetaFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digital-products/products/_fields', 'generalFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digital-products/products/_fields', 'pricingFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digital-products/products/_fields', 'behavioralMetaFields', [$this]);
+        $html .= $viewService->renderTemplateMacro('commerce-digital-products/products/_fields', 'generalMetaFields', [$this]);
 
         return $html;
     }
@@ -349,7 +349,7 @@ class Product extends Purchasable
         $productType = $this->getType();
 
         if ($productType) {
-            return UrlHelper::cpUrl('commerce-digitalproducts/products/'.$productType->handle.'/'.$this->id);
+            return UrlHelper::cpUrl('commerce-digital-products/products/'.$productType->handle.'/'.$this->id);
         }
 
         return null;
@@ -568,13 +568,13 @@ class Product extends Purchasable
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => ['label' => Craft::t('commerce-digitalproducts', 'Title')],
-            'type' => ['label' => Craft::t('commerce-digitalproducts', 'Type')],
-            'slug' => ['label' => Craft::t('commerce-digitalproducts', 'Slug')],
-            'sku' => ['label' => Craft::t('commerce-digitalproducts', 'SKU')],
-            'price' => ['label' => Craft::t('commerce-digitalproducts', 'Price')],
-            'postDate' => ['label' => Craft::t('commerce-digitalproducts', 'Post Date')],
-            'expiryDate' => ['label' => Craft::t('commerce-digitalproducts', 'Expiry Date')],
+            'title' => ['label' => Craft::t('commerce-digital-products', 'Title')],
+            'type' => ['label' => Craft::t('commerce-digital-products', 'Type')],
+            'slug' => ['label' => Craft::t('commerce-digital-products', 'Slug')],
+            'sku' => ['label' => Craft::t('commerce-digital-products', 'SKU')],
+            'price' => ['label' => Craft::t('commerce-digital-products', 'Price')],
+            'postDate' => ['label' => Craft::t('commerce-digital-products', 'Post Date')],
+            'expiryDate' => ['label' => Craft::t('commerce-digital-products', 'Expiry Date')],
         ];
     }
 
@@ -626,7 +626,7 @@ class Product extends Purchasable
                 return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
 
             case 'promotable':
-                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('commerce-digitalproducts', 'Yes').'"></span>' : '');
+                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('commerce-digital-products', 'Yes').'"></span>' : '');
 
             default:
                 return parent::tableAttributeHtml($attribute);
@@ -639,10 +639,10 @@ class Product extends Purchasable
     protected static function defineSortOptions(): array
     {
         return [
-            'title' => Craft::t('commerce-digitalproducts', 'Title'),
-            'postDate' => Craft::t('commerce-digitalproducts', 'Post Date'),
-            'expiryDate' => Craft::t('commerce-digitalproducts', 'Expiry Date'),
-            'price' => Craft::t('commerce-digitalproducts', 'Price'),
+            'title' => Craft::t('commerce-digital-products', 'Title'),
+            'postDate' => Craft::t('commerce-digital-products', 'Post Date'),
+            'expiryDate' => Craft::t('commerce-digital-products', 'Expiry Date'),
+            'price' => Craft::t('commerce-digital-products', 'Price'),
         ];
     }
 }

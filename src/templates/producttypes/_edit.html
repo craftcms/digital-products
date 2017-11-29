@@ -2,8 +2,8 @@
 {% set selectedSubnavItem = "productTypes" %}
 
 {% set crumbs = [
-    { label: "Digital Products"|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/index') },
-    { label: "Product Types"|t('commerce-digitalproducts'), url: url('commerce-digitalproducts/producttypes/index') }
+    { label: "Digital Products"|t('commerce-digital-products'), url: url('commerce-digital-products/index') },
+    { label: "Product Types"|t('commerce-digital-products'), url: url('commerce-digital-products/producttypes/index') }
 ] %}
 
 {% set fullPageForm = true %}
@@ -12,14 +12,14 @@
 {% import "_includes/forms" as forms %}
 
 {% block content %}
-    <input type="hidden" name="action" value="commerce-digitalproducts/product-types/save">
-    <input type="hidden" name="redirect" value="{{ 'commerce-digitalproducts/producttypes'|hash }}">
+    <input type="hidden" name="action" value="commerce-digital-products/product-types/save">
+    <input type="hidden" name="redirect" value="{{ 'commerce-digital-products/producttypes'|hash }}">
     {% if productType.id %}<input type="hidden" name="productTypeId" value="{{ productType.id }}">{% endif %}
 
     {{ forms.textField({
         first: true,
-        label: "Name"|t('commerce-digitalproducts'),
-        instructions: "What this product type will be called in the CP."|t('commerce-digitalproducts'),
+        label: "Name"|t('commerce-digital-products'),
+        instructions: "What this product type will be called in the CP."|t('commerce-digital-products'),
         id: 'name',
         name: 'name',
         value: productType.name,
@@ -30,8 +30,8 @@
     }) }}
 
     {{ forms.textField({
-        label: "Handle"|t('commerce-digitalproducts'),
-        instructions: "How you’ll refer to this product type in the templates."|t('commerce-digitalproducts'),
+        label: "Handle"|t('commerce-digital-products'),
+        instructions: "How you’ll refer to this product type in the templates."|t('commerce-digital-products'),
         id: 'handle',
         class: 'code',
         name: 'handle',
@@ -41,8 +41,8 @@
     }) }}
 
     {{ forms.textField({
-        label: "Automatic SKU Format"|t('commerce-digitalproducts'),
-        instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t('commerce-digitalproducts',{ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
+        label: "Automatic SKU Format"|t('commerce-digital-products'),
+        instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t('commerce-digital-products',{ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
         id: 'skuFormat',
         class: 'ltr',
         name: 'skuFormat',
@@ -54,7 +54,7 @@
         {% from "_includes/forms" import checkboxField %}
 
         {{ checkboxField({
-            label: "Products of this type have their own URLs"|t('commerce-digitalproducts'),
+            label: "Products of this type have their own URLs"|t('commerce-digital-products'),
             id: 'hasUrls',
             name: 'hasUrls',
             checked: productType.hasUrls,
@@ -66,8 +66,8 @@
         {% from "_includes/forms" import textField %}
 
         {{ textField({
-            label: "Product Template"|t('commerce-digitalproducts'),
-            instructions: "The template to use when a product’s URL is requested."|t('commerce-digitalproducts'),
+            label: "Product Template"|t('commerce-digital-products'),
+            instructions: "The template to use when a product’s URL is requested."|t('commerce-digital-products'),
             id: 'template',
             class: 'ltr',
             name: 'template',

@@ -2,12 +2,12 @@
 	{%- import "_includes/forms" as forms -%}
 
 	{{ forms.textField({
-		label: "Title"|t('commerce-digitalproducts'),
+		label: "Title"|t('commerce-digital-products'),
         site: product.site,
 		id: 'title',
 		name: 'title',
 		value: product.title,
-		placeholder: 'Enter title'|t('commerce-digitalproducts'),
+		placeholder: 'Enter title'|t('commerce-digital-products'),
 		errors: product.getErrors('title'),
 		first: true,
 		autofocus: true,
@@ -21,16 +21,16 @@
 	{%- import "_includes/forms" as forms -%}
 
 	{{ forms.textField({
-		label: "Slug"|t('commerce-digitalproducts'),
+		label: "Slug"|t('commerce-digital-products'),
 		id: 'slug',
 		name: 'slug',
 		value: product.slug,
-		placeholder: 'Enter slug'|t('commerce-digitalproducts'),
+		placeholder: 'Enter slug'|t('commerce-digital-products'),
 		errors: product.getErrors('slug')|merge(product.getErrors('uri'))
 	}) }}
 
 	{{ forms.dateTimeField({
-		label: 'Post Date'|t('commerce-digitalproducts'),
+		label: 'Post Date'|t('commerce-digital-products'),
 		id: 'postDate',
 		name: 'postDate',
 		value: product.postDate,
@@ -38,7 +38,7 @@
 	}) }}
 
 	{{ forms.dateTimeField({
-		label: 'Expiry Date'|t('commerce-digitalproducts'),
+		label: 'Expiry Date'|t('commerce-digital-products'),
 		id: 'expiryDate',
 		name: 'expiryDate',
 		value: product.expiryDate,
@@ -51,7 +51,7 @@
 	{%- import "_includes/forms" as forms -%}
 
 	{{ forms.selectField({
-		label: 'Tax Category'|t('commerce-digitalproducts'),
+		label: 'Tax Category'|t('commerce-digital-products'),
 		name: 'taxCategoryId',
 		value: product.taxCategoryId,
 		required: true,
@@ -60,7 +60,7 @@
 
 	{{ forms.checkboxField({
 		id: 'promotable',
-		fieldLabel: 'Promotable'|t('commerce-digitalproducts'),
+		fieldLabel: 'Promotable'|t('commerce-digital-products'),
 		name: 'promotable',
 		checked: product.promotable,
 	}) }}
@@ -72,11 +72,11 @@
 
 	{{ forms.textField({
 		id: 'sku',
-		label: 'SKU'|t('commerce-digitalproducts'),
+		label: 'SKU'|t('commerce-digital-products'),
 		required: true,
 		name: 'sku',
 		value: product.sku,
-		placeholder: 'Enter SKU'|t('commerce-digitalproducts'),
+		placeholder: 'Enter SKU'|t('commerce-digital-products'),
 		errors: product.getErrors('sku')
 	}) }}
 
@@ -88,10 +88,10 @@
 
 	{{ forms.textField({
 		id: 'price',
-		label: 'Price'|t('commerce-digitalproducts'),
+		label: 'Price'|t('commerce-digital-products'),
 		name: 'price',
 		value: (product.price == '0' ? '0'|number : (product.price ?  product.price|number ?: '')),
-		placeholder: 'Enter price'|t('commerce-digitalproducts'),
+		placeholder: 'Enter price'|t('commerce-digital-products'),
 		unit: craft.commerce.primaryPaymentCurrency.iso,
 		required: true,
 		errors: product.getErrors('price')

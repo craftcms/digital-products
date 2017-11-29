@@ -205,7 +205,7 @@ class Install extends Migration
         // Update this one's settings to old values
         $this->update('{{%plugins}}', [
             'settings' => $row['settings']
-        ], ['handle' => 'commerce-digitalproducts']);
+        ], ['handle' => 'commerce-digital-products']);
 
         // Delete the old row
         $this->delete('{{%plugins}}', ['id' => $row['id']]);

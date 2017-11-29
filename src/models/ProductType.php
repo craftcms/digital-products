@@ -78,7 +78,7 @@ class ProductType extends Model
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('commerce-digitalproducts/producttypes/'.$this->id);
+        return UrlHelper::cpUrl('commerce-digital-products/producttypes/'.$this->id);
     }
 
     /**

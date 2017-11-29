@@ -29,14 +29,14 @@ class SettingsController extends BaseController
         $settings = new SettingsModel($postData);
 
         if (!$settings->validate()) {
-            Craft::$app->getSession()->setError(Craft::t('commerce-digitalproducts', 'Couldn’t save settings.'));
+            Craft::$app->getSession()->setError(Craft::t('commerce-digital-products', 'Couldn’t save settings.'));
 
-            return $this->renderTemplate('commerce-digitalproducts/settings', ['settings' => $settings]);
+            return $this->renderTemplate('commerce-digital-products/settings', ['settings' => $settings]);
         }
 
         Craft::$app->getPlugins()->savePluginSettings(DigitalProducts::getInstance(), $settings->toArray());
 
-        Craft::$app->getSession()->setNotice(Craft::t('commerce-digitalproducts', 'Settings saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('commerce-digital-products', 'Settings saved.'));
 
         return $this->redirectToPostedUrl();
     }

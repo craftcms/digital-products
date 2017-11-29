@@ -103,7 +103,7 @@ class License extends Element
      */
     public function __toString()
     {
-        return Craft::t('commerce-digitalproducts', 'License for “{product}”', ['product' => $this->getProductName()]);
+        return Craft::t('commerce-digital-products', 'License for “{product}”', ['product' => $this->getProductName()]);
     }
 
     /**
@@ -193,7 +193,7 @@ class License extends Element
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('commerce-digitalproducts/licenses/'.$this->id);
+        return UrlHelper::cpUrl('commerce-digital-products/licenses/'.$this->id);
     }
 
     /**
@@ -216,7 +216,7 @@ class License extends Element
     public function getName()
     {
 
-        return Craft::t('commerce-digitalproducts', 'License');
+        return Craft::t('commerce-digital-products', 'License');
     }
 
     /**
@@ -242,13 +242,13 @@ class License extends Element
 
         $sources = [
             '*' => [
-                'label' => Craft::t('commerce-digitalproducts', 'All product types'),
+                'label' => Craft::t('commerce-digital-products', 'All product types'),
                 'criteria' => ['typeId' => $productTypeIds],
                 'defaultSort' => ['dateCreated', 'desc']
             ]
         ];
 
-        $sources[] = ['heading' => Craft::t('commerce-digitalproducts', 'Product Types')];
+        $sources[] = ['heading' => Craft::t('commerce-digital-products', 'Product Types')];
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
@@ -353,7 +353,7 @@ class License extends Element
         $rules[] = [
             'userId',
             'required',
-            'message' => Craft::t('commerce-digitalproducts', 'A license must have either an email or an owner assigned to it.'),
+            'message' => Craft::t('commerce-digital-products', 'A license must have either an email or an owner assigned to it.'),
             'when' => function ($model) {
                 return empty($model->ownerEmail);
             }];
@@ -449,11 +449,11 @@ class License extends Element
     protected static  function defineTableAttributes(): array
     {
         return [
-            'product' => ['label' => Craft::t('commerce-digitalproducts', 'Licensed Product')],
-            'productType' => ['label' => Craft::t('commerce-digitalproducts', 'Product Type')],
-            'dateCreated' => ['label' => Craft::t('commerce-digitalproducts', 'License Issue Date')],
-            'licensedTo' => ['label' => Craft::t('commerce-digitalproducts', 'Licensed To')],
-            'orderLink' => ['label' => Craft::t('commerce-digitalproducts', 'Associated Order')]
+            'product' => ['label' => Craft::t('commerce-digital-products', 'Licensed Product')],
+            'productType' => ['label' => Craft::t('commerce-digital-products', 'Product Type')],
+            'dateCreated' => ['label' => Craft::t('commerce-digital-products', 'License Issue Date')],
+            'licensedTo' => ['label' => Craft::t('commerce-digital-products', 'Licensed To')],
+            'orderLink' => ['label' => Craft::t('commerce-digital-products', 'Associated Order')]
         ];
     }
 
@@ -500,7 +500,7 @@ class License extends Element
             case 'orderLink':
                 $url = $this->getOrderEditUrl();
 
-                return $url ? '<a href="'.$url.'">'.Craft::t('commerce-digitalproducts', 'View order').'</a>' : '';
+                return $url ? '<a href="'.$url.'">'.Craft::t('commerce-digital-products', 'View order').'</a>' : '';
 
             default: {
                 return parent::tableAttributeHtml($attribute);
@@ -514,9 +514,9 @@ class License extends Element
     protected static function defineSortOptions(): array
     {
         return [
-            'slug' => Craft::t('commerce-digitalproducts', 'Product name'),
-            'licensedTo' => Craft::t('commerce-digitalproducts', 'Owner'),
-            'dateCreated' => Craft::t('commerce-digitalproducts', 'License issue date'),
+            'slug' => Craft::t('commerce-digital-products', 'Product name'),
+            'licensedTo' => Craft::t('commerce-digital-products', 'Owner'),
+            'dateCreated' => Craft::t('commerce-digital-products', 'License issue date'),
         ];
     }
 
