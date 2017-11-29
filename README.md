@@ -4,52 +4,60 @@ This plugin makes it possible to sell licenses for digital products with [Craft 
 
 ## Requirements
 
-Digital Products requires Craft CMS 2.6 or later and Craft Commerce 1.1 or later.
+Digital Products requires Craft CMS 3.0 or later and Craft Commerce 2.0 or later.
 
 ## Installation
 
-To install Digital Products, copy the digitalproducts/ folder into craft/plugins/, and then go to Settings → Plugins and click the “Install” button next to “Digital Products”.
+To install the plugin, follow these instructions.
 
-## Configuration
+1. Open your terminal and go to your Craft project:
 
-Digital Products gets its own configuration file, located at `craft/config/digitalproducts.php`. It can have the following config settings:
+        cd /path/to/project
 
-- **autoAssignLicensesOnUserRegistration** _(boolean)_ – Whether licenses should be automatically assigned to newly-registered users if the emails match. (Default is `true`.)
-- **autoAssignUserOnPurchase** _(boolean)_ – Whether license should automatically be assigned to existing users if the emails match. (Default is `false`.)
-- **licenseKeyCharacters** (string) – The available characters that can be used in license key generation. (Default is all alphanumeric ASCII characters.)
-- **licenseKeyLength** _(integer)_ – The length of generated license keys. (Default is `24`.)
-- **requireLoggedInUser** _(boolean)_ – Whether a user *must* be logged in when completing an order with at least one digital product in the cart. (Default is `false`.)
+2. Then tell Composer to load the plugin:
 
-## Plugin Hooks
+        composer require craftcms/commerce-digitalproducts
 
-Digital Products offers a few hooks that enable other plugins to modify its behavior:
-
-- **digitalProducts_modifyLicenseKey** – Gives plugins a chance to modify a license key when it’s getting generated.
-
-- **digitalProducts_modifyProductSources** – Gives plugins a chance to modify
-the sources on digital product indexes.
-- **digitalProducts_defineAdditionalProductTableAttributes** – Gives plugins a chance to add additional available table attributes to digital product indexes.
-- **digitalProducts_getProductTableAttributeHtml** – Gives plugins a chance to override the HTML of the table cells on digital product indexes.
-- **digitalProducts_modifyProductSortableAttributes** – Gives plugins a chance to modify the array of sortable attributes on digital product indexes.
-
-- **digitalProducts_modifyLicenseSources** – Gives plugins a chance to modify
-the sources on license indexes.
-- **digitalProducts_defineAdditionalLicenseTableAttributes** – Gives plugins a chance to add additional available table attributes to license indexes.
-- **digitalProducts_getLicenseTableAttributeHtml** – Gives plugins a chance to override the HTML of the table cells on license indexes.
-- **digitalProducts_modifyLicenseSortableAttributes** – Gives plugins a chance to modify the array of sortable attributes on license indexes.
+3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Digital Products.
 
 ## Events
 
-Digital Products offers a few events that other plugins can listen to:
+### The `beforeSaveProductType` and `afterSaveProductType` events
 
-- **digitalProducts_products.onBeforeSaveDigitalProduct** – Raised right before a digital product is saved. Passed with params `product` (the digital product) and `isNewProduct` (whether it’s new). Event handlers can prevent the digital product from being saved by setting `$event->performAction = false`.
-- **digitalProducts_products.onSaveDigitalProduct** – Raised after a digital product is saved. Passed with the param `product` (the digital product).
-- **digitalProducts_products.onBeforeDeleteDigitalProduct** – Raised right before a digital product is deleted. Passed with the param `product` (the digital product). Event handlers can prevent the digital product from being saved by setting `$event->performAction = false`.
-- **digitalProducts_products.onDeleteDigitalProduct** – Raised after a digital product is deleted. Passed with the param `product` (the digital product).
-- **digitalProducts_licenses.onBeforeSaveLicense** – Raised right before a license is being saved. Passed with params `license` (the license) and `isNewLicense` (whether it’s new). Event handlers can prevent the license from being saved by setting `$event->performAction = false`.
-- **digitalProducts_licenses.onSaveLicense** – Raised after a license is saved. Passed with the param `license` (the license).
-- **digitalProducts_licenses.onBeforeDeleteLicense** - Raised when a license is being deleted. Passed with the param `license` (the license). Event handlers can prevent the license from being saved by setting `$event->performAction = false`.
-- **digitalProducts_licenses.onDeleteLicense** - Raised when a license is deleted. Passed with the param `license` (the license).
+Plugins can be notified right before or right after a product type is saved in case your plugin needs to do something at that point:
+
+```php
+use craft\commerce\digitalProducts\events\ProductTypeEvent;
+use craft\commerce\digitalProducts\services\ProductTypes;
+use yii\base\Event;
+
+// ...
+
+Event::on(ProductTypes::class, ProductTypes::EVENT_BEFORE_SAVE_PRODUCTTYPE, function(ProductTypeEvent $e) {
+    // Some custom code to be executed when a product type is saved
+});
+```
+
+### The `beforeGenerateLicenseKey` event
+
+Plugins get a chance to provide a license key instead of relying on Digital Products to generate one.
+
+```php
+use craft\commerce\digitalProducts\elements\License;
+use craft\commerce\digitalProducts\events\GenerateKeyEvent;
+use craft\commerce\digitalProducts\Plugin as DigitalProducts;
+use yii\base\Event;
+
+// ...
+
+Event::on(GenerateKeyEvent::class, License::EVENT_GENERATE_LICENSE_KEY, function(GenerateKeyEvent $e) {
+    do {
+        $licenseKey = // custom key generation logic...
+    } while (!DigitalProducts::getInstance()->getLicenses()->isLicenseKeyUnique($licenseKey));
+
+    $e->licenseKey = $licenseKey;
+});
+```
 
 ## Eager loading
 
@@ -62,7 +70,7 @@ Both licenses and products have several eager-loadable properties
 * `owner` - Allows you to eager-load the Craft user that owns the license, if any.
 
 ### Products
-* `isLicensed` - Eager-loads whether the product is licensed for the currently logged in Craft User.
+* `existingLicenses` - Eager-loads all the existing licenses for the currently logged in Craft User.
 
 ## Examples
 
@@ -106,8 +114,8 @@ Both licenses and products have several eager-loadable properties
 ### Checking if currently logged in user is licensed to access a product.
 
 ```
-    {% set products = craft.digitalProducts.products({type: 'onlineCourses'}).with(['isLicensed']) %}
-    {% if products %}
+    {% set products = craft.digitalProducts.products.type('onlineCourses').with(['existingLicenses']) %}
+    {% if products|length %}
         <table class="table">
             <thead>
                 <tr>
@@ -120,7 +128,7 @@ Both licenses and products have several eager-loadable properties
                     <tr>
                         <td>{{ product.title }}</td>
                         <td>
-                            {% if product.isLicensed() %}
+                            {% if product.existingLicenses|length %}
                                 You already own this product.
                             {% else %}
                                 <a href="{{ product.getUrl() }}">Get it now!</a>
@@ -137,8 +145,10 @@ Both licenses and products have several eager-loadable properties
 
 ### 2.0
 
-* Events
-* product->getProductType is now getType
+* Digital products now fires `beforeSaveProductType`, `afterSaveProductType` and `beforeGenerateLicenseKey` events. For all element-related actions, you should look into [Craft 3 changes for Element hooks](https://github.com/craftcms/docs/blob/master/en/updating-plugins.md#element-hooks).
+* Instead of `$product->getProductType()` you must now use `$product->getType()`
+* Instead of eager-loading a boolean flag `isLicensed` for products, you must now eager-load the `existingLicenses` property, which is an array of existing licenses for that product for the current user.
+
 ### 1.0.5
 
 * Fixed a bug where digital product prices would sometimes not be saved correctly.
