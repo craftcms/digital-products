@@ -48,7 +48,7 @@ class ProductsController extends BaseController
      */
     public function actionIndex(): Response
     {
-        return $this->renderTemplate('commerce-digital-products/products/index');
+        return $this->renderTemplate('digital-products/products/index');
     }
 
     /**
@@ -97,11 +97,11 @@ class ProductsController extends BaseController
         if (!empty($variables['product']->id)) {
             $variables['title'] = $variables['product']->title;
         } else {
-            $variables['title'] = Craft::t('commerce-digital-products', 'Create a new product');
+            $variables['title'] = Craft::t('digital-products', 'Create a new product');
         }
 
         // Can't just use the entry's getCpEditUrl() because that might include the site handle when we don't want it
-        $variables['baseCpEditUrl'] = 'commerce-digital-products/products/'.$variables['productTypeHandle'].'/{id}';
+        $variables['baseCpEditUrl'] = 'digital-products/products/'.$variables['productTypeHandle'].'/{id}';
 
         // Set the "Continue Editing" URL
         $variables['continueEditingUrl'] = $variables['baseCpEditUrl'].
@@ -111,7 +111,7 @@ class ProductsController extends BaseController
 
         //$variables['promotions']['sales'] = Commerce::getInstance()->getSales()->getSalesForProduct($variables['product']);
 
-        return $this->renderTemplate('commerce-digital-products/products/_edit', $variables);
+        return $this->renderTemplate('digital-products/products/_edit', $variables);
     }
 
     /**
@@ -128,7 +128,7 @@ class ProductsController extends BaseController
         $product = Product::findOne($productId);
 
         if (!$product) {
-            throw new Exception(Craft::t('commerce-digital-products', 'No product exists with the ID “{id}”.',['id' => $productId]));
+            throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.',['id' => $productId]));
         }
 
         $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
@@ -138,7 +138,7 @@ class ProductsController extends BaseController
                 $this->asJson(['success' => false]);
             }
 
-            Craft::$app->getSession()->setError(Craft::t('commerce-digital-products', 'Couldn’t delete product.'));
+            Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete product.'));
             Craft::$app->getUrlManager()->setRouteParams([
                 'product' => $product
             ]);
@@ -150,7 +150,7 @@ class ProductsController extends BaseController
             $this->asJson(['success' => true]);
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('commerce-digital-products', 'Product deleted.'));
+        Craft::$app->getSession()->setNotice(Craft::t('digital-products', 'Product deleted.'));
 
         return $this->redirectToPostedUrl($product);
     }
@@ -226,7 +226,7 @@ class ProductsController extends BaseController
 
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
-            'action' => 'commerce-digital-products/products/viewSharedProduct',
+            'action' => 'digital-products/products/viewSharedProduct',
             'params' => ['productId' => $productId, 'locale' => $product->getSite()]
         ]);
 
@@ -381,7 +381,7 @@ class ProductsController extends BaseController
                     'fields' => '#title-field, #fields > div > div > .field, #sku-field, #price-field',
                     'extraFields' => '#meta-pane .field',
                     'previewUrl' => $variables['product']->getUrl(),
-                    'previewAction' => 'commerce-digital-products/products/previewProduct',
+                    'previewAction' => 'digital-products/products/previewProduct',
                     'previewParams' => [
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,
