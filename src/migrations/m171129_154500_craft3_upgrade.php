@@ -4,7 +4,12 @@ namespace craft\digitalproducts\migrations;
 
 use craft\db\Migration;
 use craft\db\Query;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\fields\Products;
+use craft\helpers\Json;
 use craft\helpers\MigrationHelper;
+use yii\base\InvalidParamException;
 
 /**
  * m171129_154500_craft3_upgrade migration.
@@ -16,6 +21,60 @@ class m171129_154500_craft3_upgrade extends Migration
      */
     public function safeUp()
     {
+        // Element changes
+        // =====================================================================
+
+        $this->update('{{%elements}}', [
+            'type' => Product::class
+        ], ['type' => 'DigitalProducts_Product']);
+
+        $this->update('{{%elements}}', [
+            'type' => License::class
+        ], ['type' => 'DigitalProducts_License']);
+
+        $this->update('{{%fields}}', [
+            'type' => Products::class
+        ], ['type' => 'DigitalProducts_Products']);
+
+        // Update field settings
+        $fields = (new Query())
+            ->select(['id', 'type', 'translationMethod', 'settings'])
+            ->from(['{{%fields}}'])
+            ->where([
+                'type' => [
+                    Products::class
+                ]
+            ])
+            ->all($this->db);
+
+        foreach ($fields as $field) {
+            try {
+                $settings = Json::decode($field['settings']);
+            } catch (InvalidParamException $e) {
+                echo 'Field '.$field['id'].' ('.$field['type'].') settings were invalid JSON: '.$field['settings']."\n";
+
+                return false;
+            }
+            
+            $settings['localizeRelations'] = ($field['translationMethod'] === 'site');
+
+            // targetLocale => targetSiteId
+            if (!empty($settings['targetLocale'])) {
+                $settings['targetSiteId'] = $siteIdsByLocale[$settings['targetLocale']];
+            }
+            unset($settings['targetLocale']);
+
+            $this->update(
+                '{{%fields}}',
+                [
+                    'translationMethod' => 'none',
+                    'settings' => Json::encode($settings),
+                ],
+                ['id' => $field['id']],
+                [],
+                false);
+        }
+
         // Per-site setting changes
         // =====================================================================
 
