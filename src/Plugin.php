@@ -4,6 +4,8 @@ namespace craft\digitalproducts;
 
 use Craft;
 use craft\base\Plugin as BasePlugin;
+use craft\commerce\services\Purchasables;
+use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
@@ -47,6 +49,7 @@ class Plugin extends BasePlugin
         $this->_setPluginComponents();
         $this->_registerCpRoutes();
         $this->_registerFieldTypes();
+        $this->_registerPurchasableTypes();
         $this->_registerVariable();
         $this->_registerEventHandlers();
         $this->_registerCpRoutes();
@@ -130,6 +133,16 @@ class Plugin extends BasePlugin
     {
         Event::on(Fields::className(), Fields::EVENT_REGISTER_FIELD_TYPES, function(RegisterComponentTypesEvent $event) {
             $event->types[] = Products::class;
+        });
+    }
+
+    /**
+     * Register Commerce’s purchasable
+     */
+    private function _registerPurchasableTypes()
+    {
+        Event::on(Purchasables::className(), Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES, function(RegisterComponentTypesEvent $event) {
+            $event->types[] = Product::class;
         });
     }
 

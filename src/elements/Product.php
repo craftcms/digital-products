@@ -92,13 +92,20 @@ class Product extends Purchasable
     // =========================================================================
 
     /**
+     * @inheritdoc
+     */
+    public static function displayName(): string
+    {
+        return Craft::t('digital-products', 'Digital Product');
+    }
+
+    /**
      * @return string
      */
     public function __toString(): string
     {
         return (string) $this->title;
     }
-
 
     /**
      * @return null|string
