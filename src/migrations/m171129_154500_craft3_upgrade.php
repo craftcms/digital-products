@@ -55,7 +55,7 @@ class m171129_154500_craft3_upgrade extends Migration
 
                 return false;
             }
-            
+
             $settings['localizeRelations'] = ($field['translationMethod'] === 'site');
 
             // targetLocale => targetSiteId

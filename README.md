@@ -50,7 +50,7 @@ use yii\base\Event;
 
 // ...
 
-Event::on(GenerateKeyEvent::class, License::EVENT_GENERATE_LICENSE_KEY, function(GenerateKeyEvent $e) {
+Event::on(License::class, License::EVENT_GENERATE_LICENSE_KEY, function(GenerateKeyEvent $e) {
     do {
         $licenseKey = // custom key generation logic...
     } while (!DigitalProducts::getInstance()->getLicenses()->isLicenseKeyUnique($licenseKey));
