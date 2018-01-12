@@ -515,7 +515,7 @@ class License extends Element
     {
         return [
             'slug' => Craft::t('digital-products', 'Product name'),
-            'licensedTo' => Craft::t('digital-products', 'Owner'),
+            'ownerEmail' => Craft::t('digital-products', 'Owner'),
             'dateCreated' => Craft::t('digital-products', 'License issue date'),
         ];
     }
