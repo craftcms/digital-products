@@ -1,6 +1,6 @@
 {
   "name": "craftcms/digital-products",
-  "description": "Digital Products for Craft Commerce",
+  "description": "Digital Products plugin for Craft Commerce 2",
   "version": "2.0.0",
   "type": "craft-plugin",
   "keywords": [
@@ -24,7 +24,8 @@
     "rss": "https://github.com/craftcms/digital-products/commits/master.atom"
   },
   "require": {
-    "craftcms/commerce": "*"
+    "craftcms/commerce": "^2.0.0-alpha.5",
+    "craftcms/cms": "^3.0.0-RC15"
   },
   "autoload": {
     "psr-4": {

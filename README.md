@@ -1,10 +1,10 @@
-# Digital Products plugin for Craft Commerce.
+# Digital Products plugin for Craft Commerce 2
 
 This plugin makes it possible to sell licenses for digital products with [Craft Commerce](http://craftcommerce.com).
 
 ## Requirements
 
-Digital Products requires Craft CMS 3.0 or later and Craft Commerce 2.0 or later.
+Digital Products requires Craft CMS 3.0.0-RC15 or later and Craft Commerce 2.0.0-alpha.5 or later.
 
 ## Installation
 
@@ -140,35 +140,3 @@ Both licenses and products have several eager-loadable properties
         </table>
     {% endif %}
 ```
-
-## Changelog
-
-### 2.0
-
-* Digital products now fires `beforeSaveProductType`, `afterSaveProductType` and `beforeGenerateLicenseKey` events. For all element-related actions, you should look into [Craft 3 changes for Element hooks](https://github.com/craftcms/docs/blob/master/en/updating-plugins.md#element-hooks).
-* Instead of `$product->getProductType()` you must now use `$product->getType()`
-* Instead of eager-loading a boolean flag `isLicensed` for products, you must now eager-load the `existingLicenses` property, which is an array of existing licenses for that product for the current user.
-
-### 1.0.5
-
-* Fixed a bug where digital product prices would sometimes not be saved correctly.
-
-### 1.0.4
-
-* Fixed a bug where digital product prices did not display correctly.
-
-### 1.0.3
-
-* Added support for a plugin release feed.
-
-### 1.0.2
-
-* Fixed bugs.
-
-### 1.0.1
-
-* Fixed bugs.
-
-### 1.0.0
-
-* Initial release
