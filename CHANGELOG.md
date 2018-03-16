@@ -8,3 +8,6 @@ Changelog
 - Instead of `$product->getProductType()` you must now use `$product->getType()`
 - Instead of eager-loading a boolean flag `isLicensed` for products, you must now eager-load the `existingLicenses` property, which is an array of existing licenses for that product for the current user.
 
+### Fixed
+
+- Fixed a wrong foreign key constraint ([#1](https://github.com/craftcms/commerce-digital-products/issues/1))
