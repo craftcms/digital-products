@@ -275,6 +275,14 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
+    public function getIsAvailable(): bool
+    {
+        return $this->getStatus() === static::STATUS_LIVE;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getStatus()
     {
         $status = parent::getStatus();
