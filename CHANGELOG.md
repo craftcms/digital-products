@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Unreleased
+### 2.0.0
 
 ### Changed
 - Digital products now fires `beforeSaveProductType`, `afterSaveProductType` and `beforeGenerateLicenseKey` events. For all element-related actions, you should look into [Craft 3 changes for Element hooks](https://github.com/craftcms/docs/blob/master/en/updating-plugins.md#element-hooks).
