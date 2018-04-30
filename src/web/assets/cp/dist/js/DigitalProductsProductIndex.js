@@ -44,6 +44,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
             }
         }
 
+        this.on('selectSource', $.proxy(this, 'updateButton'));
         this.base();
     },
 
@@ -61,7 +62,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
         return this.base();
     },
 
-    onSelectSource: function() {
+    updateButton: function() {
         // Get the handle of the selected source
         var selectedSourceHandle = this.$source.data('handle');
 
@@ -124,6 +125,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 
                 menuHtml += '</ul></div>';
 
+                $(menuHtml).appendTo(this.$newProductBtnGroup);
                 var menuBtn = new Garnish.MenuBtn($menuBtn);
 
                 if (this.settings.context !== 'index') {
@@ -141,13 +143,13 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
 
         if (this.settings.context === 'index' && typeof history !== 'undefined') {
             var uri = 'digital-products/products';
+
             if (selectedSourceHandle) {
                 uri += '/'+selectedSourceHandle;
             }
+
             history.replaceState({}, '', Craft.getUrl(uri));
         }
-
-        this.base();
     },
 
     _getProductTypeTriggerHref: function(productType)

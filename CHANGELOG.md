@@ -6,7 +6,8 @@ Changelog
 ### Fixed
 - Fixed a bug where tax categories were not being populated when editing a product ([#3](https://github.com/craftcms/commerce-digital-products/issues/3))
 - Fixed broken links in composer.json file ([#4](https://github.com/craftcms/commerce-digital-products/issues/4))
-- Fixed a bug where Lincese index was not working ([#7](https://github.com/craftcms/commerce-digital-products/issues/7))
+- Fixed a bug where License index was not working ([#7](https://github.com/craftcms/commerce-digital-products/issues/7))
+- Fixed a bug where the "New product" button was not working on the Product index screen ([#6](https://github.com/craftcms/commerce-digital-products/issues/6))
 
 ## 2.0.0
 
