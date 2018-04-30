@@ -89,7 +89,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
             this.$newProductBtnGroup = $('<div class="btngroup submit"/>');
             var $menuBtn;
 
-            // If they are, show a primany "New product" button, and a dropdown of the other product types (if any).
+            // If they are, show a primary "New product" button, and a dropdown of the other product types (if any).
             // Otherwise only show a menu button
             if (selectedProductType) {
                 var href = this._getProductTypeTriggerHref(selectedProductType),
