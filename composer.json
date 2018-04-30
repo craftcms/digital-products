@@ -18,10 +18,10 @@
   ],
   "support": {
     "email": "support@craftcms.com",
-    "issues": "https://github.com/craftcms/digital-products/issues?state=open",
-    "source": "https://github.com/craftcms/digital-products",
-    "docs": "https://github.com/craftcms/digital-products",
-    "rss": "https://github.com/craftcms/digital-products/commits/master.atom"
+    "issues": "https://github.com/craftcms/commerce-digital-products/issues?state=open",
+    "source": "https://github.com/craftcms/commerce-digital-products",
+    "docs": "https://github.com/craftcms/commerce-digital-products",
+    "rss": "https://github.com/craftcms/commerce-digital-products/commits/master.atom"
   },
   "require": {
     "craftcms/commerce": "^2.0.0-beta.4",

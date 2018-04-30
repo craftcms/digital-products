@@ -5,6 +5,7 @@ Changelog
 
 ### Fixed
 - Fixed a bug where tax categories were not being populated when editing a product ([#3](https://github.com/craftcms/commerce-digital-products/issues/3))
+- Fixed broken links in composer.json file. ([#4](https://github.com/craftcms/commerce-digital-products/issues/4))
 
 ## 2.0.0
 
