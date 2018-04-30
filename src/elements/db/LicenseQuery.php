@@ -2,7 +2,7 @@
 
 namespace craft\digitalproducts\elements\db;
 
-use craft\commerce\base\Element;
+use craft\base\Element;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
