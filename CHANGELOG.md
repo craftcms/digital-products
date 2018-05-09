@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Unreleased
+## 2.0.1 - 2018-05-09
 
 ### Fixed
 - Fixed a bug where tax categories were not being populated when editing a product ([#3](https://github.com/craftcms/commerce-digital-products/issues/3))
@@ -9,7 +9,7 @@ Changelog
 - Fixed a bug where License index was not working ([#7](https://github.com/craftcms/commerce-digital-products/issues/7))
 - Fixed a bug where the "New product" button was not working on the Product index screen ([#6](https://github.com/craftcms/commerce-digital-products/issues/6))
 
-## 2.0.0
+## 2.0.0 - 2018-04-04
 
 ### Changed
 - This plugin now requires Craft 3.
@@ -20,20 +20,18 @@ Changelog
 ### Fixed
 - Fixed a wrong foreign key constraint ([#1](https://github.com/craftcms/commerce-digital-products/issues/1))
 
-## 1.0.5
+## 1.0.4 - 2017-03-11
+- Fixed a bug where digital product prices did not display correctly.
 - Fixed a bug where digital product prices would sometimes not be saved correctly.
 
-## 1.0.4
-- Fixed a bug where digital product prices did not display correctly.
-
-## 1.0.3
+## 1.0.3 - 2016-11-02
 - Added support for a plugin release feed.
 
-## 1.0.2
+## 1.0.2 - 2016-10-12
 - Fixed bugs.
 
-## 1.0.1
+## 1.0.1 - 2016-10-03
 - Fixed bugs.
 
-## 1.0.0
+## 1.0.0 - 2016-06-21
 - Initial release
