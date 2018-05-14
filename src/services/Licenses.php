@@ -7,11 +7,11 @@ use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\commerce\elements\Order;
-use craft\commerce\events\OrderEvent;
 use craft\commerce\events\ProcessPaymentEvent;
 use craft\commerce\models\LineItem;
 use craft\events\UserEvent;
 use yii\base\Component;
+use yii\base\Event;
 
 /**
  * Licenses service.
@@ -39,16 +39,16 @@ class Licenses extends Component
     /**
      * Sort trough the ordered items and generate Licenses for Digital Products.
      *
-     * @param OrderEvent $event
+     * @param Event $event
      *
      * @return void
      */
-    public static function handleCompletedOrder(OrderEvent $event)
+    public static function handleCompletedOrder(Event $event)
     {
         /**
          * @var Order $order
          */
-        $order = $event->order;
+        $order = $event->sender;
         $lineItems = $order->getLineItems();
 
         /**

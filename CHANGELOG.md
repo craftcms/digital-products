@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Unreleased
+
+### Fixed
+- Fixed a bug where licenses were not being generated after completing an Commerce order.
+
 ## 2.0.1 - 2018-05-09
 
 ### Fixed
