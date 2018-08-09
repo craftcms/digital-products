@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Unreleased
+
+### Fixed
+- Fixed the navigation highlighting bug when selecting settings in the sub nav within the CP.
+
 ## 2.0.2 - 2018-05-14
 
 ### Fixed
