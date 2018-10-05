@@ -5,6 +5,7 @@ namespace craft\digitalproducts;
 use Craft;
 use craft\base\Plugin as BasePlugin;
 use craft\commerce\services\Purchasables;
+use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\models\Settings;
@@ -15,6 +16,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\UserPermissions;
 use craft\services\Users as UsersService;
@@ -47,13 +49,13 @@ class Plugin extends BasePlugin
         parent::init();
 
         $this->_setPluginComponents();
-        $this->_registerCpRoutes();
         $this->_registerFieldTypes();
         $this->_registerPurchasableTypes();
         $this->_registerVariable();
         $this->_registerEventHandlers();
         $this->_registerCpRoutes();
         $this->_registerPermissions();
+        $this->_registerElementTypes();
     }
 
     /**
@@ -181,4 +183,16 @@ class Plugin extends BasePlugin
         });
 
     }
+
+    /**
+     * Register the element types supplied by Digital Products
+     */
+    private function _registerElementTypes()
+    {
+        Event::on(Elements::class, Elements::EVENT_REGISTER_ELEMENT_TYPES, function(RegisterComponentTypesEvent $e) {
+            $e->types[] = Product::class;
+            $e->types[] = License::class;
+        });
+    }
+
 }
