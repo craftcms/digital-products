@@ -6,6 +6,9 @@ Changelog
 ### Fixed
 - Fixed a bug where only fields in the first layout tab were visible when editing a product. ([#8](https://github.com/craftcms/commerce-digital-products/issues/8))
 
+### Added
+- Added `craft\digitalproducts\models\ProductTypeSite::getSite()`
+
 ## 2.0.2 - 2018-05-14
 
 ### Fixed
