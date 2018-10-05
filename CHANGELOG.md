@@ -8,6 +8,7 @@ Changelog
 
 ### Fixed
 - Fixed a bug where only fields in the first layout tab were visible when editing a product. ([#8](https://github.com/craftcms/commerce-digital-products/issues/8))
+- Fixed a bug where product element slugs would not work. ([#9](https://github.com/craftcms/commerce-digital-products/issues/9))
 
 ### Added
 - Added `craft\digitalproducts\models\ProductTypeSite::getSite()`

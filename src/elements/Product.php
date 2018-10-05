@@ -401,6 +401,14 @@ class Product extends Purchasable
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function hasUris(): bool
+    {
+        return true;
+    }
+
+    /**
      * Returns the product's product type model.
      *
      * @return ProductType
