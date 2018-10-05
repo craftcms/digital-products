@@ -2,6 +2,7 @@
 namespace craft\digitalproducts\controllers;
 
 use Craft;
+use craft\commerce\models\ProductType;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\helpers\DateTimeHelper;
@@ -312,6 +313,8 @@ class ProductsController extends BaseController
      */
     private function _prepareVariableArray(&$variables)
     {
+        $variables['tabs'] = [];
+
         // Locale related checks
         if (Craft::$app->getIsMultiSite()) {
             // Only use the sites that the user has access to
@@ -340,6 +343,9 @@ class ProductsController extends BaseController
         }
 
         // Product related checks
+        /** @var ProductType $productType */
+        $productType = $variables['productType'];
+
         if (empty($variables['product'])) {
             if (!empty($variables['productId'])) {
                 $variables['product'] = Craft::$app->getElements()->getElementById($variables['productId'], Product::class, $site->id);
@@ -349,13 +355,16 @@ class ProductsController extends BaseController
                 }
             } else {
                 $variables['product'] = new Product();
-                $variables['product']->typeId = $variables['productType']->id;
+                $variables['product']->typeId = $productType->id;
 
                 if (!empty($variables['siteId'])) {
                     $variables['product']->site = $variables['siteId'];
                 }
             }
         }
+
+        /** @var Product $product */
+        $product = $variables['product'];
 
         // Enable locales
         if ($variables['product']->id) {
@@ -366,6 +375,26 @@ class ProductsController extends BaseController
             foreach (Craft::$app->getSites()->getEditableSiteIds() as $site) {
                 $variables['enabledSiteIds'][] = $site;
             }
+        }
+
+        foreach ($productType->getProductFieldLayout()->getTabs() as $index => $tab) {
+            // Do any of the fields on this tab have errors?
+            $hasErrors = false;
+            
+            if ($product->hasErrors()) {
+                foreach ($tab->getFields() as $field) {
+                    /** @var Field $field */
+                    if ($hasErrors = $product->hasErrors($field->handle . '.*')) {
+                        break;
+                    }
+                }
+            }
+
+            $variables['tabs'][] = [
+                'label' => Craft::t('commerce', $tab->name),
+                'url' => '#tab' . ($index + 1),
+                'class' => $hasErrors ? 'error' : null
+            ];
         }
     }
 
