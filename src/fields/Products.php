@@ -18,10 +18,11 @@ class Products extends BaseRelationField
     // Public Methods
     // =========================================================================
 
+
     /**
      * @inheritdoc
      */
-    public function getName(): string
+    public static function displayName(): string
     {
         return Craft::t('commerce', 'Digital Products');
     }
