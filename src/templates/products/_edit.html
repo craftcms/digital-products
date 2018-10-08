@@ -131,9 +131,9 @@
                     <input type="button"
                            class="btn small formsubmit"
                            value="{{ 'Delete'|t('digital-products') }}"
-                           data-action="digitalProducts/products/deleteProduct"
+                           data-action="digital-products/products/delete-product"
                            data-confirm="{{ 'Are you sure you want to delete this product?'|t('digital-products') }}"
-                           data-redirect="digitalproducts/products">
+                           data-redirect="{{ 'digital-products/products'|hash }}">
                 </div>
             {% endif %}
         {% endset %}

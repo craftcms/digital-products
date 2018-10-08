@@ -10,6 +10,7 @@ Changelog
 - Fixed a bug where only fields in the first layout tab were visible when editing a product. ([#8](https://github.com/craftcms/commerce-digital-products/issues/8))
 - Fixed a bug where product element slugs would not work. ([#9](https://github.com/craftcms/commerce-digital-products/issues/9))
 - Fixed a bug where querying for licenses would not work in some cases. ([#11](https://github.com/craftcms/commerce-digital-products/issues/11))
+- Fixed a bug where it was impossible to delete a product. ([#12](https://github.com/craftcms/commerce-digital-products/issues/12))
 
 ### Added
 - Added `craft\digitalproducts\models\ProductTypeSite::getSite()`

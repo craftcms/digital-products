@@ -118,10 +118,9 @@ class ProductsController extends BaseController
     /**
      * Delete a product.
      *
-     * @return Response
      * @throws Exception if no product found
      */
-    public function actionDeleteProduct(): Response
+    public function actionDeleteProduct()
     {
         $this->requirePostRequest();
 
@@ -134,7 +133,7 @@ class ProductsController extends BaseController
 
         $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
 
-        if (Craft::$app->getElements()->deleteElement($product)) {
+        if (!Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
                 $this->asJson(['success' => false]);
             }
@@ -380,7 +379,7 @@ class ProductsController extends BaseController
         foreach ($productType->getProductFieldLayout()->getTabs() as $index => $tab) {
             // Do any of the fields on this tab have errors?
             $hasErrors = false;
-            
+
             if ($product->hasErrors()) {
                 foreach ($tab->getFields() as $field) {
                     /** @var Field $field */
