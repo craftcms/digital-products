@@ -163,7 +163,7 @@ class Plugin extends BasePlugin
                 $productTypePermissions['digitalProducts-manageProductType'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
             }
 
-            $event->permissions[] = [
+            $event->permissions[Craft::t('digital-products', 'Digital Products')] = [
                 'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
                 'digitalProducts-manageProducts' => ['label' => Craft::t('digital-products', 'Manage products'), 'nested' => $productTypePermissions],
                 'digitalProducts-manageLicenses' => ['label' => Craft::t('digital-products', 'Manage licenses')],
