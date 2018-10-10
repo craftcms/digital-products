@@ -50,16 +50,22 @@ class ProductTypesController extends BaseController
             'productType' => $productType,
         ];
 
+        $variables['brandNewProductType'] = false;
+
         if (empty($variables['productType'])) {
-            $productType = $productTypeId ? DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($productTypeId) : new ProductType();
+            if (!empty($variables['productTypeId'])) {
+                $productTypeId = $variables['productTypeId'];
+                $variables['productType'] = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($productTypeId);
 
-            if (!$productType) {
-                throw new Exception('Product type not found.');
+                if (!$variables['productType']) {
+                    throw new HttpException(404);
+                }
+            } else {
+                $variables['productType'] = new ProductType();
+                $variables['brandNewProductType'] = true;
             }
-
-            $variables['productType'] = $productType;
         }
-        
+
         $variables['title'] = $variables['productType']->id ? $variables['productType']->name : Craft::t('digital-products', 'Create a new digital product type');
 
         return $this->renderTemplate('digital-products/producttypes/_edit', $variables);
