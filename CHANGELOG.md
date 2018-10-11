@@ -13,6 +13,7 @@ Changelog
 - Fixed a bug where querying for licenses would not work in some cases. ([#11](https://github.com/craftcms/commerce-digital-products/issues/11))
 - Fixed a bug where it was impossible to delete a product. ([#12](https://github.com/craftcms/commerce-digital-products/issues/12))
 - Fixed a bug where template path and product type URI format generator would not work correctly. ([#16](https://github.com/craftcms/commerce-digital-products/issues/16))
+- Fixed deprecation errors in templates. ([#19](https://github.com/craftcms/commerce-digital-products/issues/19))
 
 ### Added
 - Added `craft\digitalproducts\models\ProductTypeSite::getSite()`

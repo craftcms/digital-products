@@ -7,7 +7,7 @@
 {% set elementType = 'craft\\digitalproducts\\elements\\Product' %}
 
 {% if productTypeHandle is defined %}
-    {% includejs 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
+    {% js 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
 {% endif %}
 
 {% do view.registerAssetBundle('craft\\digitalproducts\\web\\assets\\cp\\Bundle') -%}
