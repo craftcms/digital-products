@@ -124,7 +124,7 @@ class Plugin extends BasePlugin
     private function _registerEventHandlers()
     {
         Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
-        Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER, [$this->getLicenses(), 'handleCompletedOrder']);
+        Event::on(Order::class, Order::EVENT_AFTER_ORDER_PAID, [$this->getLicenses(), 'handleCompletedOrder']);
         Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT_EVENT, [$this->getLicenses(), 'maybePreventPayment']);
     }
 

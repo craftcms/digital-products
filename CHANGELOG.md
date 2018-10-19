@@ -5,6 +5,7 @@ Changelog
 
 ### Changed
 - Changed the label for the digital products field to „Digital Products”. ([#13](https://github.com/craftcms/commerce-digital-products/issues/13))
+- Licenses are now generated after the order is paid, instead of when it's completed. ([#21](https://github.com/craftcms/commerce-digital-products/issues/21))
 
 ### Fixed
 - Fixed a bug where querying for products sometimes would be broken.
