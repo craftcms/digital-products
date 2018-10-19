@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Unreleased
+## 2.0.3 - 2018-10-19
 
 ### Added
 - Added `craft\digitalproducts\models\ProductTypeSite::getSite()`.
