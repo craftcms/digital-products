@@ -14,7 +14,7 @@
 {% else %}
     {{ forms.elementSelectField({
         elementType: productElementType,
-        elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
+        elements: license.productId ? craft.digitalProducts.products.id(license.productId).all() : null,
         instructions: "The digital product that this license should be associated with"|t('digital-products'),
         label: "Product"|t('digital-products'),
         id: 'product',
@@ -37,7 +37,7 @@
 
 {{ forms.elementSelectField({
     elementType: userElementType,
-    elements: license.userId ? craft.users.id(license.userId).find() : null,
+    elements: license.userId ? craft.users.id(license.userId).all() : null,
     label: "Owner"|t('digital-products'),
     id: 'owner',
     class: 'ltr',

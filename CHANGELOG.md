@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Unreleased
+
+### Fixed
+- Fixed deprecation errors in templates. ([#25](https://github.com/craftcms/digital-products/issues/25))
+
 ## 2.0.3 - 2018-10-19
 
 ### Added
