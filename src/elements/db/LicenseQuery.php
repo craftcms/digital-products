@@ -399,7 +399,7 @@ class LicenseQuery extends ElementQuery
         }
 
         if ($this->productId) {
-            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.productId', $this->productId));
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.productId', $this->productId));
         }
 
         if ($this->typeId) {
@@ -411,7 +411,7 @@ class LicenseQuery extends ElementQuery
         }
 
         if ($this->orderId) {
-            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.orderId', $this->orderId));
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_licenses.orderId', $this->orderId));
         }
 
         if ($this->licenseKey) {

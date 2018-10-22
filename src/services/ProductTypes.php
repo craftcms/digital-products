@@ -12,6 +12,7 @@ use craft\commerce\events\ProductTypeEvent;
 use craft\db\Query;
 use craft\events\SiteEvent;
 use craft\helpers\App;
+use craft\queue\jobs\ResaveElements;
 use yii\base\Component;
 use yii\base\Exception;
 
@@ -197,7 +198,8 @@ class ProductTypes extends Component
                     'productTypeId',
                     'siteId',
                     'uriFormat',
-                    'template'
+                    'template',
+                    'hasUrls'
                 ])
                 ->from('{{%digitalproducts_producttypes_sites}}')
                 ->where(['productTypeId' => $productTypeId])
@@ -359,34 +361,21 @@ class ProductTypes extends Component
 
                 // Are there any sites left?
                 if (!empty($allSiteSettings)) {
-                    // Drop the old product URIs for any site settings that don't have URLs
-                    if (!empty($sitesNowWithoutUrls)) {
-                        $db->createCommand()
-                            ->update(
-                                '{{%elements_sites}}',
-                                ['uri' => null],
-                                [
-                                    'elementId' => $productTypeIds,
-                                    'siteId' => $sitesNowWithoutUrls,
-                                ])
-                            ->execute();
-                    } else if (!empty($sitesWithNewUriFormats)) {
-                        foreach ($productTypeIds as $productTypeId) {
-                            App::maxPowerCaptain();
-
-                            // Loop through each of the changed sites and update all of the products’ slugs and
-                            // URIs
-                            foreach ($sitesWithNewUriFormats as $siteId) {
-                                $product = Product::find()
-                                    ->id($productTypeId)
-                                    ->siteId($siteId)
-                                    ->status(null)
-                                    ->one();
-
-                                if ($product) {
-                                    Craft::$app->getElements()->updateElementSlugAndUri($product, false, false);
-                                }
-                            }
+                    if (!$isNewProductType) {
+                        foreach ($allSiteSettings as $siteId => $siteSettings) {
+                            Craft::$app->getQueue()->push(new ResaveElements([
+                                'description' => Craft::t('app', 'Resaving {type} products ({site})', [
+                                    'type' => $productType->name,
+                                    'site' => $siteSettings->getSite()->name,
+                                ]),
+                                'elementType' => Product::class,
+                                'criteria' => [
+                                    'siteId' => $siteId,
+                                    'typeId' => $productType->id,
+                                    'status' => null,
+                                    'enabledForSite' => false,
+                                ]
+                            ]));
                         }
                     }
                 }

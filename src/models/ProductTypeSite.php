@@ -1,8 +1,10 @@
 <?php
 namespace craft\digitalproducts\models;
 
+use Craft;
 use craft\base\Model;
 use craft\digitalproducts\Plugin as DigitalProducts;
+use craft\models\Site;
 use yii\base\InvalidConfigException;
 
 /**
@@ -57,6 +59,11 @@ class ProductTypeSite extends Model
      */
     public $uriFormatIsRequired = true;
 
+    /**
+     * @var Site
+     */
+    private $_site = null;
+
     // Public Methods
     // =========================================================================
 
@@ -93,6 +100,20 @@ class ProductTypeSite extends Model
     public function setProductType(ProductType $productType)
     {
         $this->_productType = $productType;
+    }
+
+    /**
+     * Gets the associated site.
+     *
+     * @return Site
+     */
+    public function getSite(): Site
+    {
+        if (!$this->_site) {
+            $this->_site = Craft::$app->getSites()->getSiteById($this->siteId);
+        }
+
+        return $this->_site;
     }
 
     /**

@@ -94,9 +94,7 @@
                 {{ productFields.titleField(product) }}
 
                 <div>
-                    {% set allProductTab = productType.getFieldLayout().getTabs() %}
-
-                    {% for tab in allProductTab %}
+                    {% for tab in productType.getFieldLayout().getTabs() %}
                         <div id="tab{{ loop.index }}" {% if not loop.first %} class="hidden" {% endif %}>
                             {% include "_includes/fields" with {
                                 fields: tab.getFields(),
@@ -109,9 +107,9 @@
             </div>
 
     {% if not product.slug %}
-        {% includejs %}
+        {% js %}
             window.slugGenerator = new Craft.SlugGenerator('#title', '#slug');
-        {% endincludejs %}
+        {% endjs %}
     {% endif %}
 
 {% endblock %}
@@ -133,9 +131,9 @@
                     <input type="button"
                            class="btn small formsubmit"
                            value="{{ 'Delete'|t('digital-products') }}"
-                           data-action="digitalProducts/products/deleteProduct"
+                           data-action="digital-products/products/delete-product"
                            data-confirm="{{ 'Are you sure you want to delete this product?'|t('digital-products') }}"
-                           data-redirect="digitalproducts/products">
+                           data-redirect="{{ 'digital-products/products'|hash }}">
                 </div>
             {% endif %}
         {% endset %}

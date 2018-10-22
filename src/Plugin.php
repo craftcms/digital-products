@@ -5,6 +5,7 @@ namespace craft\digitalproducts;
 use Craft;
 use craft\base\Plugin as BasePlugin;
 use craft\commerce\services\Purchasables;
+use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\models\Settings;
@@ -15,6 +16,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\UserPermissions;
 use craft\services\Users as UsersService;
@@ -47,13 +49,13 @@ class Plugin extends BasePlugin
         parent::init();
 
         $this->_setPluginComponents();
-        $this->_registerCpRoutes();
         $this->_registerFieldTypes();
         $this->_registerPurchasableTypes();
         $this->_registerVariable();
         $this->_registerEventHandlers();
         $this->_registerCpRoutes();
         $this->_registerPermissions();
+        $this->_registerElementTypes();
     }
 
     /**
@@ -122,7 +124,7 @@ class Plugin extends BasePlugin
     private function _registerEventHandlers()
     {
         Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
-        Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER, [$this->getLicenses(), 'handleCompletedOrder']);
+        Event::on(Order::class, Order::EVENT_AFTER_ORDER_PAID, [$this->getLicenses(), 'handleCompletedOrder']);
         Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT_EVENT, [$this->getLicenses(), 'maybePreventPayment']);
     }
 
@@ -131,7 +133,7 @@ class Plugin extends BasePlugin
      */
     private function _registerFieldTypes()
     {
-        Event::on(Fields::className(), Fields::EVENT_REGISTER_FIELD_TYPES, function(RegisterComponentTypesEvent $event) {
+        Event::on(Fields::class, Fields::EVENT_REGISTER_FIELD_TYPES, function(RegisterComponentTypesEvent $event) {
             $event->types[] = Products::class;
         });
     }
@@ -141,7 +143,7 @@ class Plugin extends BasePlugin
      */
     private function _registerPurchasableTypes()
     {
-        Event::on(Purchasables::className(), Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES, function(RegisterComponentTypesEvent $event) {
+        Event::on(Purchasables::class, Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES, function(RegisterComponentTypesEvent $event) {
             $event->types[] = Product::class;
         });
     }
@@ -161,7 +163,7 @@ class Plugin extends BasePlugin
                 $productTypePermissions['digitalProducts-manageProductType'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
             }
 
-            $event->permissions[] = [
+            $event->permissions[Craft::t('digital-products', 'Digital Products')] = [
                 'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
                 'digitalProducts-manageProducts' => ['label' => Craft::t('digital-products', 'Manage products'), 'nested' => $productTypePermissions],
                 'digitalProducts-manageLicenses' => ['label' => Craft::t('digital-products', 'Manage licenses')],
@@ -181,4 +183,16 @@ class Plugin extends BasePlugin
         });
 
     }
+
+    /**
+     * Register the element types supplied by Digital Products
+     */
+    private function _registerElementTypes()
+    {
+        Event::on(Elements::class, Elements::EVENT_REGISTER_ELEMENT_TYPES, function(RegisterComponentTypesEvent $e) {
+            $e->types[] = Product::class;
+            $e->types[] = License::class;
+        });
+    }
+
 }

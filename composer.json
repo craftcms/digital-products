@@ -1,7 +1,7 @@
 {
   "name": "craftcms/digital-products",
   "description": "Digital Products plugin for Craft Commerce 2",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "type": "craft-plugin",
   "keywords": [
     "digital",
