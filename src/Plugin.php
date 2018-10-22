@@ -16,6 +16,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\UserPermissions;
@@ -97,11 +98,11 @@ class Plugin extends BasePlugin
     }
 
     /**
-     * Get Settings URL
+     * @inheritdoc
      */
-    public function getSettingsUrl(): bool
+    public function getSettingsResponse()
     {
-        return false;
+        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('digital-products/settings'));
     }
 
     // Protected Methods
