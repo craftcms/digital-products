@@ -5,6 +5,7 @@ Changelog
 
 ### Fixed
 - Fixed deprecation errors in templates. ([#25](https://github.com/craftcms/digital-products/issues/25))
+- Fixed a bug where deleting a product was impossible from its page. ([#24](https://github.com/craftcms/digital-products/issues/24))
 
 ## 2.0.3 - 2018-10-19
 
