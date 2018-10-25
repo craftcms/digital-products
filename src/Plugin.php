@@ -11,6 +11,7 @@ use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
+use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
@@ -32,6 +33,21 @@ use yii\base\Event;
  */
 class Plugin extends BasePlugin
 {
+    /**
+     * @inheritDoc
+     */
+    public $hasCpSection = true;
+
+    /**
+     * @inheritDoc
+     */
+    public $hasCpSettings = true;
+
+    /**
+     * @inheritDoc
+     */
+    public $schemaVersion = '2.0.1';
+
     // Traits
     // =========================================================================
 
@@ -127,6 +143,13 @@ class Plugin extends BasePlugin
         Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
         Event::on(Order::class, Order::EVENT_AFTER_ORDER_PAID, [$this->getLicenses(), 'handleCompletedOrder']);
         Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT_EVENT, [$this->getLicenses(), 'maybePreventPayment']);
+
+        $projectConfigService = Craft::$app->getProjectConfig();
+
+        $productTypeService = $this->getProductTypes();
+        $projectConfigService->onAdd(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType']);
+        $projectConfigService->onUpdate(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType']);
+        $projectConfigService->onRemove(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleDeletedProductType']);
     }
 
     /**

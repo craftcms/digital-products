@@ -3,6 +3,13 @@ Changelog
 
 ## Unreleased
 
+### Added
+- Added support for project config.
+
+### Changed
+- Digital Products now requires Craft 3.1.0-alpha.1 or later.
+- Digital Products now requires Commerce 2.0-beta.12 or later.
+
 ### Fixed
 - Fixed deprecation errors in templates. ([#25](https://github.com/craftcms/digital-products/issues/25))
 - Fixed a bug where deleting a product was impossible from its page. ([#24](https://github.com/craftcms/digital-products/issues/24))
