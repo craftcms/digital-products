@@ -9,7 +9,7 @@ Changelog
 ### Changed
 - Licenses are now generated after the order is paid, instead of when it’s completed. ([#21](https://github.com/craftcms/commerce-digital-products/issues/21))
 
-### Fixed
+### Fixed
 - Fixed a bug where Digital Products fields were named “Products”. ([#13](https://github.com/craftcms/commerce-digital-products/issues/13))
 - Fixed a bug where querying for products didn’t always return the correct results.
 - Fixed a bug where only fields in the first field layout tab were visible when editing a product. ([#8](https://github.com/craftcms/commerce-digital-products/issues/8))
