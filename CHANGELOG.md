@@ -4,10 +4,10 @@ Changelog
 ## Unreleased
 
 ### Fixed
-- Fixed deprecation errors in templates. ([#25](https://github.com/craftcms/digital-products/issues/25))
-- Fixed a bug where deleting a product was impossible from its page. ([#24](https://github.com/craftcms/digital-products/issues/24))
-- Fixed an incorrect plugin settings URL. ([#23](https://github.com/craftcms/digital-products/issues/23))
-- Fixed a bug where querying for licenses would not work in some cases. For real this time. ([#11](https://github.com/craftcms/commerce-digital-products/issues/11))
+- Fixed a bug where it wasn't possible to delete a product from its edit page. ([#24](https://github.com/craftcms/digital-products/issues/24))
+- Fixed deprecation errors in Control Panel templates. ([#25](https://github.com/craftcms/digital-products/issues/25))
+- Fixed a bug where the "Digital Products" item on the Settings page linked to a blank page. ([#23](https://github.com/craftcms/digital-products/issues/23))
+- Fixed a bug where querying for licenses would not work in some cases. ([#11](https://github.com/craftcms/commerce-digital-products/issues/11))
 
 ## 2.0.3 - 2018-10-19
 
