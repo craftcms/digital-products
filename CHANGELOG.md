@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Unreleased
+## 2.0.4 - 2018-07-12
 
 ### Fixed
 - Fixed a bug where it wasn't possible to delete a product from its edit page. ([#24](https://github.com/craftcms/digital-products/issues/24))
