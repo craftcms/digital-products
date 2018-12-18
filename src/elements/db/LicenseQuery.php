@@ -399,7 +399,7 @@ class LicenseQuery extends ElementQuery
         }
 
         if ($this->productId) {
-            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.productId', $this->productId));
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.id', $this->productId));
         }
 
         if ($this->typeId) {
