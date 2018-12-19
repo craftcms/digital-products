@@ -46,6 +46,11 @@ class Settings extends Model
      */
     public $requireLoggedInUser = true;
 
+    /**
+     * @var bool Whether the license should be generated on order being paid in full as opposed to order being completed.
+     */
+    public $generateLicenseOnOrderPaid = true;
+
     public function rules() {
         $rules = parent::rules();
 

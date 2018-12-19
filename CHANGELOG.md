@@ -1,14 +1,17 @@
 Changelog
 =========
 
-## 2.0.4 - 2018-07-12
+## Unreleased
 
 ### Added
 - Added support for project config.
+- Added the `generateLicenseOnOrderPaid` setting which allows to specify when the license should be created.
 
 ### Changed
 - Digital Products now requires Craft 3.1.0-alpha.1 or later.
 - Digital Products now requires Commerce 2.0-beta.12 or later.
+
+## 2.0.4 - 2018-07-12
 
 ### Fixed
 - Fixed a bug where it wasn't possible to delete a product from its edit page. ([#24](https://github.com/craftcms/digital-products/issues/24))
