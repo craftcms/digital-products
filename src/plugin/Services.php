@@ -3,6 +3,7 @@
 namespace craft\digitalproducts\plugin;
 
 use craft\digitalproducts\services\Licenses;
+use craft\digitalproducts\services\Products;
 use craft\digitalproducts\services\ProductTypes;
 
 /**
@@ -22,6 +23,16 @@ trait Services
     public function getLicenses(): Licenses
     {
         return $this->get('licenses');
+    }
+
+    /**
+     * Returns the product  service.
+     *
+     * @return Products The product type service
+     */
+    public function getProducts(): Products
+    {
+        return $this->get('products');
     }
 
     /**
@@ -45,6 +56,7 @@ trait Services
         $this->setComponents([
             'licenses' => Licenses::class,
             'productTypes' => ProductTypes::class,
+            'products' => Products::class,
         ]);
     }
 }

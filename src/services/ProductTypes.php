@@ -11,6 +11,7 @@ use craft\digitalproducts\records\ProductTypeSite as ProductTypeSiteRecord;
 use craft\commerce\events\ProductTypeEvent;
 use craft\db\Query;
 use craft\events\ConfigEvent;
+use craft\events\DeleteSiteEvent;
 use craft\events\SiteEvent;
 use craft\helpers\Db;
 use craft\helpers\ProjectConfig as ProjectConfigHelper;
@@ -504,6 +505,57 @@ class ProductTypes extends Component
             $transaction->rollBack();
 
             throw $e;
+        }
+    }
+
+    /**
+     * Prune a deleted site from category group site settings.
+     *
+     * @param DeleteSiteEvent $event
+     */
+    public function pruneDeletedSite(DeleteSiteEvent $event)
+    {
+        $siteUid = $event->site->uid;
+
+        $projectConfig = Craft::$app->getProjectConfig();
+        $productTypes = $projectConfig->get(self::CONFIG_PRODUCTTYPES_KEY);
+
+        // Loop through the product types and prune the UID from field layouts.
+        if (is_array($productTypes)) {
+            foreach ($productTypes as $productTypeUid => $productType) {
+                $projectConfig->remove(self::CONFIG_PRODUCTTYPES_KEY . '.' . $productTypeUid . '.siteSettings.' . $siteUid);
+            }
+        }
+    }
+
+    /**
+     * Adds a new product type setting row when a Site is added to Craft.
+     *
+     * @param SiteEvent $event The event that triggered this.
+     */
+    public function afterSaveSiteHandler(SiteEvent $event)
+    {
+        if ($event->isNew) {
+            $primarySiteSettings = (new Query())
+                ->select([
+                    'productTypes.uid productTypeUid',
+                    'producttypes_sites.uriFormat',
+                    'producttypes_sites.template',
+                    'producttypes_sites.hasUrls'])
+                ->from(['{{%digitalproducts_producttypes_sites}} producttypes_sites'])
+                ->innerJoin(['{{%digitalproducts_producttypes}} productTypes'], '[[producttypes_sites.productTypeId]] = [[productTypes.id]]')
+                ->where(['siteId' => $event->oldPrimarySiteId])
+                ->one();
+
+            if ($primarySiteSettings) {
+                $newSiteSettings = [
+                    'uriFormat' => $primarySiteSettings['uriFormat'],
+                    'template' => $primarySiteSettings['template'],
+                    'hasUrls' => $primarySiteSettings['hasUrls']
+                ];
+
+                Craft::$app->getProjectConfig()->set(self::CONFIG_PRODUCTTYPES_KEY . '.' . $primarySiteSettings['productTypeUid'] . '.siteSettings.' . $event->site->uid, $newSiteSettings);
+            }
         }
     }
 
