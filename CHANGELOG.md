@@ -9,7 +9,7 @@ Changelog
 
 ### Changed
 - Digital Products now requires Craft 3.1.0-alpha.1 or later.
-- Digital Products now requires Commerce 2.0-beta.12 or later.
+- Digital Products now requires Commerce 2.0 or later.
 
 ### Fixed
 - Fixed an error where adding or removing sites would not reflect those changes in product type settings.
