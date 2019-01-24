@@ -13,6 +13,7 @@ Changelog
 
 ### Fixed
 - Fixed an error where adding or removing sites would not reflect those changes in product type settings.
+- Fixed an error where a non-existing Commerce event was being referenced.
 
 ## 2.0.4 - 2018-07-12
 
