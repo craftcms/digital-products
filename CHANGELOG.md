@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Unreleased
+## 2.1 - 2019-01-24
 
 ### Added
 - Added support for project config.
