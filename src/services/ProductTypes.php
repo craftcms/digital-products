@@ -111,7 +111,7 @@ class ProductTypes extends Component
             $allProductTypeIds = $this->getAllProductTypeIds();
 
             foreach ($allProductTypeIds as $productTypeId) {
-                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productTypeId)) {
+                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts:'.$productTypeId)) {
                     $this->_editableProductTypeIds[] = $productTypeId;
                 }
             }

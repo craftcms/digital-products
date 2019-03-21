@@ -90,7 +90,7 @@ class Plugin extends BasePlugin
             ];
         }
 
-        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
+        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductTypes')) {
             $navItems['subnav']['productTypes'] = [
                 'label' => Craft::t('digital-products', 'Product Types'),
                 'url' => 'digital-products/producttypes'
@@ -110,7 +110,6 @@ class Plugin extends BasePlugin
                 'url' => 'digital-products/settings'
             ];
         }
-
         return $navItems;
     }
 
@@ -187,18 +186,18 @@ class Plugin extends BasePlugin
     private function _registerPermissions()
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
-            $productTypes = [];//$this->getProductTypes()->getAllProductTypes();
+            $productTypes = $this->getProductTypes()->getAllProductTypes();
 
             $productTypePermissions = [];
 
             foreach ($productTypes as $id => $productType) {
                 $suffix = ':'.$id;
-                $productTypePermissions['digitalProducts-manageProductType'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
+                $productTypePermissions['digitalProducts-manageProducts'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
             }
 
             $event->permissions[Craft::t('digital-products', 'Digital Products')] = [
-                'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
                 'digitalProducts-manageProducts' => ['label' => Craft::t('digital-products', 'Manage products'), 'nested' => $productTypePermissions],
+                'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
                 'digitalProducts-manageLicenses' => ['label' => Craft::t('digital-products', 'Manage licenses')],
             ];
         });

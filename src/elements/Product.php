@@ -183,7 +183,7 @@ class Product extends Purchasable
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
-            $canEditProducts = Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productType->id);
+            $canEditProducts = Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts:'.$productType->id);
 
             $sources[$key] = [
                 'key' => $key,
@@ -350,7 +350,7 @@ class Product extends Purchasable
         if ($this->getType()) {
             $id = $this->getType()->id;
 
-            return Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$id);
+            return Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts:'.$id);
         }
 
         return false;
