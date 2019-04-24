@@ -6,6 +6,20 @@ Changelog
 ### Fixed
 - Fixed an error that could occur when saving a digital product if didn’t have a boolean `promotable` value set.
 
+## 2.1 - 2019-01-24
+
+### Added
+- Added support for project config.
+- Added the `generateLicenseOnOrderPaid` setting which allows to specify when the license should be created.
+
+### Changed
+- Digital Products now requires Craft 3.1.0-alpha.1 or later.
+- Digital Products now requires Commerce 2.0 or later.
+
+### Fixed
+- Fixed an error where adding or removing sites would not reflect those changes in product type settings.
+- Fixed an error where a non-existing Commerce event was being referenced.
+
 ## 2.0.4 - 2018-07-12
 
 ### Fixed

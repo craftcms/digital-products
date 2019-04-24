@@ -11,6 +11,7 @@ use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
+use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
@@ -19,6 +20,7 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\services\Sites;
 use craft\services\UserPermissions;
 use craft\services\Users as UsersService;
 use craft\web\twig\variables\CraftVariable;
@@ -32,6 +34,21 @@ use yii\base\Event;
  */
 class Plugin extends BasePlugin
 {
+    /**
+     * @inheritDoc
+     */
+    public $hasCpSection = true;
+
+    /**
+     * @inheritDoc
+     */
+    public $hasCpSettings = true;
+
+    /**
+     * @inheritDoc
+     */
+    public $schemaVersion = '2.0.1';
+
     // Traits
     // =========================================================================
 
@@ -125,8 +142,23 @@ class Plugin extends BasePlugin
     private function _registerEventHandlers()
     {
         Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
-        Event::on(Order::class, Order::EVENT_AFTER_ORDER_PAID, [$this->getLicenses(), 'handleCompletedOrder']);
-        Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT_EVENT, [$this->getLicenses(), 'maybePreventPayment']);
+        Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT, [$this->getLicenses(), 'maybePreventPayment']);
+
+        if ($this->getSettings()->generateLicenseOnOrderPaid) {
+            Event::on(Order::class, Order::EVENT_AFTER_ORDER_PAID, [$this->getLicenses(), 'handleCompletedOrder']);
+        } else {
+            Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER, [$this->getLicenses(), 'handleCompletedOrder']);
+        }
+
+        Event::on(Sites::class, Sites::EVENT_AFTER_SAVE_SITE, [$this->getProductTypes(), 'afterSaveSiteHandler']);
+        Event::on(Sites::class, Sites::EVENT_AFTER_SAVE_SITE, [$this->getProducts(), 'afterSaveSiteHandler']);
+
+        $projectConfigService = Craft::$app->getProjectConfig();
+        $productTypeService = $this->getProductTypes();
+        $projectConfigService->onAdd(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
+            ->onUpdate(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
+            ->onRemove(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleDeletedProductType']);
+        Event::on(Sites::class, Sites::EVENT_AFTER_DELETE_SITE, [$productTypeService, 'pruneDeletedSite']);
     }
 
     /**

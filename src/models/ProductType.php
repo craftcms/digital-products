@@ -58,6 +58,11 @@ class ProductType extends Model
     public $skuFormat;
 
     /**
+     * @var string|null UID
+     */
+    public $uid;
+
+    /**
      * @var ProductTypeSite[]
      */
     private $_siteSettings;
