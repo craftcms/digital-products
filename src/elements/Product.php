@@ -470,11 +470,11 @@ class Product extends Purchasable
             $productRecord = new ProductRecord();
             $productRecord->id = $this->id;
         }
-        
+
         $productRecord->postDate = $this->postDate;
         $productRecord->expiryDate = $this->expiryDate;
         $productRecord->typeId = $this->typeId;
-        $productRecord->promotable = $this->promotable;
+        $productRecord->promotable = (bool)$this->promotable;
         $productRecord->taxCategoryId = $this->taxCategoryId;
         $productRecord->price = $this->price;
 
@@ -557,7 +557,7 @@ class Product extends Purchasable
      */
     public function getIsPromotable(): bool
     {
-        return $this->promotable;
+        return (bool)$this->promotable;
     }
 
     // Protected methods

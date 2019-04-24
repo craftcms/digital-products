@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Unreleased
+
+### Fixed
+- Fixed an error that could occur when saving a digital product if didn’t have a boolean `promotable` value set.
+
 ## 2.0.4 - 2018-07-12
 
 ### Fixed
