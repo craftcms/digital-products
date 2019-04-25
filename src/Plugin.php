@@ -47,7 +47,7 @@ class Plugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    public $schemaVersion = '2.0.1';
+    public $schemaVersion = '2.1.0';
 
     // Traits
     // =========================================================================
@@ -187,12 +187,12 @@ class Plugin extends BasePlugin
     private function _registerPermissions()
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
-            $productTypes = [];//$this->getProductTypes()->getAllProductTypes();
+            $productTypes = $this->getProductTypes()->getAllProductTypes();
 
             $productTypePermissions = [];
 
-            foreach ($productTypes as $id => $productType) {
-                $suffix = ':'.$id;
+            foreach ($productTypes as $productType) {
+                $suffix = ':' . $productType->uid;
                 $productTypePermissions['digitalProducts-manageProductType'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
             }
 

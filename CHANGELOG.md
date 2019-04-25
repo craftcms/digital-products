@@ -5,6 +5,7 @@ Changelog
 
 ### Fixed
 - Fixed an error that could occur when saving a digital product if didn’t have a boolean `promotable` value set.
+- Restore missing edit product permissions. ([#33](https://github.com/craftcms/digital-products/pull/33))
 
 ## 2.1 - 2019-01-24
 
