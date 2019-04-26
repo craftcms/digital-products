@@ -396,7 +396,7 @@ class ProductTypes extends Component
                     $siteSettingsRecord->siteId = $siteId;
                 }
 
-                $siteSettingsRecord->hasUrls = $siteSettings['hasUrls'];
+                $siteSettingsRecord->hasUrls = (bool)$siteSettings['hasUrls'];
                 $siteSettingsRecord->uriFormat = $siteSettings['uriFormat'];
                 $siteSettingsRecord->template = $siteSettings['template'];
 
