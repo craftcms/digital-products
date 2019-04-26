@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.2.0 - 2019-04-26
 
 ### Added
 - Added support for the `project-config/rebuild` command.
