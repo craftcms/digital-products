@@ -3,6 +3,9 @@ Changelog
 
 ## Unreleased
 
+### Added
+- Added support for the `project-config/rebuild` command.
+
 ### Changed
 - Digital Products now correctly typecasts the boolean and integer values saved to the project config.
 
