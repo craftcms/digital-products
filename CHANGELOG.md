@@ -8,6 +8,8 @@ Changelog
 
 ### Changed
 - Digital Products now correctly typecasts the boolean and integer values saved to the project config.
+- Digital Products now requires Craft 3.1.20 or later.
+- Digital Products now requires Commerce 2.1 or later.
 
 ### Fixed
 - Fixed an error that could occur when saving a digital product if didn’t have a boolean `promotable` value set.

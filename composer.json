@@ -24,8 +24,8 @@
     "rss": "https://github.com/craftcms/commerce-digital-products/commits/master.atom"
   },
   "require": {
-    "craftcms/commerce": "^2.0",
-    "craftcms/cms": "^3.1.0-alpha.1"
+    "craftcms/commerce": "^2.1",
+    "craftcms/cms": "^3.1.20"
   },
   "autoload": {
     "psr-4": {
