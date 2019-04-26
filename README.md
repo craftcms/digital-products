@@ -1,24 +1,35 @@
-# Digital Products plugin for Craft Commerce 2
+<p align="center"><img src="./src/icon.svg" width="100" height="100" alt="Digital Products icon"></p>
 
-This plugin makes it possible to sell licenses for digital products with [Craft Commerce](http://craftcommerce.com).
+<h1 align="center">Digital Products</h1>
+
+This plugin makes it possible to sell licenses for digital products with [Craft Commerce](https://craftcms.com/commerce).
 
 ## Requirements
 
-Digital Products requires Craft CMS 3.1.20 or later and Craft Commerce 2.1 or later.
+Digital Products requires Craft 3.1.20 and Craft Commerce 2.1.0 or later.
 
 ## Installation
 
-To install the plugin, follow these instructions.
+You can install this plugin from the Plugin Store or with Composer.
 
-1. Open your terminal and go to your Craft project:
+#### From the Plugin Store
 
-        cd /path/to/project
+Go to the Plugin Store in your project’s Control Panel and search for “Digital Products”. Then click on the “Install” button in its modal window.
 
-2. Then tell Composer to load the plugin:
+#### With Composer
 
-        composer require craftcms/digital-products
+Open your terminal and run the following commands:
 
-3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Digital Products.
+```bash
+# go to the project directory
+cd /path/to/my-project.test
+
+# tell Composer to load the plugin
+composer require craftcms/digital-products
+
+# tell Craft to install the plugin
+./craft install/plugin digital-products
+```
 
 ## Events
 
@@ -76,67 +87,67 @@ Both licenses and products have several eager-loadable properties
 
 ### Displaying the licensed product for the currently logged in Craft User.
 
-```
-    {% if currentUser %}
-        {% set licenses = craft.digitalProducts.licenses.owner(currentUser).with(['products', 'order']) %}
+```twig
+{% if currentUser %}
+    {% set licenses = craft.digitalProducts.licenses.owner(currentUser).with(['products', 'order']) %}
 
-        <div class="panel panel-default">
-        <div class="panel-heading"><h3 class="panel-title">Licenses</h3></div>
-        {% if licenses %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Licensed product</th>
-                        <th>License date</th>
-                        <th>Order</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for license in licenses %}
-                    <tr>
-                        <td><a href="{{ license.product.getUrl() }}">{{ license.product.title }}</a></td>
-                        <td>{{ license.dateCreated|date('Y-m-d H:i:s') }}</td>
-                        <td>
-                            {% if license.orderId %}
-                                <a href="/store/order?number={{ license.order.number }}">Order no. {{ license.orderId }}</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-    {% else %}
-        <p>Please log in first</p>
+    <div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Licenses</h3></div>
+    {% if licenses %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Licensed product</th>
+                    <th>License date</th>
+                    <th>Order</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for license in licenses %}
+                <tr>
+                    <td><a href="{{ license.product.getUrl() }}">{{ license.product.title }}</a></td>
+                    <td>{{ license.dateCreated|date('Y-m-d H:i:s') }}</td>
+                    <td>
+                        {% if license.orderId %}
+                            <a href="/store/order?number={{ license.order.number }}">Order no. {{ license.orderId }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
+{% else %}
+    <p>Please log in first</p>
+{% endif %}
 ```
 
 ### Checking if currently logged in user is licensed to access a product.
 
-```
-    {% set products = craft.digitalProducts.products.type('onlineCourses').with(['existingLicenses']) %}
-    {% if products|length %}
-        <table class="table">
-            <thead>
+```twig
+{% set products = craft.digitalProducts.products.type('onlineCourses').with(['existingLicenses']) %}
+{% if products|length %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>License status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
                 <tr>
-                    <th>Product</th>
-                    <th>License status</th>
+                    <td>{{ product.title }}</td>
+                    <td>
+                        {% if product.existingLicenses|length %}
+                            You already own this product.
+                        {% else %}
+                            <a href="{{ product.getUrl() }}">Get it now!</a>
+                        {% endif %}
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                    <tr>
-                        <td>{{ product.title }}</td>
-                        <td>
-                            {% if product.existingLicenses|length %}
-                                You already own this product.
-                            {% else %}
-                                <a href="{{ product.getUrl() }}">Get it now!</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
 ```

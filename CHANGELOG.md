@@ -1,5 +1,4 @@
-Changelog
-=========
+# Release Notes for Digital Products
 
 ## Unreleased
 
@@ -8,15 +7,14 @@ Changelog
 
 ### Changed
 - Digital Products now correctly typecasts the boolean and integer values saved to the project config.
-- Digital Products now requires Craft 3.1.20 or later.
-- Digital Products now requires Commerce 2.1 or later.
+- Digital Products now requires Craft 3.1.20 and Craft Commerce 2.1.0 or later.
 
 ### Fixed
-- Fixed an error that could occur when saving a digital product if didn’t have a boolean `promotable` value set.
-- Restore missing edit product permissions. ([#33](https://github.com/craftcms/digital-products/pull/33))
-- Fixed an error that could prevent listing created licenses in the control panel.
+- Fixed an error that could occur when saving a digital product if it didn’t have a boolean `promotable` value set.
+- Fixed a bug where edit product permissions were missing. ([#33](https://github.com/craftcms/digital-products/pull/33))
+- Fixed an error that could prevent licenses from getting listed properly in the Control Panel.
 
-## 2.1 - 2019-01-24
+## 2.1.0 - 2019-01-24
 
 ### Added
 - Added support for project config.
