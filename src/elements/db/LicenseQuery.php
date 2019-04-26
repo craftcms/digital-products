@@ -379,7 +379,7 @@ class LicenseQuery extends ElementQuery
             'digitalproducts_licenses.ownerName',
             'digitalproducts_licenses.ownerEmail',
             'digitalproducts_licenses.userId',
-            'digitalproducts_licenses.orderId'
+            'digitalproducts_licenses.orderId',
         ]);
 
         if ($this->email) {
@@ -416,10 +416,6 @@ class LicenseQuery extends ElementQuery
 
         if ($this->licenseKey) {
             $this->subQuery->andWhere(Db::parseParam('digitalproducts_licenses.licenseKey', $this->licenseKey));
-        }
-
-        if (!$this->orderBy) {
-            $this->orderBy = ['digitalproducts_licenses.dateCreated' => SORT_DESC];
         }
 
         return parent::beforePrepare();

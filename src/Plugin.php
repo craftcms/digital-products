@@ -8,6 +8,7 @@ use craft\commerce\services\Purchasables;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fields\Products;
+use craft\digitalproducts\helpers\ProjectConfigData;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
@@ -15,11 +16,13 @@ use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
+use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\services\ProjectConfig;
 use craft\services\Sites;
 use craft\services\UserPermissions;
 use craft\services\Users as UsersService;
@@ -47,7 +50,7 @@ class Plugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    public $schemaVersion = '2.0.1';
+    public $schemaVersion = '2.1.0';
 
     // Traits
     // =========================================================================
@@ -159,6 +162,10 @@ class Plugin extends BasePlugin
             ->onUpdate(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
             ->onRemove(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleDeletedProductType']);
         Event::on(Sites::class, Sites::EVENT_AFTER_DELETE_SITE, [$productTypeService, 'pruneDeletedSite']);
+
+        Event::on(ProjectConfig::class, ProjectConfig::EVENT_REBUILD, function (RebuildConfigEvent $event) {
+            $event->config['digital-products'] = ProjectConfigData::rebuildProjectConfig();
+        });
     }
 
     /**
@@ -187,12 +194,12 @@ class Plugin extends BasePlugin
     private function _registerPermissions()
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
-            $productTypes = [];//$this->getProductTypes()->getAllProductTypes();
+            $productTypes = $this->getProductTypes()->getAllProductTypes();
 
             $productTypePermissions = [];
 
-            foreach ($productTypes as $id => $productType) {
-                $suffix = ':'.$id;
+            foreach ($productTypes as $productType) {
+                $suffix = ':' . $productType->uid;
                 $productTypePermissions['digitalProducts-manageProductType'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
             }
 

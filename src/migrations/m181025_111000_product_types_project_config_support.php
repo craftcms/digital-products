@@ -56,7 +56,7 @@ class m181025_111000_product_types_project_config_support extends Migration
 
         foreach ($typeSiteRows as $typeSiteRow) {
             $typeSiteData[$typeSiteRow['typeUid']][$typeSiteRow['siteUid']] = [
-                'hasUrls' => $typeSiteRow['hasUrls'],
+                'hasUrls' => (bool)$typeSiteRow['hasUrls'],
                 'uriFormat' => $typeSiteRow['uriFormat'],
                 'template' => $typeSiteRow['template'],
             ];
@@ -145,14 +145,14 @@ class m181025_111000_product_types_project_config_support extends Migration
                 $layout['tabs'][$fieldRow['tabUid']] =
                     [
                         'name' => $fieldRow['tabName'],
-                        'sortOrder' => $fieldRow['tabOrder'],
+                        'sortOrder' => (int)$fieldRow['tabOrder'],
                     ];
             }
 
             $tab = &$layout['tabs'][$fieldRow['tabUid']];
 
-            $field['required'] = $fieldRow['required'];
-            $field['sortOrder'] = $fieldRow['fieldOrder'];
+            $field['required'] = (bool)$fieldRow['required'];
+            $field['sortOrder'] = (int)$fieldRow['fieldOrder'];
 
             $tab['fields'][$fieldRow['fieldUid']] = $field;
         }

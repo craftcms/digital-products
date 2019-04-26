@@ -82,7 +82,7 @@ class ProductsController extends BaseController
             throw new Exception('The product type was not found.');
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:'.$productType->id);
+        $this->requirePermission('digitalProducts-manageProducts:'.$productType->uid);
         $variables['productType'] = $productType;
 
         if ($siteHandle !== null) {

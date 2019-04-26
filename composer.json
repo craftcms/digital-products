@@ -1,10 +1,11 @@
 {
   "name": "craftcms/digital-products",
   "description": "Digital Products plugin for Craft Commerce 2",
-  "version": "2.1",
+  "version": "2.2.0",
   "type": "craft-plugin",
   "keywords": [
     "digital",
+    "products",
     "commerce",
     "craftcms",
     "yii2"
@@ -24,24 +25,17 @@
     "rss": "https://github.com/craftcms/commerce-digital-products/commits/master.atom"
   },
   "require": {
-    "craftcms/commerce": "^2.0",
-    "craftcms/cms": "^3.1.0-alpha.1"
+    "craftcms/commerce": "^2.1",
+    "craftcms/cms": "^3.1.20"
   },
   "autoload": {
     "psr-4": {
       "craft\\digitalproducts\\": "src/"
     }
   },
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https://asset-packagist.org"
-    }
-  ],
   "extra": {
     "handle": "digital-products",
     "name": "Digital Products",
-    "description": "Add digital products to Craft Commerce.",
-    "developer": "Pixel & Tonic"
+    "documentationUrl": "https://github.com/craftcms/digital-products/blob/master/README.md"
   }
 }
