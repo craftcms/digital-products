@@ -35,9 +35,9 @@ class ProductQuery extends ElementQuery
     public $editable = false;
 
     /**
-     * @var int|int[]|null The product type ID(s) that the resulting products must have.
+     * @var mixed The Post Date that the resulting products must have.
      */
-    public $typeId;
+    public $expiryDate;
 
     /**
      * @var mixed The Post Date that the resulting products must have.
@@ -45,9 +45,14 @@ class ProductQuery extends ElementQuery
     public $postDate;
 
     /**
-     * @var mixed The Post Date that the resulting products must have.
+     * @var mixed The sku the resulting products must have.
      */
-    public $expiryDate;
+    public $sku;
+
+    /**
+     * @var int|int[]|null The product type ID(s) that the resulting products must have.
+     */
+    public $typeId;
 
     // Public Methods
     // =========================================================================
@@ -83,30 +88,6 @@ class ProductQuery extends ElementQuery
             default:
                 parent::__set($name, $value);
         }
-    }
-
-    /**
-     * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
-     *
-     * @param string|string[]|ProductType|null $value The property value
-     *
-     * @return static self reference
-     */
-    public function type($value)
-    {
-        if ($value instanceof ProductType) {
-            $this->typeId = $value->id;
-        } else if ($value !== null) {
-            $this->typeId = (new Query())
-                ->select(['id'])
-                ->from(['{{%digitalproducts_producttypes}}'])
-                ->where(Db::parseParam('handle', $value))
-                ->column();
-        } else {
-            $this->typeId = null;
-        }
-
-        return $this;
     }
 
     /**
@@ -162,15 +143,15 @@ class ProductQuery extends ElementQuery
     }
 
     /**
-     * Sets the [[typeId]] property.
+     * Sets the [[expiryDate]] property.
      *
-     * @param int|int[]|null $value The property value
+     * @param mixed $value The property value
      *
      * @return static self reference
      */
-    public function typeId($value)
+    public function expiryDate($value)
     {
-        $this->typeId = $value;
+        $this->expiryDate = $value;
 
         return $this;
     }
@@ -190,15 +171,53 @@ class ProductQuery extends ElementQuery
     }
 
     /**
-     * Sets the [[expiryDate]] property.
+     * Sets the [[sku]] property.
      *
      * @param mixed $value The property value
      *
      * @return static self reference
      */
-    public function expiryDate($value)
+    public function sku($value)
     {
-        $this->expiryDate = $value;
+        $this->sku = $value;
+
+        return $this;
+    }
+
+    /**
+     * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
+     *
+     * @param string|string[]|ProductType|null $value The property value
+     *
+     * @return static self reference
+     */
+    public function type($value)
+    {
+        if ($value instanceof ProductType) {
+            $this->typeId = $value->id;
+        } else if ($value !== null) {
+            $this->typeId = (new Query())
+                ->select(['id'])
+                ->from(['{{%digitalproducts_producttypes}}'])
+                ->where(Db::parseParam('handle', $value))
+                ->column();
+        } else {
+            $this->typeId = null;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the [[typeId]] property.
+     *
+     * @param int|int[]|null $value The property value
+     *
+     * @return static self reference
+     */
+    public function typeId($value)
+    {
+        $this->typeId = $value;
 
         return $this;
     }
@@ -219,22 +238,26 @@ class ProductQuery extends ElementQuery
         $this->joinElementTable('digitalproducts_products');
 
         $this->query->select([
-            'digitalproducts_products.id',
-            'digitalproducts_products.typeId',
-            'digitalproducts_products.taxCategoryId',
-            'digitalproducts_products.postDate',
             'digitalproducts_products.expiryDate',
-            'digitalproducts_products.sku',
+            'digitalproducts_products.id',
+            'digitalproducts_products.postDate',
+            'digitalproducts_products.price',
             'digitalproducts_products.promotable',
-            'digitalproducts_products.price'
+            'digitalproducts_products.sku',
+            'digitalproducts_products.taxCategoryId',
+            'digitalproducts_products.typeId'
         ]);
+
+        if ($this->expiryDate) {
+            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.expiryDate', $this->expiryDate));
+        }
 
         if ($this->postDate) {
             $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.postDate', $this->postDate));
         }
 
-        if ($this->expiryDate) {
-            $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.expiryDate', $this->expiryDate));
+        if ($this->sku) {
+            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.sku', $this->sku));
         }
 
         if ($this->typeId) {
