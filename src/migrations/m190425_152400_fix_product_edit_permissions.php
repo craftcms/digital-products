@@ -19,15 +19,12 @@ class m190425_152400_fix_product_edit_permissions extends Migration
     public function safeUp()
     {
         $projectConfig = Craft::$app->getProjectConfig();
-
         $productTypes = $projectConfig->get('digital-products.productTypes');
 
         if (is_array($productTypes)) {
-            $groups = $projectConfig->get('users.groups');
-
             // Create all the new permissions in the table and store ids by name
+            $groups = $projectConfig->get('users.groups');
             $productTypeUids = array_keys($productTypes);
-
             $permissionIdsByName = [];
 
             foreach ($productTypeUids as $productTypeUid) {
@@ -46,12 +43,13 @@ class m190425_152400_fix_product_edit_permissions extends Migration
 
             // Migrate all the group permissions
             if (is_array($groups)) {
-                $groupUids = array_keys($groups);
-
                 // Collect eligible permission combos for groups
+                $groupUids = array_keys($groups);
                 $newPermissions = [];
+                
                 foreach ($groupUids as $groupUid) {
                     $permissions = $projectConfig->get('users.groups.' . $groupUid . '.permissions');
+                    
                     if(is_array($permissions)) {
                         foreach ($productTypeUids as $productTypeUid) {
                             if (in_array('digitalproducts-manageproducts', $permissions, true)) {
@@ -63,6 +61,7 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                 }
 
                 $projectConfig->muteEvents = true;
+                
                 // Add new permissions
                 foreach ($newPermissions as $groupUid => $productTypePermissions) {
                     $schemaVersion = $projectConfig->get('plugins.digital-products.schemaVersion', true);
@@ -81,6 +80,7 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                         ]);
                     }
                 }
+                
                 $projectConfig->muteEvents = false;
 
                 // Migrate the users
