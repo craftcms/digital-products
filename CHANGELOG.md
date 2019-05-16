@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed an error that could occur when updating to 2.2.0 and there were user groups with no defined permissions.
+
 ## 2.2.0 - 2019-04-26
 
 ### Added
