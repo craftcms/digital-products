@@ -182,5 +182,7 @@
                 </div>
             {% endif %}
         </div>
-    {% endif %}
+	{% endif %}
+	
+	{% hook "cp.digital-products.product.edit.details" %}
 {% endblock %}
