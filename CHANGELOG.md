@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.2.1 - 2019-06-14
 
 ### Added
 - Added the `cp.digital-products.product.edit.details` template hook.
