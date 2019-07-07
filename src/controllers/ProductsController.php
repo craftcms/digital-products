@@ -13,6 +13,7 @@ use craft\helpers\Localization;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
 use craft\web\Controller as BaseController;
+use DateTime;
 use yii\base\Exception;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -486,7 +487,7 @@ class ProductsController extends BaseController
         }
 
         if (!$product->postDate) {
-            $product->postDate = new \DateTime();
+            $product->postDate = new DateTime();
         }
 
         return $product;

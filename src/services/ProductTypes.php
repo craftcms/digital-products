@@ -18,6 +18,7 @@ use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
 use craft\queue\jobs\ResaveElements;
+use Throwable;
 use yii\base\Component;
 use yii\base\Exception;
 
@@ -227,7 +228,7 @@ class ProductTypes extends Component
      * @param bool $runValidation If validation should be ran.
      *
      * @return bool Whether the product type was saved successfully.
-     * @throws \Throwable if reasons
+     * @throws Throwable if reasons
      */
     public function saveProductType(ProductType $productType, bool $runValidation = true): bool
     {
@@ -439,7 +440,7 @@ class ProductTypes extends Component
             }
 
             $transaction->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $transaction->rollBack();
 
             throw $e;
@@ -451,7 +452,7 @@ class ProductTypes extends Component
      *
      * @param int $id The product type's id.
      * @return bool Whether the product type was deleted successfully.
-     * @throws \Throwable if reasons
+     * @throws Throwable if reasons
      */
     public function deleteProductTypeById(int $id): bool
     {
@@ -498,7 +499,7 @@ class ProductTypes extends Component
                 ->execute();
 
             $transaction->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $transaction->rollBack();
 
             throw $e;

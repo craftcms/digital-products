@@ -15,6 +15,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
+use DateTime;
 use yii\base\Exception;
 
 /**
@@ -55,12 +56,12 @@ class Product extends Purchasable
     public $taxCategoryId;
 
     /**
-     * @var \DateTime Post date
+     * @var DateTime Post date
      */
     public $postDate;
 
     /**
-     * @var \DateTime Expiry date
+     * @var DateTime Expiry date
      */
     public $expiryDate;
 

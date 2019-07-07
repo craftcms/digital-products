@@ -5,6 +5,7 @@ namespace craft\digitalproducts\records;
 use craft\commerce\records\TaxCategory;
 use craft\db\ActiveRecord;
 use craft\records\Element;
+use DateTime;
 use yii\db\ActiveQueryInterface;
 
 /**
@@ -13,8 +14,8 @@ use yii\db\ActiveQueryInterface;
  * @property int $id            Product id
  * @property int $typeId        Product type id
  * @property int $taxCategoryId Product tax category id
- * @property \DateTime $postDate      Product post date
- * @property \DateTime $expiryDate    Product expiry date
+ * @property DateTime $postDate      Product post date
+ * @property DateTime $expiryDate    Product expiry date
  * @property bool $promotable    Can sales/discounts be applied?
  * @property string $sku           Product SKU
  * @property float $price         Product price

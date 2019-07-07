@@ -261,7 +261,7 @@ class ProductQuery extends ElementQuery
      */
     protected function statusCondition(string $status)
     {
-        $currentTimeDb = Db::prepareDateForDb(new \DateTime());
+        $currentTimeDb = Db::prepareDateForDb(new DateTime());
 
         switch ($status) {
             case Product::STATUS_LIVE:
