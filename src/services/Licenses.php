@@ -33,7 +33,10 @@ class Licenses extends Component
      */
     public function isLicenseKeyUnique(string $licenseKey): bool
     {
-        return !(bool) License::findOne(['licenseKey' => $licenseKey]);
+        return !License::find()
+            ->licenseKey($licenseKey)
+            ->anyStatus()
+            ->exists();
     }
 
     /**

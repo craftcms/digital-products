@@ -125,7 +125,10 @@ class ProductsController extends BaseController
         $this->requirePostRequest();
 
         $productId = Craft::$app->getRequest()->getRequiredParam('productId');
-        $product = Product::findOne($productId);
+        $product = Product::find()
+            ->id($productId)
+            ->anyStatus()
+            ->one();
 
         if (!$product) {
             throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.',['id' => $productId]));

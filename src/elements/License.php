@@ -141,7 +141,10 @@ class License extends Element
             return $this->_product;
         }
 
-        return $this->_product = Product::findOne($this->productId);
+        return $this->_product = Product::find()
+            ->id($this->productId)
+            ->anyStatus()
+            ->one();
     }
 
     /**
