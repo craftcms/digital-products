@@ -8,6 +8,7 @@ use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\models\ProductTypeSite;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\web\Controller as BaseController;
+use yii\web\HttpException;
 use yii\web\Response;
 
 
@@ -37,6 +38,7 @@ class ProductTypesController extends BaseController
      * @param int|null $productTypeId the product type id
      * @param ProductType|null $productType the product type
      * @return Response
+     * @throws HttpException
      */
     public function actionEdit(int $productTypeId = null, ProductType $productType = null): Response
     {
