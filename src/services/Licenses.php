@@ -48,24 +48,18 @@ class Licenses extends Component
      */
     public static function handleCompletedOrder(Event $event)
     {
-        /**
-         * @var Order $order
-         */
+        /** @var Order $order */
         $order = $event->sender;
         $lineItems = $order->getLineItems();
 
-        /**
-         * @var LineItem $lineItem
-         */
+        /** @var LineItem $lineItem */
         foreach ($lineItems as $lineItem) {
             $itemId = $lineItem->purchasableId;
             $element = Craft::$app->getElements()->getElementById($itemId);
             $quantity = $lineItem->qty;
 
             if ($element instanceof Product) {
-                /**
-                 * @var Product $element
-                 */
+                /** @var Product $element */
                 for ($i = 0; $i < $quantity; $i++) {
                     DigitalProducts::getInstance()->getLicenses()->licenseProductByOrder($element, $order);
                 }
