@@ -5,7 +5,6 @@ namespace craft\digitalproducts\migrations;
 use craft\commerce\elements\Order;
 use craft\commerce\elements\Product;
 use craft\db\Migration;
-use craft\db\Query;
 use craft\helpers\MigrationHelper;
 
 /**
@@ -48,9 +47,7 @@ class Install extends Migration
     // =========================================================================
 
     /**
-     * Creates the tables for Craft Commerce
-     *
-     * @return void
+     * Creates the tables for Digital Products
      */
     protected function createTables()
     {
@@ -103,13 +100,10 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
-
     }
 
     /**
      * Drop the tables
-     *
-     * @return void
      */
     protected function dropTables()
     {
@@ -117,14 +111,10 @@ class Install extends Migration
         $this->dropTable('{{%digitalproducts_products}}');
         $this->dropTable('{{%digitalproducts_producttypes}}');
         $this->dropTable('{{%digitalproducts_producttypes_sites}}');
-
-        return null;
     }
 
     /**
      * Creates the indexes.
-     *
-     * @return void
      */
     protected function createIndexes()
     {
@@ -145,8 +135,6 @@ class Install extends Migration
 
     /**
      * Adds the foreign keys.
-     *
-     * @return void
      */
     protected function addForeignKeys()
     {
@@ -167,8 +155,6 @@ class Install extends Migration
 
     /**
      * Adds the foreign keys.
-     *
-     * @return void
      */
     protected function dropForeignKeys()
     {

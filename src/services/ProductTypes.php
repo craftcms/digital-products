@@ -3,13 +3,13 @@
 namespace craft\digitalproducts\services;
 
 use Craft;
+use craft\commerce\events\ProductTypeEvent;
+use craft\db\Query;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\models\ProductTypeSite;
 use craft\digitalproducts\records\ProductType as ProductTypeRecord;
 use craft\digitalproducts\records\ProductTypeSite as ProductTypeSiteRecord;
-use craft\commerce\events\ProductTypeEvent;
-use craft\db\Query;
 use craft\events\ConfigEvent;
 use craft\events\DeleteSiteEvent;
 use craft\events\SiteEvent;
@@ -18,6 +18,7 @@ use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
 use craft\queue\jobs\ResaveElements;
+use Throwable;
 use yii\base\Component;
 use yii\base\Exception;
 
@@ -111,7 +112,7 @@ class ProductTypes extends Component
             $allProductTypeIds = $this->getAllProductTypeIds();
 
             foreach ($allProductTypeIds as $productTypeId) {
-                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productTypeId)) {
+                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:' . $productTypeId)) {
                     $this->_editableProductTypeIds[] = $productTypeId;
                 }
             }
@@ -163,7 +164,6 @@ class ProductTypes extends Component
      * Get a product type by it's handle.
      *
      * @param string $handle The product type's handle.
-     *
      * @return ProductType|null The product type or `null`.
      */
     public function getProductTypeByHandle($handle)
@@ -193,7 +193,6 @@ class ProductTypes extends Component
      * Get an array of product type site settings for a product type by it's id.
      *
      * @param int $productTypeId The product type id.
-     *
      * @return array The product type settings.
      */
     public function getProductTypeSites($productTypeId): array
@@ -225,11 +224,11 @@ class ProductTypes extends Component
     /**
      * Save a product type.
      *
-     * @param ProductType $productType   The product type model.
-     * @param bool        $runValidation If validation should be ran.
+     * @param ProductType $productType The product type model.
+     * @param bool $runValidation If validation should be ran.
      *
      * @return bool Whether the product type was saved successfully.
-     * @throws \Throwable if reasons
+     * @throws Throwable if reasons
      */
     public function saveProductType(ProductType $productType, bool $runValidation = true): bool
     {
@@ -441,7 +440,7 @@ class ProductTypes extends Component
             }
 
             $transaction->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $transaction->rollBack();
 
             throw $e;
@@ -452,9 +451,8 @@ class ProductTypes extends Component
      * Delete a product type by it's id.
      *
      * @param int $id The product type's id.
-     *
      * @return bool Whether the product type was deleted successfully.
-     * @throws \Throwable if reasons
+     * @throws Throwable if reasons
      */
     public function deleteProductTypeById(int $id): bool
     {
@@ -501,7 +499,7 @@ class ProductTypes extends Component
                 ->execute();
 
             $transaction->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $transaction->rollBack();
 
             throw $e;
@@ -541,7 +539,8 @@ class ProductTypes extends Component
                     'productTypes.uid productTypeUid',
                     'producttypes_sites.uriFormat',
                     'producttypes_sites.template',
-                    'producttypes_sites.hasUrls'])
+                    'producttypes_sites.hasUrls'
+                ])
                 ->from(['{{%digitalproducts_producttypes_sites}} producttypes_sites'])
                 ->innerJoin(['{{%digitalproducts_producttypes}} productTypes'], '[[producttypes_sites.productTypeId]] = [[productTypes.id]]')
                 ->where(['siteId' => $event->oldPrimarySiteId])
@@ -563,7 +562,6 @@ class ProductTypes extends Component
      * Get a product's type by id.
      *
      * @param int $productTypeId The product type's id.
-     *
      * @return ProductType|null Either the product type or `null`.
      */
     public function getProductTypeById(int $productTypeId)
@@ -592,23 +590,25 @@ class ProductTypes extends Component
     /**
      * Returns whether a product type’s products have URLs, and if the template path is valid.
      *
-     * @param ProductType $productType The product for which to validate the template.
-     *
+     * @param ProductType $productType The product type for which to validate the template.
+     * @param int $siteId
      * @return bool Whether the template is valid.
      */
-    public function isProductTypeTemplateValid(ProductType $productType): bool
+    public function isProductTypeTemplateValid(ProductType $productType, int $siteId): bool
     {
-        if ($productType->hasUrls) {
+        $siteSettings = $productType->getSiteSettings();
+
+        if (isset($siteSettings[$siteId]) && $siteSettings[$siteId]->hasUrls) {
             // Set Craft to the site template mode
-            $templatesService = Craft::$app->getView();
-            $oldTemplateMode = $templatesService->getTemplateMode();
-            $templatesService->setTemplateMode($templatesService::TEMPLATE_MODE_SITE);
+            $view = Craft::$app->getView();
+            $oldTemplateMode = $view->getTemplateMode();
+            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
 
             // Does the template exist?
-            $templateExists = $templatesService->doesTemplateExist($productType->template);
+            $templateExists = Craft::$app->getView()->doesTemplateExist((string)$siteSettings[$siteId]->template);
 
             // Restore the original template mode
-            $templatesService->setTemplateMode($oldTemplateMode);
+            $view->setTemplateMode($oldTemplateMode);
 
             if ($templateExists) {
                 return true;
@@ -622,8 +622,6 @@ class ProductTypes extends Component
      * Add new product type setting rows when a Site is added to Craft.
      *
      * @param SiteEvent $event The event that triggered this.
-     *
-     * @return void
      */
     public function addSiteHandler(SiteEvent $event)
     {
@@ -700,6 +698,4 @@ class ProductTypes extends Component
     {
         return ProductTypeRecord::findOne(['uid' => $uid]) ?? new ProductTypeRecord();
     }
-
-
 }

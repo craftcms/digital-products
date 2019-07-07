@@ -9,7 +9,7 @@ use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fields\Products;
 use craft\helpers\Json;
 use craft\helpers\MigrationHelper;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 
 /**
  * m171129_154500_craft3_upgrade migration.
@@ -50,18 +50,14 @@ class m171129_154500_craft3_upgrade extends Migration
         foreach ($fields as $field) {
             try {
                 $settings = Json::decode($field['settings']);
-            } catch (InvalidParamException $e) {
-                echo 'Field '.$field['id'].' ('.$field['type'].') settings were invalid JSON: '.$field['settings']."\n";
+            } catch (InvalidArgumentException $e) {
+                echo 'Field ' . $field['id'] . ' (' . $field['type'] . ') settings were invalid JSON: ' . $field['settings'] . "\n";
 
                 return false;
             }
 
             $settings['localizeRelations'] = ($field['translationMethod'] === 'site');
 
-            // targetLocale => targetSiteId
-            if (!empty($settings['targetLocale'])) {
-                $settings['targetSiteId'] = $siteIdsByLocale[$settings['targetLocale']];
-            }
             unset($settings['targetLocale']);
 
             $this->update(
@@ -163,7 +159,6 @@ class m171129_154500_craft3_upgrade extends Migration
     public function safeDown()
     {
         echo "m171129_154500_craft3_upgrade cannot be reverted.\n";
-
         return false;
     }
 }

@@ -3,10 +3,10 @@
 namespace craft\digitalproducts\elements\db;
 
 use craft\base\Element;
+use craft\db\Query;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
-use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
@@ -44,12 +44,12 @@ class LicenseQuery extends ElementQuery
      */
     public $userEmail;
 
-   /**
+    /**
      * @var int|int[] The user id for the user that the license belongs to.
      */
     public $ownerId;
 
-   /**
+    /**
      * @var int The product id for the product that is licensed
      */
     public $productId;
@@ -73,7 +73,6 @@ class LicenseQuery extends ElementQuery
      * @var string The license key.
      */
     public $licenseKey;
-
 
     // Public Methods
     // =========================================================================
@@ -121,13 +120,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[email]] property.
      *
      * @param string $value The property value
-     *
      * @return static self reference
      */
     public function email($value)
     {
         $this->email = $value;
-
         return $this;
     }
 
@@ -135,13 +132,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[ownerEmail]] property.
      *
      * @param string $value The property value
-     *
      * @return static self reference
      */
     public function ownerEmail($value)
     {
         $this->ownerEmail = $value;
-
         return $this;
     }
 
@@ -149,13 +144,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[userEmail]] property.
      *
      * @param string $value The property value
-     *
      * @return static self reference
      */
     public function userEmail($value)
     {
         $this->userEmail = $value;
-
         return $this;
     }
 
@@ -163,10 +156,10 @@ class LicenseQuery extends ElementQuery
      * Sets the [[productId]] property based on a given product or the sku.
      *
      * @param User $value
-     *
      * @return static self reference
      */
-    public function owner($value) {
+    public function owner($value)
+    {
         if ($value instanceof User) {
             $this->ownerId = $value->id;
         } else if ($value !== null) {
@@ -186,10 +179,10 @@ class LicenseQuery extends ElementQuery
      * Sets the [[productId]] property based on a given product or the sku.
      *
      * @param Product $value
-     *
      * @return static self reference
      */
-    public function product($value) {
+    public function product($value)
+    {
         if ($value instanceof Product) {
             $this->productId = $value->id;
         } else if ($value !== null) {
@@ -209,7 +202,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
      *
      * @param string|string[]|ProductType $value The property value
-     *
      * @return static self reference
      */
     public function type($value)
@@ -233,7 +225,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is before the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function before($value)
@@ -243,7 +234,7 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->dateCreated = ArrayHelper::toArray($this->dateCreated);
-        $this->dateCreated[] = '<'.$value;
+        $this->dateCreated[] = '<' . $value;
 
         return $this;
     }
@@ -252,7 +243,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is after the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function after($value)
@@ -262,7 +252,7 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->dateCreated = ArrayHelper::toArray($this->dateCreated);
-        $this->dateCreated[] = '>='.$value;
+        $this->dateCreated[] = '>=' . $value;
 
         return $this;
     }
@@ -271,13 +261,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[typeId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function typeId($value)
     {
         $this->typeId = $value;
-
         return $this;
     }
 
@@ -285,13 +273,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[ownerId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function ownerId($value)
     {
         $this->ownerId = $value;
-
         return $this;
     }
 
@@ -299,13 +285,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[productId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function productId($value)
     {
         $this->productId = $value;
-
         return $this;
     }
 
@@ -313,13 +297,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[orderId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function orderId($value)
     {
         $this->orderId = $value;
-
         return $this;
     }
 
@@ -327,13 +309,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[licenseKey]] property.
      *
      * @param string|string[] $value The property value
-     *
      * @return static self reference
      */
     public function licenseKey($value)
     {
         $this->licenseKey = $value;
-
         return $this;
     }
 
@@ -341,7 +321,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[licenseDate]] property.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function licenseDate($value)
@@ -351,7 +330,6 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->licenseDate = $value;
-
         return $this;
     }
 

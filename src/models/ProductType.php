@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\models;
 
 use craft\base\Model;
@@ -14,9 +15,9 @@ use craft\models\FieldLayout;
  *
  * @method null setFieldLayout(FieldLayout $fieldLayout)
  * @method FieldLayout getFieldLayout()
- * @property string                         $cpEditUrl
- * @property ProductTypeSite[]              $siteSettings
- * @property mixed                          $productFieldLayout
+ * @property string $cpEditUrl
+ * @property ProductTypeSite[] $siteSettings
+ * @property mixed $productFieldLayout
  * @mixin FieldLayoutBehavior
  *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
@@ -48,11 +49,6 @@ class ProductType extends Model
     public $handle;
 
     /**
-     * @var bool Has URLs
-     */
-    public $hasUrls;
-
-    /**
      * @var string SKU format
      */
     public $skuFormat;
@@ -71,7 +67,7 @@ class ProductType extends Model
     // =========================================================================
 
     /**
-     * @return null|string
+     * @inheritdoc
      */
     public function __toString()
     {
@@ -83,7 +79,7 @@ class ProductType extends Model
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('digital-products/producttypes/'.$this->id);
+        return UrlHelper::cpUrl('digital-products/producttypes/' . $this->id);
     }
 
     /**
@@ -110,8 +106,6 @@ class ProductType extends Model
      * Sets the product type's site-specific settings.
      *
      * @param ProductTypeSite[] $siteSettings
-     *
-     * @return void
      */
     public function setSiteSettings(array $siteSettings)
     {

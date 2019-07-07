@@ -4,6 +4,8 @@ namespace craft\digitalproducts;
 
 use Craft;
 use craft\base\Plugin as BasePlugin;
+use craft\commerce\elements\Order;
+use craft\commerce\services\Payments as PaymentService;
 use craft\commerce\services\Purchasables;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
@@ -14,8 +16,6 @@ use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
 use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
-use craft\commerce\elements\Order;
-use craft\commerce\services\Payments as PaymentService;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
@@ -163,7 +163,7 @@ class Plugin extends BasePlugin
             ->onRemove(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleDeletedProductType']);
         Event::on(Sites::class, Sites::EVENT_AFTER_DELETE_SITE, [$productTypeService, 'pruneDeletedSite']);
 
-        Event::on(ProjectConfig::class, ProjectConfig::EVENT_REBUILD, function (RebuildConfigEvent $event) {
+        Event::on(ProjectConfig::class, ProjectConfig::EVENT_REBUILD, function(RebuildConfigEvent $event) {
             $event->config['digital-products'] = ProjectConfigData::rebuildProjectConfig();
         });
     }
@@ -200,7 +200,7 @@ class Plugin extends BasePlugin
 
             foreach ($productTypes as $productType) {
                 $suffix = ':' . $productType->uid;
-                $productTypePermissions['digitalProducts-manageProductType'.$suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
+                $productTypePermissions['digitalProducts-manageProductType' . $suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
             }
 
             $event->permissions[Craft::t('digital-products', 'Digital Products')] = [
@@ -221,7 +221,6 @@ class Plugin extends BasePlugin
             $variable = $event->sender;
             $variable->set('digitalProducts', DigitalProducts::class);
         });
-
     }
 
     /**
@@ -234,5 +233,4 @@ class Plugin extends BasePlugin
             $e->types[] = License::class;
         });
     }
-
 }

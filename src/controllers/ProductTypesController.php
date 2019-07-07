@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\controllers;
 
 use Craft;
@@ -7,7 +8,7 @@ use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\models\ProductTypeSite;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\web\Controller as BaseController;
-use yii\base\Exception;
+use yii\web\HttpException;
 use yii\web\Response;
 
 
@@ -17,13 +18,10 @@ use yii\web\Response;
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
-
 class ProductTypesController extends BaseController
 {
-
     // Public Methods
     // =========================================================================
-
 
     /**
      * @inheritdoc
@@ -37,11 +35,10 @@ class ProductTypesController extends BaseController
     /**
      * Edit a product type.
      *
-     * @param int|null         $productTypeId the product type id
-     * @param ProductType|null $productType   the product type
-     *
+     * @param int|null $productTypeId the product type id
+     * @param ProductType|null $productType the product type
      * @return Response
-     * @@throws Exception if product type is not found
+     * @throws HttpException
      */
     public function actionEdit(int $productTypeId = null, ProductType $productType = null): Response
     {
@@ -74,7 +71,7 @@ class ProductTypesController extends BaseController
     /**
      * Save a Product Type
      *
-     * @return Response
+     * @return Response|null
      */
     public function actionSave()
     {
@@ -83,18 +80,17 @@ class ProductTypesController extends BaseController
         $productType = new ProductType();
 
         $request = Craft::$app->getRequest();
-        
+
         $productType->id = $request->getBodyParam('productTypeId');
         $productType->name = $request->getBodyParam('name');
         $productType->handle = $request->getBodyParam('handle');
-        $productType->hasUrls = $request->getBodyParam('hasUrls');
         $productType->skuFormat = $request->getBodyParam('skuFormat');
 
         // Site-specific settings
         $allSiteSettings = [];
 
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
-            $postedSettings = $request->getBodyParam('sites.'.$site->handle);
+            $postedSettings = $request->getBodyParam('sites.' . $site->handle);
 
             $siteSettings = new ProductTypeSite();
             $siteSettings->siteId = $site->id;
@@ -150,5 +146,4 @@ class ProductTypesController extends BaseController
 
         return $this->asJson(['success' => true]);
     }
-
 }

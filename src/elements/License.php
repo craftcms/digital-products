@@ -1,22 +1,22 @@
 <?php
+
 namespace craft\digitalproducts\elements;
 
 use Craft;
 use craft\base\Element;
+use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Query;
 use craft\digitalproducts\elements\db\LicenseQuery;
 use craft\digitalproducts\events\GenerateKeyEvent;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\License as LicenseRecord;
-use craft\commerce\Plugin as Commerce;
-use craft\commerce\elements\Order;
-use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\UrlHelper;
-use Exception;
 use yii\base\InvalidConfigException;
 
 /**
@@ -141,7 +141,10 @@ class License extends Element
             return $this->_product;
         }
 
-        return $this->_product = Product::findOne($this->productId);
+        return $this->_product = Product::find()
+            ->id($this->productId)
+            ->anyStatus()
+            ->one();
     }
 
     /**
@@ -183,17 +186,17 @@ class License extends Element
      */
     public function getProductName(): string
     {
-        return (string) $this->getProduct();
+        return (string)$this->getProduct();
     }
 
     /**
-     * @inheritdoc BaseElementModel::getCpEditUrl()
+     * @inheritdoc
      *
      * @return string
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('digital-products/licenses/'.$this->id);
+        return UrlHelper::cpUrl('digital-products/licenses/' . $this->id);
     }
 
     /**
@@ -204,7 +207,7 @@ class License extends Element
     public function getOrderEditUrl(): string
     {
         if ($this->orderId) {
-            return UrlHelper::cpUrl('commerce/orders/'.$this->orderId);
+            return UrlHelper::cpUrl('commerce/orders/' . $this->orderId);
         }
 
         return '';
@@ -215,7 +218,6 @@ class License extends Element
      */
     public function getName()
     {
-
         return Craft::t('digital-products', 'License');
     }
 
@@ -251,7 +253,7 @@ class License extends Element
         $sources[] = ['heading' => Craft::t('digital-products', 'Product Types')];
 
         foreach ($productTypes as $productType) {
-            $key = 'productType:'.$productType->id;
+            $key = 'productType:' . $productType->id;
 
             $sources[$key] = [
                 'key' => $key,
@@ -280,10 +282,10 @@ class License extends Element
                 ->where(['in', 'id', $sourceElementIds])
                 ->all();
 
-            return array(
+            return [
                 'elementType' => Product::class,
                 'map' => $map
-            );
+            ];
         }
 
         if ($handle === 'order') {
@@ -293,10 +295,10 @@ class License extends Element
                 ->where(['in', 'id', $sourceElementIds])
                 ->all();
 
-            return array(
+            return [
                 'elementType' => Order::class,
                 'map' => $map
-            );
+            ];
         }
 
         if ($handle === 'owner') {
@@ -307,10 +309,10 @@ class License extends Element
                 ->andWhere(['not', ['userId' => null]])
                 ->all();
 
-            return array(
+            return [
                 'elementType' => User::class,
                 'map' => $map
-            );
+            ];
         }
 
         return parent::eagerLoadingMap($sourceElements, $handle);
@@ -323,19 +325,16 @@ class License extends Element
     {
         if ($handle === 'product') {
             $this->_product = $elements[0] ?? null;
-
             return;
         }
 
         if ($handle === 'owner') {
             $this->_user = $elements[0] ?? null;
-
             return;
         }
 
         if ($handle === 'order') {
             $this->_order = $elements[0] ?? null;
-
             return;
         }
 
@@ -354,16 +353,16 @@ class License extends Element
             'userId',
             'required',
             'message' => Craft::t('digital-products', 'A license must have either an email or an owner assigned to it.'),
-            'when' => function ($model) {
+            'when' => function($model) {
                 return empty($model->ownerEmail);
-            }];
+            }
+        ];
 
         return $rules;
     }
 
     /**
      * @inheritdoc
-     *
      * @return LicenseQuery The newly created [[LicenseQuery]] instance.
      */
     public static function find(): ElementQueryInterface
@@ -380,7 +379,7 @@ class License extends Element
             $licenseRecord = LicenseRecord::findOne($this->id);
 
             if (!$licenseRecord) {
-                throw new InvalidConfigException('Invalid license id: '.$this->id);
+                throw new InvalidConfigException('Invalid license id: ' . $this->id);
             }
         } else {
             $licenseRecord = new LicenseRecord();
@@ -410,7 +409,6 @@ class License extends Element
         }
 
         $licenseRecord->save(false);
-
     }
 
     // Protected Methods
@@ -437,7 +435,6 @@ class License extends Element
 
         do {
             $licenseKey = DigitalProducts::getInstance()->getLicenses()->generateLicenseKey();
-
         } while (!DigitalProducts::getInstance()->getLicenses()->isLicenseKeyUnique($licenseKey));
 
         return $licenseKey;
@@ -446,7 +443,7 @@ class License extends Element
     /**
      * @inheritdoc
      */
-    protected static  function defineTableAttributes(): array
+    protected static function defineTableAttributes(): array
     {
         return [
             'product' => ['label' => Craft::t('digital-products', 'Licensed Product')],
@@ -500,11 +497,12 @@ class License extends Element
             case 'orderLink':
                 $url = $this->getOrderEditUrl();
 
-                return $url ? '<a href="'.$url.'">'.Craft::t('digital-products', 'View order').'</a>' : '';
+                return $url ? '<a href="' . $url . '">' . Craft::t('digital-products', 'View order') . '</a>' : '';
 
-            default: {
-                return parent::tableAttributeHtml($attribute);
-            }
+            default:
+                {
+                    return parent::tableAttributeHtml($attribute);
+                }
         }
     }
 
@@ -530,16 +528,14 @@ class License extends Element
     protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, string $attribute)
     {
         /** @var ElementQuery $elementQuery */
-        if ($attribute === 'product')
-        {
+        if ($attribute === 'product') {
             $with = $elementQuery->with ?: [];
             $with[] = 'product';
             $elementQuery->with = $with;
             return;
         }
 
-        if ($attribute === 'licensedTo')
-        {
+        if ($attribute === 'licensedTo') {
             $with = $elementQuery->with ?: [];
             $with[] = 'owner';
             $elementQuery->with = $with;

@@ -3,11 +3,11 @@
 namespace craft\digitalproducts\elements\db;
 
 use Craft;
+use craft\db\Query;
+use craft\db\QueryAbortedException;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
-use craft\db\Query;
-use craft\db\QueryAbortedException;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
@@ -94,7 +94,6 @@ class ProductQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is before the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function before($value)
@@ -104,7 +103,7 @@ class ProductQuery extends ElementQuery
         }
 
         $this->postDate = ArrayHelper::toArray($this->postDate);
-        $this->postDate[] = '<'.$value;
+        $this->postDate[] = '<' . $value;
 
         return $this;
     }
@@ -113,7 +112,6 @@ class ProductQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is after the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function after($value)
@@ -123,7 +121,7 @@ class ProductQuery extends ElementQuery
         }
 
         $this->postDate = ArrayHelper::toArray($this->postDate);
-        $this->postDate[] = '>='.$value;
+        $this->postDate[] = '>=' . $value;
 
         return $this;
     }
@@ -132,13 +130,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[editable]] property.
      *
      * @param bool $value The property value (defaults to true)
-     *
      * @return static self reference
      */
     public function editable(bool $value = true)
     {
         $this->editable = $value;
-
         return $this;
     }
 
@@ -146,13 +142,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[expiryDate]] property.
      *
      * @param mixed $value The property value
-     *
      * @return static self reference
      */
     public function expiryDate($value)
     {
         $this->expiryDate = $value;
-
         return $this;
     }
 
@@ -160,13 +154,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[postDate]] property.
      *
      * @param mixed $value The property value
-     *
      * @return static self reference
      */
     public function postDate($value)
     {
         $this->postDate = $value;
-
         return $this;
     }
 
@@ -174,13 +166,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[sku]] property.
      *
      * @param mixed $value The property value
-     *
      * @return static self reference
      */
     public function sku($value)
     {
         $this->sku = $value;
-
         return $this;
     }
 
@@ -188,7 +178,6 @@ class ProductQuery extends ElementQuery
      * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
      *
      * @param string|string[]|ProductType|null $value The property value
-     *
      * @return static self reference
      */
     public function type($value)
@@ -212,13 +201,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[typeId]] property.
      *
      * @param int|int[]|null $value The property value
-     *
      * @return static self reference
      */
     public function typeId($value)
     {
         $this->typeId = $value;
-
         return $this;
     }
 
@@ -274,7 +261,7 @@ class ProductQuery extends ElementQuery
      */
     protected function statusCondition(string $status)
     {
-        $currentTimeDb = Db::prepareDateForDb(new \DateTime());
+        $currentTimeDb = Db::prepareDateForDb(new DateTime());
 
         switch ($status) {
             case Product::STATUS_LIVE:

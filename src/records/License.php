@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\records;
 
 use craft\commerce\records\Order;
@@ -10,24 +11,23 @@ use yii\db\ActiveQueryInterface;
 /**
  * License record.
  *
- * @property int     $id         License id
- * @property int     $productId  Product id
- * @property int     $orderId    Order id
- * @property string  $licenseKey License key
- * @property string  $ownerName  Name of the license owner
- * @property float   $ownerEmail Email of the license owner
- * @property int     $userId     User id
+ * @property int $id         License id
+ * @property int $productId  Product id
+ * @property int $orderId    Order id
+ * @property string $licenseKey License key
+ * @property string $ownerName  Name of the license owner
+ * @property float $ownerEmail Email of the license owner
+ * @property int $userId     User id
  * @property Element $element    Element
  * @property Product $product    Product
- * @property Order   $order      Order
- * @property User    $user       User
+ * @property Order $order      Order
+ * @property User $user       User
  *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
 class License extends ActiveRecord
 {
-
     // Public Methods
     // =========================================================================
 

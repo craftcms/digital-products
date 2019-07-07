@@ -3,12 +3,12 @@
 namespace craft\digitalproducts\services;
 
 use Craft;
-use craft\digitalproducts\elements\License;
-use craft\digitalproducts\elements\Product;
-use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\events\ProcessPaymentEvent;
 use craft\commerce\models\LineItem;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\events\UserEvent;
 use yii\base\Component;
 use yii\base\Event;
@@ -28,43 +28,37 @@ class Licenses extends Component
      * Returns true if a given license key is unique.
      *
      * @param string $licenseKey the license key
-     *
      * @return bool
      */
     public function isLicenseKeyUnique(string $licenseKey): bool
     {
-        return !(bool) License::findOne(['licenseKey' => $licenseKey]);
+        return !License::find()
+            ->licenseKey($licenseKey)
+            ->anyStatus()
+            ->exists();
     }
 
     /**
      * Sort trough the ordered items and generate Licenses for Digital Products.
      *
      * @param Event $event
-     *
-     * @return void
      */
     public static function handleCompletedOrder(Event $event)
     {
-        /**
-         * @var Order $order
-         */
+        /** @var Order $order */
         $order = $event->sender;
         $lineItems = $order->getLineItems();
 
-        /**
-         * @var LineItem $lineItem
-         */
+        /** @var LineItem $lineItem */
         foreach ($lineItems as $lineItem) {
             $itemId = $lineItem->purchasableId;
             $element = Craft::$app->getElements()->getElementById($itemId);
             $quantity = $lineItem->qty;
 
             if ($element instanceof Product) {
-                /**
-                 * @var Product $element
-                 */
+                /** @var Product $element */
                 for ($i = 0; $i < $quantity; $i++) {
-                   DigitalProducts::getInstance()->getLicenses()->licenseProductByOrder($element, $order);
+                    DigitalProducts::getInstance()->getLicenses()->licenseProductByOrder($element, $order);
                 }
             }
         }
@@ -74,8 +68,6 @@ class Licenses extends Component
      * Prevent paying for orders with digital products in it if user not logged in when required by config.
      *
      * @param ProcessPaymentEvent $event
-     *
-     * @return void
      */
     public static function maybePreventPayment(ProcessPaymentEvent $event)
     {
@@ -107,15 +99,12 @@ class Licenses extends Component
      * Assign licenses to a just-activated user, if emails match and config allows it.
      *
      * @param UserEvent $event
-     *
-     * @return void
      */
     public static function handleUserActivation(UserEvent $event)
     {
         if (!DigitalProducts::getInstance()->getSettings()->autoAssignLicensesOnUserRegistration) {
             return;
         }
-
 
         $licenses = License::find()->ownerEmail($event->user->email)->all();
 
@@ -133,8 +122,7 @@ class Licenses extends Component
      * Generate a license for a Product per Order.
      *
      * @param Product $product
-     * @param Order   $order
-     *
+     * @param Order $order
      * @return bool
      */
     public function licenseProductByOrder(Product $product, Order $order): bool
