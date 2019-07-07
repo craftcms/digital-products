@@ -3,10 +3,10 @@
 namespace craft\digitalproducts\elements\db;
 
 use craft\base\Element;
+use craft\db\Query;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
-use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
@@ -44,12 +44,12 @@ class LicenseQuery extends ElementQuery
      */
     public $userEmail;
 
-   /**
+    /**
      * @var int|int[] The user id for the user that the license belongs to.
      */
     public $ownerId;
 
-   /**
+    /**
      * @var int The product id for the product that is licensed
      */
     public $productId;
@@ -166,7 +166,8 @@ class LicenseQuery extends ElementQuery
      *
      * @return static self reference
      */
-    public function owner($value) {
+    public function owner($value)
+    {
         if ($value instanceof User) {
             $this->ownerId = $value->id;
         } else if ($value !== null) {
@@ -189,7 +190,8 @@ class LicenseQuery extends ElementQuery
      *
      * @return static self reference
      */
-    public function product($value) {
+    public function product($value)
+    {
         if ($value instanceof Product) {
             $this->productId = $value->id;
         } else if ($value !== null) {
@@ -243,7 +245,7 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->dateCreated = ArrayHelper::toArray($this->dateCreated);
-        $this->dateCreated[] = '<'.$value;
+        $this->dateCreated[] = '<' . $value;
 
         return $this;
     }
@@ -262,7 +264,7 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->dateCreated = ArrayHelper::toArray($this->dateCreated);
-        $this->dateCreated[] = '>='.$value;
+        $this->dateCreated[] = '>=' . $value;
 
         return $this;
     }

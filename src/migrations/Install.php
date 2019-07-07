@@ -5,7 +5,6 @@ namespace craft\digitalproducts\migrations;
 use craft\commerce\elements\Order;
 use craft\commerce\elements\Product;
 use craft\db\Migration;
-use craft\db\Query;
 use craft\helpers\MigrationHelper;
 
 /**
@@ -103,7 +102,6 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
-
     }
 
     /**

@@ -51,7 +51,7 @@ class m171129_154500_craft3_upgrade extends Migration
             try {
                 $settings = Json::decode($field['settings']);
             } catch (InvalidParamException $e) {
-                echo 'Field '.$field['id'].' ('.$field['type'].') settings were invalid JSON: '.$field['settings']."\n";
+                echo 'Field ' . $field['id'] . ' (' . $field['type'] . ') settings were invalid JSON: ' . $field['settings'] . "\n";
 
                 return false;
             }

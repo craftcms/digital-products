@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\models;
 
 use Craft;
@@ -13,7 +14,6 @@ use yii\base\InvalidConfigException;
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
-
 class ProductTypeSite extends Model
 {
     // Properties
@@ -84,7 +84,7 @@ class ProductTypeSite extends Model
         }
 
         if (($this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->productTypeId)) === null) {
-            throw new InvalidConfigException('Invalid product type ID: '.$this->productTypeId);
+            throw new InvalidConfigException('Invalid product type ID: ' . $this->productTypeId);
         }
 
         return $this->_productType;

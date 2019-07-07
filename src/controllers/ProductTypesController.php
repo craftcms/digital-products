@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\controllers;
 
 use Craft;
@@ -17,7 +18,6 @@ use yii\web\Response;
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
-
 class ProductTypesController extends BaseController
 {
 
@@ -37,8 +37,8 @@ class ProductTypesController extends BaseController
     /**
      * Edit a product type.
      *
-     * @param int|null         $productTypeId the product type id
-     * @param ProductType|null $productType   the product type
+     * @param int|null $productTypeId the product type id
+     * @param ProductType|null $productType the product type
      *
      * @return Response
      * @@throws Exception if product type is not found
@@ -83,7 +83,7 @@ class ProductTypesController extends BaseController
         $productType = new ProductType();
 
         $request = Craft::$app->getRequest();
-        
+
         $productType->id = $request->getBodyParam('productTypeId');
         $productType->name = $request->getBodyParam('name');
         $productType->handle = $request->getBodyParam('handle');
@@ -94,7 +94,7 @@ class ProductTypesController extends BaseController
         $allSiteSettings = [];
 
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
-            $postedSettings = $request->getBodyParam('sites.'.$site->handle);
+            $postedSettings = $request->getBodyParam('sites.' . $site->handle);
 
             $siteSettings = new ProductTypeSite();
             $siteSettings->siteId = $site->id;

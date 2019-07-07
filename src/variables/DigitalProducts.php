@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\variables;
 
 use craft\digitalproducts\elements\db\LicenseQuery;

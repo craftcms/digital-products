@@ -3,13 +3,13 @@
 namespace craft\digitalproducts\services;
 
 use Craft;
+use craft\commerce\events\ProductTypeEvent;
+use craft\db\Query;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\models\ProductTypeSite;
 use craft\digitalproducts\records\ProductType as ProductTypeRecord;
 use craft\digitalproducts\records\ProductTypeSite as ProductTypeSiteRecord;
-use craft\commerce\events\ProductTypeEvent;
-use craft\db\Query;
 use craft\events\ConfigEvent;
 use craft\events\DeleteSiteEvent;
 use craft\events\SiteEvent;
@@ -111,7 +111,7 @@ class ProductTypes extends Component
             $allProductTypeIds = $this->getAllProductTypeIds();
 
             foreach ($allProductTypeIds as $productTypeId) {
-                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productTypeId)) {
+                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:' . $productTypeId)) {
                     $this->_editableProductTypeIds[] = $productTypeId;
                 }
             }
@@ -225,8 +225,8 @@ class ProductTypes extends Component
     /**
      * Save a product type.
      *
-     * @param ProductType $productType   The product type model.
-     * @param bool        $runValidation If validation should be ran.
+     * @param ProductType $productType The product type model.
+     * @param bool $runValidation If validation should be ran.
      *
      * @return bool Whether the product type was saved successfully.
      * @throws \Throwable if reasons
@@ -541,7 +541,8 @@ class ProductTypes extends Component
                     'productTypes.uid productTypeUid',
                     'producttypes_sites.uriFormat',
                     'producttypes_sites.template',
-                    'producttypes_sites.hasUrls'])
+                    'producttypes_sites.hasUrls'
+                ])
                 ->from(['{{%digitalproducts_producttypes_sites}} producttypes_sites'])
                 ->innerJoin(['{{%digitalproducts_producttypes}} productTypes'], '[[producttypes_sites.productTypeId]] = [[productTypes.id]]')
                 ->where(['siteId' => $event->oldPrimarySiteId])

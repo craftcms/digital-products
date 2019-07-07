@@ -11,7 +11,6 @@ use Craft;
 use craft\db\Migration;
 use craft\db\Query;
 use craft\helpers\ArrayHelper;
-use craft\helpers\Json;
 
 /**
  * m181025_111000_product_types_project_config_support migration.

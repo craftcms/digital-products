@@ -3,11 +3,11 @@
 namespace craft\digitalproducts\elements\db;
 
 use Craft;
+use craft\db\Query;
+use craft\db\QueryAbortedException;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
-use craft\db\Query;
-use craft\db\QueryAbortedException;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
@@ -104,7 +104,7 @@ class ProductQuery extends ElementQuery
         }
 
         $this->postDate = ArrayHelper::toArray($this->postDate);
-        $this->postDate[] = '<'.$value;
+        $this->postDate[] = '<' . $value;
 
         return $this;
     }
@@ -123,7 +123,7 @@ class ProductQuery extends ElementQuery
         }
 
         $this->postDate = ArrayHelper::toArray($this->postDate);
-        $this->postDate[] = '>='.$value;
+        $this->postDate[] = '>=' . $value;
 
         return $this;
     }

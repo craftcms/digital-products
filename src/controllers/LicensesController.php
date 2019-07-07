@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\controllers;
 
 use Craft;
@@ -15,7 +16,6 @@ use yii\web\Response;
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
-
 class LicensesController extends BaseController
 {
 
@@ -35,7 +35,7 @@ class LicensesController extends BaseController
     /**
      * Create or edit a License
      *
-     * @param int|null     $licenseId   the license id
+     * @param int|null $licenseId the license id
      * @param License|null $license the license
      *
      * @return Response
@@ -54,7 +54,7 @@ class LicensesController extends BaseController
             }
         }
 
-        $variables['title'] = $license->id ? (string) $license : Craft::t('digital-products', 'Create a new License');
+        $variables['title'] = $license->id ? (string)$license : Craft::t('digital-products', 'Create a new License');
         $variables['license'] = $license;
         $variables['userElementType'] = User::class;
         $variables['productElementType'] = Product::class;
@@ -129,7 +129,7 @@ class LicensesController extends BaseController
         /** @var License $license */
         $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
-        if(!$license){
+        if (!$license) {
             throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
         }
 

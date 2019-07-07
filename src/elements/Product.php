@@ -1,16 +1,17 @@
 <?php
+
 namespace craft\digitalproducts\elements;
 
 use Craft;
 use craft\commerce\base\Purchasable;
+use craft\commerce\models\TaxCategory;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Query;
 use craft\digitalproducts\elements\db\ProductQuery;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\Product as ProductRecord;
-use craft\commerce\models\TaxCategory;
-use craft\commerce\Plugin as Commerce;
 use craft\elements\db\ElementQueryInterface;
-use craft\db\Query;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
@@ -104,7 +105,7 @@ class Product extends Purchasable
      */
     public function __toString(): string
     {
-        return (string) $this->title;
+        return (string)$this->title;
     }
 
     /**
@@ -182,8 +183,8 @@ class Product extends Purchasable
         $sources[] = ['heading' => Craft::t('digital-products', 'Product Types')];
 
         foreach ($productTypes as $productType) {
-            $key = 'productType:'.$productType->id;
-            $canEditProducts = Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$productType->id);
+            $key = 'productType:' . $productType->id;
+            $canEditProducts = Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:' . $productType->id);
 
             $sources[$key] = [
                 'key' => $key,
@@ -251,8 +252,7 @@ class Product extends Purchasable
         if ($handle === 'existingLicenses') {
             $userId = Craft::$app->getUser()->getId();
 
-            if ($userId)
-            {
+            if ($userId) {
                 $sourceElementIds = ArrayHelper::getColumn($sourceElements, 'id');
 
                 $map = (new Query())
@@ -262,10 +262,10 @@ class Product extends Purchasable
                     ->andWhere(['userId' => $userId])
                     ->all();
 
-                return array(
+                return [
                     'elementType' => License::class,
                     'map' => $map
-                );
+                ];
             }
         }
 
@@ -350,7 +350,7 @@ class Product extends Purchasable
         if ($this->getType()) {
             $id = $this->getType()->id;
 
-            return Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:'.$id);
+            return Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:' . $id);
         }
 
         return false;
@@ -364,7 +364,7 @@ class Product extends Purchasable
         $productType = $this->getType();
 
         if ($productType) {
-            return UrlHelper::cpUrl('digital-products/products/'.$productType->handle.'/'.$this->id);
+            return UrlHelper::cpUrl('digital-products/products/' . $productType->handle . '/' . $this->id);
         }
 
         return null;
@@ -464,7 +464,7 @@ class Product extends Purchasable
             $productRecord = ProductRecord::findOne($this->id);
 
             if (!$productRecord) {
-                throw new Exception('Invalid product id: '.$this->id);
+                throw new Exception('Invalid product id: ' . $this->id);
             }
         } else {
             $productRecord = new ProductRecord();
@@ -504,6 +504,7 @@ class Product extends Purchasable
     {
         return $this->id;
     }
+
     /**
      * @inheritdoc
      */
@@ -649,7 +650,7 @@ class Product extends Purchasable
                 return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
 
             case 'promotable':
-                return ($this->$attribute ? '<span data-icon="check" title="'.Craft::t('digital-products', 'Yes').'"></span>' : '');
+                return ($this->$attribute ? '<span data-icon="check" title="' . Craft::t('digital-products', 'Yes') . '"></span>' : '');
 
             default:
                 return parent::tableAttributeHtml($attribute);

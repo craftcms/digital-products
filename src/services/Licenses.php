@@ -3,12 +3,12 @@
 namespace craft\digitalproducts\services;
 
 use Craft;
-use craft\digitalproducts\elements\License;
-use craft\digitalproducts\elements\Product;
-use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\commerce\elements\Order;
 use craft\commerce\events\ProcessPaymentEvent;
 use craft\commerce\models\LineItem;
+use craft\digitalproducts\elements\License;
+use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\events\UserEvent;
 use yii\base\Component;
 use yii\base\Event;
@@ -67,7 +67,7 @@ class Licenses extends Component
                  * @var Product $element
                  */
                 for ($i = 0; $i < $quantity; $i++) {
-                   DigitalProducts::getInstance()->getLicenses()->licenseProductByOrder($element, $order);
+                    DigitalProducts::getInstance()->getLicenses()->licenseProductByOrder($element, $order);
                 }
             }
         }
@@ -136,7 +136,7 @@ class Licenses extends Component
      * Generate a license for a Product per Order.
      *
      * @param Product $product
-     * @param Order   $order
+     * @param Order $order
      *
      * @return bool
      */

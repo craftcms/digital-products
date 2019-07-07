@@ -46,11 +46,11 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                 // Collect eligible permission combos for groups
                 $groupUids = array_keys($groups);
                 $newPermissions = [];
-                
+
                 foreach ($groupUids as $groupUid) {
                     $permissions = $projectConfig->get('users.groups.' . $groupUid . '.permissions');
-                    
-                    if(is_array($permissions)) {
+
+                    if (is_array($permissions)) {
                         foreach ($productTypeUids as $productTypeUid) {
                             if (in_array('digitalproducts-manageproducts', $permissions, true)) {
                                 $permissionName = 'digitalproducts-manageproducttype:' . $productTypeUid;
@@ -61,7 +61,7 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                 }
 
                 $projectConfig->muteEvents = true;
-                
+
                 // Add new permissions
                 foreach ($newPermissions as $groupUid => $productTypePermissions) {
                     $schemaVersion = $projectConfig->get('plugins.digital-products.schemaVersion', true);
@@ -80,7 +80,7 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                         ]);
                     }
                 }
-                
+
                 $projectConfig->muteEvents = false;
 
                 // Migrate the users

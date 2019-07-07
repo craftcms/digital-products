@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\digitalproducts\controllers;
 
 use Craft;
@@ -55,10 +56,10 @@ class ProductsController extends BaseController
     /**
      * Edit a product
      *
-     * @param string       $productTypeHandle the product type handle
-     * @param int|null     $productId         the product id
-     * @param string|null  $siteHandle        the site handle
-     * @param Product|null $product           the product
+     * @param string $productTypeHandle the product type handle
+     * @param int|null $productId the product id
+     * @param string|null $siteHandle the site handle
+     * @param Product|null $product the product
      *
      * @return Response
      * @throws Exception in case of a missing product type or an incorrect site handle.
@@ -82,14 +83,14 @@ class ProductsController extends BaseController
             throw new Exception('The product type was not found.');
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:'.$productType->uid);
+        $this->requirePermission('digitalProducts-manageProducts:' . $productType->uid);
         $variables['productType'] = $productType;
 
         if ($siteHandle !== null) {
             $variables['site'] = Craft::$app->getSites()->getSiteByHandle($siteHandle);
 
             if (!$variables['site']) {
-                throw new Exception('Invalid site handle: '.$siteHandle);
+                throw new Exception('Invalid site handle: ' . $siteHandle);
             }
         }
 
@@ -102,11 +103,11 @@ class ProductsController extends BaseController
         }
 
         // Can't just use the entry's getCpEditUrl() because that might include the site handle when we don't want it
-        $variables['baseCpEditUrl'] = 'digital-products/products/'.$variables['productTypeHandle'].'/{id}';
+        $variables['baseCpEditUrl'] = 'digital-products/products/' . $variables['productTypeHandle'] . '/{id}';
 
         // Set the "Continue Editing" URL
-        $variables['continueEditingUrl'] = $variables['baseCpEditUrl'].
-            (Craft::$app->getIsMultiSite() && Craft::$app->getSites()->currentSite->id !== $variables['site']->id ? '/'.$variables['site']->handle : '');
+        $variables['continueEditingUrl'] = $variables['baseCpEditUrl'] .
+            (Craft::$app->getIsMultiSite() && Craft::$app->getSites()->currentSite->id !== $variables['site']->id ? '/' . $variables['site']->handle : '');
 
         $this->_maybeEnableLivePreview($variables);
 
@@ -131,10 +132,10 @@ class ProductsController extends BaseController
             ->one();
 
         if (!$product) {
-            throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.',['id' => $productId]));
+            throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.', ['id' => $productId]));
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
+        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
 
         if (!Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
@@ -169,7 +170,7 @@ class ProductsController extends BaseController
 
         $product = $this->_buildProductFromPost();
 
-        $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
+        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
 
         $existingProduct = (bool)$product->id;
 
@@ -202,7 +203,7 @@ class ProductsController extends BaseController
         $this->requirePostRequest();
 
         $product = $this->_buildProductFromPost();
-        $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
+        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
 
         return $this->_showProduct($product);
     }
@@ -210,8 +211,8 @@ class ProductsController extends BaseController
     /**
      * Redirects the client to a URL for viewing a disabled product on the front end.
      *
-     * @param int      $productId the product id
-     * @param int|null $siteId    the site id
+     * @param int $productId the product id
+     * @param int|null $siteId the site id
      *
      * @return Response
      * @throws Exception if there's no valid product template
@@ -225,7 +226,7 @@ class ProductsController extends BaseController
             throw new Exception();
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:'.$product->typeId);
+        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
 
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
@@ -241,11 +242,11 @@ class ProductsController extends BaseController
     /**
      * Shows an product/draft/version based on a token.
      *
-     * @param int      $productId
+     * @param int $productId
      * @param int|null $siteId
      *
-     * @throws Exception if product not found
      * @return Response
+     * @throws Exception if product not found
      */
     public function actionViewSharedProduct($productId, $siteId = null): Response
     {
@@ -269,8 +270,8 @@ class ProductsController extends BaseController
      *
      * @param Product $product
      *
-     * @throws Exception if product type is not found
      * @return Response
+     * @throws Exception if product type is not found
      */
     private function _showProduct(Product $product): Response
     {
@@ -284,13 +285,13 @@ class ProductsController extends BaseController
         $siteSettings = $productType->getSiteSettings();
 
         if (!isset($siteSettings[$product->siteId]) || !$siteSettings[$product->siteId]->hasUrls) {
-            throw new ServerErrorHttpException('The product '.$product->id.' doesn\'t have a URL for the site '.$product->siteId.'.');
+            throw new ServerErrorHttpException('The product ' . $product->id . ' doesn\'t have a URL for the site ' . $product->siteId . '.');
         }
 
         $site = Craft::$app->getSites()->getSiteById($product->siteId);
 
         if (!$site) {
-            throw new ServerErrorHttpException('Invalid site ID: '.$product->siteId);
+            throw new ServerErrorHttpException('Invalid site ID: ' . $product->siteId);
         }
 
         Craft::$app->language = $site->language;
@@ -408,7 +409,7 @@ class ProductsController extends BaseController
     private function _maybeEnableLivePreview(array &$variables)
     {
         if (!Craft::$app->getRequest()->isMobileBrowser(true) && DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($variables['productType'])) {
-            $this->getView()->registerJs('Craft.LivePreview.init('.Json::encode([
+            $this->getView()->registerJs('Craft.LivePreview.init(' . Json::encode([
                     'fields' => '#title-field, #fields > div > div > .field, #sku-field, #price-field',
                     'extraFields' => '#meta-pane .field',
                     'previewUrl' => $variables['product']->getUrl(),
@@ -418,7 +419,7 @@ class ProductsController extends BaseController
                         'productId' => $variables['product']->id,
                         'locale' => $variables['product']->locale,
                     ]
-                ]).');');
+                ]) . ');');
 
             $variables['showPreviewBtn'] = true;
 

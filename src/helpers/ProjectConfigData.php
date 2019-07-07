@@ -9,7 +9,6 @@ namespace craft\digitalproducts\helpers;
 
 use Craft;
 use craft\db\Query;
-use craft\helpers\Json;
 
 /**
  * Class ProjectConfigData
@@ -28,6 +27,7 @@ class ProjectConfigData
 
     /**
      * Return a rebuilt project config array
+     *
      * @return array
      */
     public static function rebuildProjectConfig(): array
