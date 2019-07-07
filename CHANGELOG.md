@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.2.2 - 2019-07-07
 
 ### Fixed
 - Fixed an error that occurred when deleting a disabled product. ([#41](https://github.com/craftcms/digital-products/issues/41))
