@@ -58,10 +58,6 @@ class m171129_154500_craft3_upgrade extends Migration
 
             $settings['localizeRelations'] = ($field['translationMethod'] === 'site');
 
-            // targetLocale => targetSiteId
-            if (!empty($settings['targetLocale'])) {
-                $settings['targetSiteId'] = $siteIdsByLocale[$settings['targetLocale']];
-            }
             unset($settings['targetLocale']);
 
             $this->update(
