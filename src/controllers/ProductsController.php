@@ -15,6 +15,7 @@ use craft\models\Site;
 use craft\web\Controller as BaseController;
 use DateTime;
 use yii\base\Exception;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
@@ -223,8 +224,12 @@ class ProductsController extends BaseController
         /** @var Product $product */
         $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
-        if (!$product || DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($product->getType())) {
-            throw new Exception();
+        if (!$product) {
+            throw new BadRequestHttpException('Invalid product ID: ' . $productId);
+        }
+
+        if (!DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($product->getType(), $product->siteId)) {
+            throw new ServerErrorHttpException('Product type has an invalid template path');
         }
 
         $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
@@ -298,7 +303,9 @@ class ProductsController extends BaseController
         Craft::$app->language = $site->language;
 
         // Have this product override any freshly queried products with the same ID/site
-        Craft::$app->getElements()->setPlaceholderElement($product);
+        if ($product->id) {
+            Craft::$app->getElements()->setPlaceholderElement($product);
+        }
 
         $this->getView()->getTwig()->disableStrictVariables();
 
@@ -409,12 +416,15 @@ class ProductsController extends BaseController
      */
     private function _maybeEnableLivePreview(array &$variables)
     {
-        if (!Craft::$app->getRequest()->isMobileBrowser(true) && DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($variables['productType'])) {
+        if (
+            !Craft::$app->getRequest()->isMobileBrowser(true) &&
+            DigitalProducts::getInstance()->getProductTypes()->isProductTypeTemplateValid($variables['productType'], $variables['product']->siteId)
+        ) {
             $this->getView()->registerJs('Craft.LivePreview.init(' . Json::encode([
                     'fields' => '#title-field, #fields > div > div > .field, #sku-field, #price-field',
                     'extraFields' => '#meta-pane .field',
                     'previewUrl' => $variables['product']->getUrl(),
-                    'previewAction' => 'digital-products/products/previewProduct',
+                    'previewAction' => Craft::$app->getSecurity()->hashData('digital-products/products/preview-product'),
                     'previewParams' => [
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,

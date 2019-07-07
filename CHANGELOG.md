@@ -4,6 +4,7 @@
 
 ### Fixed
 - Fixed an error that occurred when deleting a disabled product. ([#41](https://github.com/craftcms/digital-products/issues/41))
+- Fixed Live Preview and sharing support.
 
 ## 2.2.1 - 2019-06-14
 

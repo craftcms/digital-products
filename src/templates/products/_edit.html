@@ -18,8 +18,12 @@
     <div class="flex-grow"></div>
 
     {% if showPreviewBtn %}
-        {% include "_includes/previewbtns" %}
+        <div class="btn livepreviewbtn">{{ "Live Preview"|t('app') }}</div>
     {% endif %}
+    {% if shareUrl is defined %}
+        <a href="{{ shareUrl }}" class="btn sharebtn" rel="noopener" target="_blank">{{ 'Share'|t('app') }}</a>
+    {% endif %}
+    <div class="flex-grow"></div>
     {{ block('actionButton') }}
 {% endblock %}
 
