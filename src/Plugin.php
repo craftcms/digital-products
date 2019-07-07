@@ -233,5 +233,4 @@ class Plugin extends BasePlugin
             $e->types[] = License::class;
         });
     }
-
 }

@@ -497,6 +497,7 @@ class Product extends Purchasable
 
     // Implement Purchasable
     // =========================================================================
+
     /**
      * @inheritdoc
      */

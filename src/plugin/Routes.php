@@ -8,13 +8,8 @@ use yii\base\Event;
 
 trait Routes
 {
-    // Private Methods
-    // =========================================================================
-
     /**
      * Control Panel routes.
-     *
-     * @return void
      */
     public function _registerCpRoutes()
     {

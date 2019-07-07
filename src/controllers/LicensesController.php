@@ -18,9 +18,8 @@ use yii\web\Response;
  */
 class LicensesController extends BaseController
 {
-
     /**
-     * @inheritDoc BaseController::init()
+     * @inheritdoc
      */
     public function init()
     {
@@ -37,7 +36,6 @@ class LicensesController extends BaseController
      *
      * @param int|null $licenseId the license id
      * @param License|null $license the license
-     *
      * @return Response
      */
     public function actionEdit(int $licenseId = null, License $license = null): Response
@@ -65,7 +63,7 @@ class LicensesController extends BaseController
     /**
      * Save a License.
      *
-     * @return Response
+     * @return Response|null
      * @throws Exception if a non existing license id provided
      */
     public function actionSave()
@@ -118,7 +116,7 @@ class LicensesController extends BaseController
     /**
      * Delete a License.
      *
-     * @return Response
+     * @return Response|null
      * @throws Exception if a non existing license id provided
      */
     public function actionDelete()
@@ -151,5 +149,4 @@ class LicensesController extends BaseController
 
         return null;
     }
-
 }

@@ -163,7 +163,6 @@ class ProductTypes extends Component
      * Get a product type by it's handle.
      *
      * @param string $handle The product type's handle.
-     *
      * @return ProductType|null The product type or `null`.
      */
     public function getProductTypeByHandle($handle)
@@ -193,7 +192,6 @@ class ProductTypes extends Component
      * Get an array of product type site settings for a product type by it's id.
      *
      * @param int $productTypeId The product type id.
-     *
      * @return array The product type settings.
      */
     public function getProductTypeSites($productTypeId): array
@@ -452,7 +450,6 @@ class ProductTypes extends Component
      * Delete a product type by it's id.
      *
      * @param int $id The product type's id.
-     *
      * @return bool Whether the product type was deleted successfully.
      * @throws \Throwable if reasons
      */
@@ -564,7 +561,6 @@ class ProductTypes extends Component
      * Get a product's type by id.
      *
      * @param int $productTypeId The product type's id.
-     *
      * @return ProductType|null Either the product type or `null`.
      */
     public function getProductTypeById(int $productTypeId)
@@ -594,7 +590,6 @@ class ProductTypes extends Component
      * Returns whether a product type’s products have URLs, and if the template path is valid.
      *
      * @param ProductType $productType The product for which to validate the template.
-     *
      * @return bool Whether the template is valid.
      */
     public function isProductTypeTemplateValid(ProductType $productType): bool
@@ -623,8 +618,6 @@ class ProductTypes extends Component
      * Add new product type setting rows when a Site is added to Craft.
      *
      * @param SiteEvent $event The event that triggered this.
-     *
-     * @return void
      */
     public function addSiteHandler(SiteEvent $event)
     {
@@ -701,6 +694,4 @@ class ProductTypes extends Component
     {
         return ProductTypeRecord::findOne(['uid' => $uid]) ?? new ProductTypeRecord();
     }
-
-
 }

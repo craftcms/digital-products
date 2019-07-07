@@ -21,12 +21,11 @@ use yii\db\ActiveQueryInterface;
  */
 class ProductType extends ActiveRecord
 {
-
     // Public Methods
     // =========================================================================
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public static function tableName(): string
     {

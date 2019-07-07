@@ -94,7 +94,6 @@ class ProductQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is before the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function before($value)
@@ -113,7 +112,6 @@ class ProductQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is after the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function after($value)
@@ -132,13 +130,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[editable]] property.
      *
      * @param bool $value The property value (defaults to true)
-     *
      * @return static self reference
      */
     public function editable(bool $value = true)
     {
         $this->editable = $value;
-
         return $this;
     }
 
@@ -146,13 +142,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[expiryDate]] property.
      *
      * @param mixed $value The property value
-     *
      * @return static self reference
      */
     public function expiryDate($value)
     {
         $this->expiryDate = $value;
-
         return $this;
     }
 
@@ -160,13 +154,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[postDate]] property.
      *
      * @param mixed $value The property value
-     *
      * @return static self reference
      */
     public function postDate($value)
     {
         $this->postDate = $value;
-
         return $this;
     }
 
@@ -174,13 +166,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[sku]] property.
      *
      * @param mixed $value The property value
-     *
      * @return static self reference
      */
     public function sku($value)
     {
         $this->sku = $value;
-
         return $this;
     }
 
@@ -188,7 +178,6 @@ class ProductQuery extends ElementQuery
      * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
      *
      * @param string|string[]|ProductType|null $value The property value
-     *
      * @return static self reference
      */
     public function type($value)
@@ -212,13 +201,11 @@ class ProductQuery extends ElementQuery
      * Sets the [[typeId]] property.
      *
      * @param int|int[]|null $value The property value
-     *
      * @return static self reference
      */
     public function typeId($value)
     {
         $this->typeId = $value;
-
         return $this;
     }
 

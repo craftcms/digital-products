@@ -11,13 +11,11 @@ use craft\fields\BaseRelationField;
  *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since     2.0
- *
  */
 class Products extends BaseRelationField
 {
     // Public Methods
     // =========================================================================
-
 
     /**
      * @inheritdoc

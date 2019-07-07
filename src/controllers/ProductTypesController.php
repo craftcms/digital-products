@@ -20,10 +20,8 @@ use yii\web\Response;
  */
 class ProductTypesController extends BaseController
 {
-
     // Public Methods
     // =========================================================================
-
 
     /**
      * @inheritdoc
@@ -74,7 +72,7 @@ class ProductTypesController extends BaseController
     /**
      * Save a Product Type
      *
-     * @return Response
+     * @return Response|null
      */
     public function actionSave()
     {
@@ -150,5 +148,4 @@ class ProductTypesController extends BaseController
 
         return $this->asJson(['success' => true]);
     }
-
 }

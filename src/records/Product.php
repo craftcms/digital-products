@@ -27,7 +27,6 @@ use yii\db\ActiveQueryInterface;
  */
 class Product extends ActiveRecord
 {
-
     // Public Methods
     // =========================================================================
 

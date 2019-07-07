@@ -74,7 +74,6 @@ class LicenseQuery extends ElementQuery
      */
     public $licenseKey;
 
-
     // Public Methods
     // =========================================================================
 
@@ -121,13 +120,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[email]] property.
      *
      * @param string $value The property value
-     *
      * @return static self reference
      */
     public function email($value)
     {
         $this->email = $value;
-
         return $this;
     }
 
@@ -135,13 +132,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[ownerEmail]] property.
      *
      * @param string $value The property value
-     *
      * @return static self reference
      */
     public function ownerEmail($value)
     {
         $this->ownerEmail = $value;
-
         return $this;
     }
 
@@ -149,13 +144,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[userEmail]] property.
      *
      * @param string $value The property value
-     *
      * @return static self reference
      */
     public function userEmail($value)
     {
         $this->userEmail = $value;
-
         return $this;
     }
 
@@ -163,7 +156,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[productId]] property based on a given product or the sku.
      *
      * @param User $value
-     *
      * @return static self reference
      */
     public function owner($value)
@@ -187,7 +179,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[productId]] property based on a given product or the sku.
      *
      * @param Product $value
-     *
      * @return static self reference
      */
     public function product($value)
@@ -211,7 +202,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
      *
      * @param string|string[]|ProductType $value The property value
-     *
      * @return static self reference
      */
     public function type($value)
@@ -235,7 +225,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is before the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function before($value)
@@ -254,7 +243,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[postDate]] property to only allow products whose Post Date is after the given value.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function after($value)
@@ -273,13 +261,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[typeId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function typeId($value)
     {
         $this->typeId = $value;
-
         return $this;
     }
 
@@ -287,13 +273,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[ownerId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function ownerId($value)
     {
         $this->ownerId = $value;
-
         return $this;
     }
 
@@ -301,13 +285,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[productId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function productId($value)
     {
         $this->productId = $value;
-
         return $this;
     }
 
@@ -315,13 +297,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[orderId]] property.
      *
      * @param int|int[] $value The property value
-     *
      * @return static self reference
      */
     public function orderId($value)
     {
         $this->orderId = $value;
-
         return $this;
     }
 
@@ -329,13 +309,11 @@ class LicenseQuery extends ElementQuery
      * Sets the [[licenseKey]] property.
      *
      * @param string|string[] $value The property value
-     *
      * @return static self reference
      */
     public function licenseKey($value)
     {
         $this->licenseKey = $value;
-
         return $this;
     }
 
@@ -343,7 +321,6 @@ class LicenseQuery extends ElementQuery
      * Sets the [[licenseDate]] property.
      *
      * @param DateTime|string $value The property value
-     *
      * @return static self reference
      */
     public function licenseDate($value)
@@ -353,7 +330,6 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->licenseDate = $value;
-
         return $this;
     }
 

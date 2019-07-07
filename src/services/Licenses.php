@@ -28,7 +28,6 @@ class Licenses extends Component
      * Returns true if a given license key is unique.
      *
      * @param string $licenseKey the license key
-     *
      * @return bool
      */
     public function isLicenseKeyUnique(string $licenseKey): bool
@@ -43,8 +42,6 @@ class Licenses extends Component
      * Sort trough the ordered items and generate Licenses for Digital Products.
      *
      * @param Event $event
-     *
-     * @return void
      */
     public static function handleCompletedOrder(Event $event)
     {
@@ -71,8 +68,6 @@ class Licenses extends Component
      * Prevent paying for orders with digital products in it if user not logged in when required by config.
      *
      * @param ProcessPaymentEvent $event
-     *
-     * @return void
      */
     public static function maybePreventPayment(ProcessPaymentEvent $event)
     {
@@ -104,15 +99,12 @@ class Licenses extends Component
      * Assign licenses to a just-activated user, if emails match and config allows it.
      *
      * @param UserEvent $event
-     *
-     * @return void
      */
     public static function handleUserActivation(UserEvent $event)
     {
         if (!DigitalProducts::getInstance()->getSettings()->autoAssignLicensesOnUserRegistration) {
             return;
         }
-
 
         $licenses = License::find()->ownerEmail($event->user->email)->all();
 
@@ -131,7 +123,6 @@ class Licenses extends Component
      *
      * @param Product $product
      * @param Order $order
-     *
      * @return bool
      */
     public function licenseProductByOrder(Product $product, Order $order): bool

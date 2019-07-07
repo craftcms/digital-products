@@ -72,7 +72,7 @@ class ProductType extends Model
     // =========================================================================
 
     /**
-     * @return null|string
+     * @inheritdoc
      */
     public function __toString()
     {
@@ -111,8 +111,6 @@ class ProductType extends Model
      * Sets the product type's site-specific settings.
      *
      * @param ProductTypeSite[] $siteSettings
-     *
-     * @return void
      */
     public function setSiteSettings(array $siteSettings)
     {

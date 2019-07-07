@@ -190,7 +190,7 @@ class License extends Element
     }
 
     /**
-     * @inheritdoc BaseElementModel::getCpEditUrl()
+     * @inheritdoc
      *
      * @return string
      */
@@ -218,7 +218,6 @@ class License extends Element
      */
     public function getName()
     {
-
         return Craft::t('digital-products', 'License');
     }
 
@@ -326,19 +325,16 @@ class License extends Element
     {
         if ($handle === 'product') {
             $this->_product = $elements[0] ?? null;
-
             return;
         }
 
         if ($handle === 'owner') {
             $this->_user = $elements[0] ?? null;
-
             return;
         }
 
         if ($handle === 'order') {
             $this->_order = $elements[0] ?? null;
-
             return;
         }
 
@@ -367,7 +363,6 @@ class License extends Element
 
     /**
      * @inheritdoc
-     *
      * @return LicenseQuery The newly created [[LicenseQuery]] instance.
      */
     public static function find(): ElementQueryInterface

@@ -7,12 +7,6 @@ use craft\commerce\base\Model;
 /**
  * Settings model.
  *
- * @property bool $autoAssignUserOnPurchase
- * @property bool $autoAssignLicensesOnUserRegistration
- * @property string $licenseKeyCharacters
- * @property int $licenseKeyLength
- * @property bool $requireLoggedInUser
- *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since  2.0
  */
@@ -51,6 +45,9 @@ class Settings extends Model
      */
     public $generateLicenseOnOrderPaid = true;
 
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         $rules = parent::rules();

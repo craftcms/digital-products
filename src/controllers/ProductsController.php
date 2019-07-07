@@ -60,7 +60,6 @@ class ProductsController extends BaseController
      * @param int|null $productId the product id
      * @param string|null $siteHandle the site handle
      * @param Product|null $product the product
-     *
      * @return Response
      * @throws Exception in case of a missing product type or an incorrect site handle.
      */
@@ -119,6 +118,7 @@ class ProductsController extends BaseController
     /**
      * Delete a product.
      *
+     * @return Response|null
      * @throws Exception if no product found
      */
     public function actionDeleteProduct()
@@ -162,7 +162,7 @@ class ProductsController extends BaseController
     /**
      * Save a new or an existing product.
      *
-     * @return Response
+     * @return Response|null
      */
     public function actionSave()
     {
@@ -199,7 +199,6 @@ class ProductsController extends BaseController
      */
     public function actionPreviewProduct(): Response
     {
-
         $this->requirePostRequest();
 
         $product = $this->_buildProductFromPost();
