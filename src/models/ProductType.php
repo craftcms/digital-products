@@ -49,11 +49,6 @@ class ProductType extends Model
     public $handle;
 
     /**
-     * @var bool Has URLs
-     */
-    public $hasUrls;
-
-    /**
      * @var string SKU format
      */
     public $skuFormat;

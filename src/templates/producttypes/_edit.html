@@ -50,34 +50,6 @@
         errors: productType.getErrors('skuFormat')
     }) }}
 
-    {% macro hasUrlsField(productType) %}
-        {% from "_includes/forms" import checkboxField %}
-
-        {{ checkboxField({
-            label: "Products of this type have their own URLs"|t('digital-products'),
-            id: 'hasUrls',
-            name: 'hasUrls',
-            checked: productType.hasUrls,
-            toggle: 'url-settings'
-        }) }}
-    {% endmacro %}
-
-    {% macro templateField(productType) %}
-        {% from "_includes/forms" import textField %}
-
-        {{ textField({
-            label: "Product Template"|t('digital-products'),
-            instructions: "The template to use when a product’s URL is requested."|t('digital-products'),
-            id: 'template',
-            class: 'ltr',
-            name: 'template',
-            value: productType.template,
-            errors: productType.getErrors('template')
-        }) }}
-    {% endmacro %}
-
-    {% from _self import hasUrlsField, templateField %}
-
     <hr>
 
     {% set siteRows = [] %}

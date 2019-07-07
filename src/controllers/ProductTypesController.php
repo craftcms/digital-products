@@ -84,7 +84,6 @@ class ProductTypesController extends BaseController
         $productType->id = $request->getBodyParam('productTypeId');
         $productType->name = $request->getBodyParam('name');
         $productType->handle = $request->getBodyParam('handle');
-        $productType->hasUrls = $request->getBodyParam('hasUrls');
         $productType->skuFormat = $request->getBodyParam('skuFormat');
 
         // Site-specific settings
