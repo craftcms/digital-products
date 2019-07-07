@@ -3,6 +3,7 @@
 namespace craft\digitalproducts\controllers;
 
 use Craft;
+use craft\base\Field;
 use craft\commerce\models\ProductType;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\Plugin as DigitalProducts;
