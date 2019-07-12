@@ -556,6 +556,14 @@ class Product extends Purchasable
     }
 
     /**
+     * @return bool
+     */
+    public function getIsShippable(): bool
+    {
+        return false;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getIsPromotable(): bool
