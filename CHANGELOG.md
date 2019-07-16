@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+##  2.2.3 - 2019-07-16
 
 ### Fixed
 - Digital products are now ignored by the shipping engine.
