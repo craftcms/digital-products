@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+##  2.2.4 - 2019-07-17
 
 ### Fixed
 - Fixed a bug where product permissions were not being checked correctly. ([#42](https://github.com/craftcms/digital-products/issues/42))
