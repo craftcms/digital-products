@@ -85,7 +85,7 @@ class ProductsController extends BaseController
             throw new Exception('The product type was not found.');
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:' . $productType->uid);
+        $this->requirePermission('digitalProducts-manageProductType:' . $productType->uid);
         $variables['productType'] = $productType;
 
         if ($siteHandle !== null) {
@@ -138,7 +138,7 @@ class ProductsController extends BaseController
             throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.', ['id' => $productId]));
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
+        $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
 
         if (!Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
@@ -173,7 +173,7 @@ class ProductsController extends BaseController
 
         $product = $this->_buildProductFromPost();
 
-        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
+        $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
 
         $existingProduct = (bool)$product->id;
 
@@ -205,7 +205,7 @@ class ProductsController extends BaseController
         $this->requirePostRequest();
 
         $product = $this->_buildProductFromPost();
-        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
+        $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
 
         return $this->_showProduct($product);
     }
@@ -232,7 +232,7 @@ class ProductsController extends BaseController
             throw new ServerErrorHttpException('Product type has an invalid template path');
         }
 
-        $this->requirePermission('digitalProducts-manageProducts:' . $product->typeId);
+        $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
 
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
