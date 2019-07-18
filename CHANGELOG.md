@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed an error where it was impossible to list existing digital products. ([#42](https://github.com/craftcms/digital-products/issues/42))
+
 ##  2.2.4 - 2019-07-17
 
 ### Fixed
