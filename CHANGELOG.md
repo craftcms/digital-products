@@ -1,5 +1,20 @@
 # Release Notes for Digital Products
 
+## 2.3.0 - 2019-07-24
+
+### Changed
+- Update Craft Commerce requirements to allow for Craft Commerce 3.
+
+## 2.2.4.1 - 2019-07-18
+
+### Fixed
+- Fixed an error where it was impossible to list existing digital products. ([#42](https://github.com/craftcms/digital-products/issues/42))
+
+##  2.2.4 - 2019-07-17
+
+### Fixed
+- Fixed a bug where product permissions were not being checked correctly. ([#42](https://github.com/craftcms/digital-products/issues/42))
+
 ##  2.2.3 - 2019-07-16
 
 ### Fixed

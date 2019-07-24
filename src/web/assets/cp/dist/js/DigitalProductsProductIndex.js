@@ -28,7 +28,7 @@ Craft.DigitalProducts.ProductIndex = Craft.BaseElementIndex.extend({
         for (var i = 0; i < this.$sources.length; i++) {
             var $source = this.$sources.eq(i),
                 key = $source.data('key'),
-                match = key.match(/^productType:(\d+)$/);
+                match = key.match(/^productType:([\w-]+)$/);
 
             if (match) {
                 this.productTypes.push({

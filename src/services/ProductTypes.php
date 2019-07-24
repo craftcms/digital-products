@@ -91,9 +91,9 @@ class ProductTypes extends Component
         $editableProductTypeIds = $this->getEditableProductTypeIds();
         $editableProductTypes = [];
 
-        foreach ($this->getAllProductTypes() as $productTypes) {
-            if (in_array($productTypes->id, $editableProductTypeIds, false)) {
-                $editableProductTypes[] = $productTypes;
+        foreach ($this->getAllProductTypes() as $productType) {
+            if (in_array($productType->id, $editableProductTypeIds, false)) {
+                $editableProductTypes[] = $productType;
             }
         }
 
@@ -109,11 +109,11 @@ class ProductTypes extends Component
     {
         if (null === $this->_editableProductTypeIds) {
             $this->_editableProductTypeIds = [];
-            $allProductTypeIds = $this->getAllProductTypeIds();
+            $allProductTypes = $this->getAllProductTypes();
 
-            foreach ($allProductTypeIds as $productTypeId) {
-                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:' . $productTypeId)) {
-                    $this->_editableProductTypeIds[] = $productTypeId;
+            foreach ($allProductTypes as $productType) {
+                if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductType:' . $productType->uid)) {
+                    $this->_editableProductTypeIds[] = $productType->id;
                 }
             }
         }
