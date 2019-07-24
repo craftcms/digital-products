@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.3.0 - 2019-07-24
 
 ### Changed
 - Update Craft Commerce requirements to allow for Craft Commerce 3.
