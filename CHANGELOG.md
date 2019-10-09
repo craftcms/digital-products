@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.3.1 - 2019-10-09
 
 ### Fixed
 - Fixed deprecation warnings on Edit Product page and Product Types index. ([#44](https://github.com/craftcms/digital-products/issues/44))
