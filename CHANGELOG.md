@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.4.0 - 2020-05-05
 
 ### Added
 - Added GraphQL support for digital products. ([#46](https://github.com/craftcms/digital-products/issues/46))
