@@ -1,5 +1,23 @@
 # Release Notes for Digital Products
 
+## 2.4.0 - 2020-05-05
+
+### Added
+- Added GraphQL support for digital products. ([#46](https://github.com/craftcms/digital-products/issues/46))
+- It’s now possible to update statuses and delete products form the Products index page. ([#34](https://github.com/craftcms/digital-products/issues/34))
+- Added `craft\digital-products\elements\Products::getGqlTypeName()`.
+- Added `craft\digital-products\elements\Products::gqlScopesByContext()`.
+- Added `craft\digital-products\elements\Products::gqlTypeNameByContext()`.
+- Added `craft\digital-products\gql\arguments\elements\Product`.
+- Added `craft\digital-products\gql\interfaces\elements\Product`.
+- Added `craft\digital-products\gql\queries\Product`.
+- Added `craft\digital-products\gql\resolvers\elements\Product`.
+- Added `craft\digital-products\gql\types\elements\Product`.
+- Added `craft\digital-products\gql\types\gemerators\ProductType`.
+- Added `craft\digital-products\helpers\Gql`.
+- Added `craft\digital-products\Plugin::defineActions()`.
+- Added `craft\digital-products\services\ProductTypes::getProductTypeByUid()`.
+
 ## 2.3.1 - 2019-10-09
 
 ### Fixed

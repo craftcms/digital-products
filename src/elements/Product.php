@@ -7,10 +7,12 @@ use craft\commerce\base\Purchasable;
 use craft\commerce\models\TaxCategory;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
+use craft\digitalproducts\elements\actions\DeleteProduct;
 use craft\digitalproducts\elements\db\ProductQuery;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\Product as ProductRecord;
+use craft\elements\actions\SetStatus;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
@@ -458,6 +460,35 @@ class Product extends Purchasable
 
     /**
      * @inheritdoc
+     * @since 2.4
+     */
+    public function getGqlTypeName(): string
+    {
+        return static::gqlTypeNameByContext($this->getType());
+    }
+
+    /**
+     * @inheritdoc
+     * @since 2.4
+     */
+    public static function gqlTypeNameByContext($context): string
+    {
+        /** @var ProductType $context */
+        return $context->handle . '_Product';
+    }
+
+    /**
+     * @inheritdoc
+     * @since 2.4
+     */
+    public static function gqlScopesByContext($context): array
+    {
+        /** @var ProductType $context */
+        return ['digitalProductTypes.' . $context->uid];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function afterSave(bool $isNew)
     {
@@ -678,5 +709,53 @@ class Product extends Purchasable
             'expiryDate' => Craft::t('digital-products', 'Expiry Date'),
             'price' => Craft::t('digital-products', 'Price'),
         ];
+    }
+
+    /**
+     * @inheritdoc
+     * @since 2.4
+     */
+    protected static function defineActions(string $source = null): array
+    {
+        $actions = parent::defineActions($source);
+
+        // Get the section(s) we need to check permissions on
+        if ($source == '*') {
+            $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
+        } else if (preg_match('/^productType:(\d+)$/', $source, $matches)) {
+            $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($matches[1]);
+
+            if ($productType) {
+                $productTypes = [$productType];
+            }
+        } else if (preg_match('/^productType:(.+)$/', $source, $matches)) {
+            $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeByUid($matches[1]);
+
+            if ($productType) {
+                $productTypes = [$productType];
+            }
+        }
+
+        if (!empty($productTypes)) {
+            $userSession = Craft::$app->getUser();
+            $canManage = false;
+
+            foreach ($productTypes as $productType) {
+                $canManage = $userSession->checkPermission('digitalProducts-manageProductType:' . $productType->uid);
+            }
+
+            if ($canManage) {
+                // Allow deletion
+                $deleteAction = Craft::$app->getElements()->createAction([
+                    'type' => DeleteProduct::class,
+                    'confirmationMessage' => Craft::t('digital-products', 'Are you sure you want to delete the selected products?'),
+                    'successMessage' => Craft::t('digital-products', 'Products deleted.'),
+                ]);
+                $actions[] = $deleteAction;
+                $actions[] = SetStatus::class;
+            }
+        }
+
+        return $actions;
     }
 }

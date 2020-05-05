@@ -10,6 +10,8 @@ use craft\commerce\services\Purchasables;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fields\Products;
+use craft\digitalproducts\gql\interfaces\elements\Product as GqlProductInterface;
+use craft\digitalproducts\gql\queries\Product as GqlProductQueries;
 use craft\digitalproducts\helpers\ProjectConfigData;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
@@ -18,10 +20,14 @@ use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterGqlPermissionsEvent;
+use craft\events\RegisterGqlQueriesEvent;
+use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\services\Gql;
 use craft\services\ProjectConfig;
 use craft\services\Sites;
 use craft\services\UserPermissions;
@@ -77,6 +83,9 @@ class Plugin extends BasePlugin
         $this->_registerCpRoutes();
         $this->_registerPermissions();
         $this->_registerElementTypes();
+        $this->_registerGqlInterfaces();
+        $this->_registerGqlQueries();
+        $this->_registerGqlPermissions();
     }
 
     /**
@@ -231,6 +240,56 @@ class Plugin extends BasePlugin
         Event::on(Elements::class, Elements::EVENT_REGISTER_ELEMENT_TYPES, function(RegisterComponentTypesEvent $e) {
             $e->types[] = Product::class;
             $e->types[] = License::class;
+        });
+    }
+
+    /**
+     * Register the Gql interfaces
+     */
+    private function _registerGqlInterfaces()
+    {
+        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_TYPES, function(RegisterGqlTypesEvent $event) {
+            // Add my GraphQL types
+            $types = $event->types;
+            $types[] = GqlProductInterface::class;
+            $event->types = $types;
+        });
+    }
+
+    /**
+     * Register the Gql things
+     */
+    private function _registerGqlQueries()
+    {
+        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_QUERIES, function(RegisterGqlQueriesEvent $event) {
+            // Add my GraphQL queries
+            $event->queries = array_merge($event->queries, GqlProductQueries::getQueries());
+        });
+    }
+
+    /**
+     * Register the Gql things
+     */
+    private function _registerGqlPermissions()
+    {
+        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_PERMISSIONS, function(RegisterGqlPermissionsEvent $event) {
+            $permissions = [];
+
+            $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
+
+            if (!empty($productTypes)) {
+                $label = Craft::t('digital-products', 'Digital Products');
+                $productPermissions = [];
+
+                foreach ($productTypes as $productType) {
+                    $suffix = 'digitalProductTypes.' . $productType->uid;
+                    $productPermissions[$suffix . ':read'] = ['label' => Craft::t('digital-products', 'View digital product type - {productType}', ['productType' => Craft::t('site', $productType->name)])];
+                }
+
+                $permissions[$label] = $productPermissions;
+            }
+
+            $event->permissions = array_merge($event->permissions, $permissions);
         });
     }
 }

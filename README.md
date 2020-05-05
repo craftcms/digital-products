@@ -35,7 +35,7 @@ composer require craftcms/digital-products
 
 ### The `beforeSaveProductType` and `afterSaveProductType` events
 
-Plugins can be notified right before or right after a product type is saved in case your plugin needs to do something at that point:
+Plugins can be notified immediately before or after a product type is saved so your plugin can take action if needed:
 
 ```php
 use craft\digitalproducts\events\ProductTypeEvent;
@@ -44,9 +44,13 @@ use yii\base\Event;
 
 // ...
 
-Event::on(ProductTypes::class, ProductTypes::EVENT_BEFORE_SAVE_PRODUCTTYPE, function(ProductTypeEvent $e) {
-    // Some custom code to be executed when a product type is saved
-});
+Event::on(
+    ProductTypes::class, 
+    ProductTypes::EVENT_BEFORE_SAVE_PRODUCTTYPE, 
+    function(ProductTypeEvent $e) {
+        // Custom code to be executed when a product type is saved
+    }
+);
 ```
 
 ### The `beforeGenerateLicenseKey` event
@@ -61,27 +65,33 @@ use yii\base\Event;
 
 // ...
 
-Event::on(License::class, License::EVENT_GENERATE_LICENSE_KEY, function(GenerateKeyEvent $e) {
-    do {
-        $licenseKey = // custom key generation logic...
-    } while (!DigitalProducts::getInstance()->getLicenses()->isLicenseKeyUnique($licenseKey));
+Event::on(
+    License::class, 
+    License::EVENT_GENERATE_LICENSE_KEY, 
+    function(GenerateKeyEvent $e) {
+        $licenseService = DigitalProducts::getInstance()->getLicenses();
+        
+        do {
+            $licenseKey = // custom key generation logic...
+        } while (!$licenseService->isLicenseKeyUnique($licenseKey));
 
-    $e->licenseKey = $licenseKey;
-});
+        $e->licenseKey = $licenseKey;
+    }
+);
 ```
 
 ## Eager loading
 
-Both licenses and products have several eager-loadable properties
+Both licenses and products have several eager-loadable properties.
 
 ### Licenses
 
-* `product` - Allows you to eager-load the product associated with the license.
-* `order` - Allows you to eager-load the order associated with the license, if any.
-* `owner` - Allows you to eager-load the Craft user that owns the license, if any.
+* `product` allows you to eager-load the product associated with the license.
+* `order` allows you to eager-load the order associated with the license, if any.
+* `owner` allows you to eager-load the Craft user that owns the license, if any.
 
 ### Products
-* `existingLicenses` - Eager-loads all the existing licenses for the currently logged in Craft User.
+* `existingLicenses` eager-loads all the existing licenses for the currently logged in Craft User.
 
 ## Examples
 
@@ -89,7 +99,11 @@ Both licenses and products have several eager-loadable properties
 
 ```twig
 {% if currentUser %}
-    {% set licenses = craft.digitalProducts.licenses.owner(currentUser).with(['products', 'order']) %}
+    {% set licenses = craft.digitalProducts
+        .licenses
+        .owner(currentUser)
+        .with(['products', 'order']) 
+    %}
 
     <div class="panel panel-default">
     <div class="panel-heading"><h3 class="panel-title">Licenses</h3></div>
@@ -105,11 +119,15 @@ Both licenses and products have several eager-loadable properties
             <tbody>
             {% for license in licenses %}
                 <tr>
-                    <td><a href="{{ license.product.getUrl() }}">{{ license.product.title }}</a></td>
+                    <td><a href="{{ license.product.getUrl() }}">
+                        {{ license.product.title }}
+                    </a></td>
                     <td>{{ license.dateCreated|date('Y-m-d H:i:s') }}</td>
                     <td>
                         {% if license.orderId %}
-                            <a href="/store/order?number={{ license.order.number }}">Order no. {{ license.orderId }}</a>
+                            <a href="/store/order?number={{ license.order.number }}">
+                                Order no. {{ license.orderId }}
+                            </a>
                         {% endif %}
                     </td>
                 </tr>
@@ -125,7 +143,12 @@ Both licenses and products have several eager-loadable properties
 ### Checking if currently logged in user is licensed to access a product.
 
 ```twig
-{% set products = craft.digitalProducts.products.type('onlineCourses').with(['existingLicenses']) %}
+{% set products = craft.digitalProducts
+    .products
+    .type('onlineCourses')
+    .with(['existingLicenses']) 
+%}
+
 {% if products|length %}
     <table class="table">
         <thead>
@@ -151,3 +174,76 @@ Both licenses and products have several eager-loadable properties
     </table>
 {% endif %}
 ```
+
+## GraphQL
+
+Digital products may be queried with GraphQL. Please read the [getting started docs](https://docs.craftcms.com/v3/graphql.html) to get up to speed with how Craft CMS handles GraphQL requests.
+
+The GraphQL implementation provides two query options: `digitalProducts` for returning multiple products, and `digitalProduct` for returning a single product.  
+
+### An example query and response
+
+#### Query payload
+
+```graphql
+query {
+    digitalProducts(type: "eBooks", limit: 2) {
+        title,
+        sku,
+        price
+    }
+}
+```
+
+#### The response
+
+```json
+{
+    "data": {
+        "digitalProducts": [
+            {
+                "title": "Breaking Bad: The Recipes",
+                "sku": "BB-TR",
+                "price": 14.99
+            },
+            {
+                "title": "The Clone Wars: Color The Clones",
+                "sku": "TCW-CTC",
+                "price": 7.95
+            }
+        ]
+    }
+}
+```
+
+#### The `digitalProducts`/`digitalProduct` query
+
+Both the queries use the same argument set.
+
+| Argument | Type | Description
+| - | - | -
+| `id`| `[QueryArgument]` | Narrows the query results based on the elements’ IDs.
+| `uid`| `[String]` | Narrows the query results based on the elements’ UIDs.
+| `status`| `[String]` | Narrows the query results based on the elements’ statuses.
+| `unique`| `Boolean` | Determines whether only elements with unique IDs should be returned by the query.
+| `title`| `[String]` | Narrows the query results based on the elements’ titles.
+| `sku`| `[String]` | Narrows the query results based on the digital products’ SKUs.
+| `slug`| `[String]` | Narrows the query results based on the elements’ slugs.
+| `uri`| `[String]` | Narrows the query results based on the elements’ URIs.
+| `search`| `String` | Narrows the query results to only elements that match a search query.
+| `relatedTo`| `[Int]` | Narrows the query results to elements that relate to *any* of the provided element IDs. This argument is ignored, if `relatedToAll` is also used.
+| `relatedToAll`| `[Int]` | Narrows the query results to elements that relate to *all* of the provided element IDs. Using this argument will cause `relatedTo` argument to be ignored.
+| `ref`| `[String]` | Narrows the query results based on a reference string.
+| `fixedOrder`| `Boolean` | Causes the query results to be returned in the order specified by the `id` argument.
+| `inReverse`| `Boolean` | Causes the query results to be returned in reverse order.
+| `dateCreated`| `[String]` | Narrows the query results based on the elements’ creation dates.
+| `dateUpdated`| `[String]` | Narrows the query results based on the elements’ last-updated dates.
+| `offset`| `Int` | Sets the offset for paginated results.
+| `limit`| `Int` | Sets the limit for paginated results.
+| `orderBy`| `String` | Sets the field the returned elements should be ordered by
+| `type`| `[String]` | Narrows the query results based on the digital products’ prdocut type handles.
+| `typeId`| `[QueryArgument]` | Narrows the query results based on the digital products’ product types, per the types’ IDs.
+| `postDate`| `[String]` | Narrows the query results based on the digital products’ post dates.
+| `before`| `String` | Narrows the query results to only digital products that were posted before a certain date.
+| `after`| `String` | Narrows the query results to only digital products that were posted on or after a certain date.
+| `expiryDate`| `[String]` | Narrows the query results based on the digital products’ expiry dates.
