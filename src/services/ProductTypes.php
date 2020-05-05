@@ -13,6 +13,7 @@ use craft\digitalproducts\records\ProductTypeSite as ProductTypeSiteRecord;
 use craft\events\ConfigEvent;
 use craft\events\DeleteSiteEvent;
 use craft\events\SiteEvent;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\StringHelper;
@@ -158,6 +159,18 @@ class ProductTypes extends Component
         }
 
         return $this->_productTypesById ?: [];
+    }
+
+    /**
+     * Returns a product type by its UID.
+     *
+     * @param string $uid the product type's UID
+     * @return ProductType|null either the product type or `null`
+     * @since 2.4
+     */
+    public function getProductTypeByUid(string $uid)
+    {
+        return ArrayHelper::firstWhere($this->getAllProductTypes(), 'uid', $uid, true);
     }
 
     /**
