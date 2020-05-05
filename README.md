@@ -151,3 +151,76 @@ Both licenses and products have several eager-loadable properties
     </table>
 {% endif %}
 ```
+
+## GraphQL
+
+Digital products supports GraphQL querying for data. Please read the [getting started docs](https://docs.craftcms.com/v3/graphql.html) to get up-to-speed with how Craft CMS handles GraphQL requests.
+
+THe GraphQL implementation provides two query options; `digitalProducts` for returning multiple products and `digitalProduct` for returning a single product.  
+
+### An example query and response
+
+#### Query payload
+
+```
+query {
+    digitalProducts(type: "eBooks", limit: 2) {
+        title,
+        sku,
+        price
+    }
+}
+```
+
+#### The response
+
+```
+{
+    "data": {
+        "digitalProducts": [
+            {
+                "title": "Breaking Bad: The Recipes",
+                "sku": "BB-TR",
+                "price": 14.99
+            },
+            {
+                "title": "The Clone Wars: Color The Clones",
+                "sku": "TCW-CTC",
+                "price": 7.95
+            }
+        ]
+    }
+}
+```
+
+#### The `digitalProducts`/`digitalProduct` query
+
+Both the queries use the same argument set.
+
+| Argument | Type | Description
+| - | - | -
+| `id`| `[QueryArgument]` | Narrows the query results based on the elements’ IDs.
+| `uid`| `[String]` | Narrows the query results based on the elements’ UIDs.
+| `status`| `[String]` | Narrows the query results based on the elements’ statuses.
+| `unique`| `Boolean` | Determines whether only elements with unique IDs should be returned by the query.
+| `title`| `[String]` | Narrows the query results based on the elements’ titles.
+| `sku`| `[String]` | Narrows the query results based on the digital products’ SKUs.
+| `slug`| `[String]` | Narrows the query results based on the elements’ slugs.
+| `uri`| `[String]` | Narrows the query results based on the elements’ URIs.
+| `search`| `String` | Narrows the query results to only elements that match a search query.
+| `relatedTo`| `[Int]` | Narrows the query results to elements that relate to *any* of the provided element IDs. This argument is ignored, if `relatedToAll` is also used.
+| `relatedToAll`| `[Int]` | Narrows the query results to elements that relate to *all* of the provided element IDs. Using this argument will cause `relatedTo` argument to be ignored.
+| `ref`| `[String]` | Narrows the query results based on a reference string.
+| `fixedOrder`| `Boolean` | Causes the query results to be returned in the order specified by the `id` argument.
+| `inReverse`| `Boolean` | Causes the query results to be returned in reverse order.
+| `dateCreated`| `[String]` | Narrows the query results based on the elements’ creation dates.
+| `dateUpdated`| `[String]` | Narrows the query results based on the elements’ last-updated dates.
+| `offset`| `Int` | Sets the offset for paginated results.
+| `limit`| `Int` | Sets the limit for paginated results.
+| `orderBy`| `String` | Sets the field the returned elements should be ordered by
+| `type`| `[String]` | Narrows the query results based on the digital products’ prdocut type handles.
+| `typeId`| `[QueryArgument]` | Narrows the query results based on the digital products’ product types, per the types’ IDs.
+| `postDate`| `[String]` | Narrows the query results based on the digital products’ post dates.
+| `before`| `String` | Narrows the query results to only digital products that were posted before a certain date.
+| `after`| `String` | Narrows the query results to only digital products that were posted on or after a certain date.
+| `expiryDate`| `[String]` | Narrows the query results based on the digital products’ expiry dates.
