@@ -185,7 +185,7 @@ The GraphQL implementation provides two query options: `digitalProducts` for ret
 
 #### Query payload
 
-```
+```graphql
 query {
     digitalProducts(type: "eBooks", limit: 2) {
         title,
@@ -197,7 +197,7 @@ query {
 
 #### The response
 
-```
+```json
 {
     "data": {
         "digitalProducts": [
