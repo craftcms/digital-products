@@ -458,6 +458,35 @@ class Product extends Purchasable
 
     /**
      * @inheritdoc
+     * @since 2.4
+     */
+    public function getGqlTypeName(): string
+    {
+        return static::gqlTypeNameByContext($this->getType());
+    }
+
+    /**
+     * @inheritdoc
+     * @since 2.4
+     */
+    public static function gqlTypeNameByContext($context): string
+    {
+        /** @var ProductType $context */
+        return $context->handle . '_Product';
+    }
+
+    /**
+     * @inheritdoc
+     * @since 2.4
+     */
+    public static function gqlScopesByContext($context): array
+    {
+        /** @var ProductType $context */
+        return ['digitalProductTypes.' . $context->uid];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function afterSave(bool $isNew)
     {

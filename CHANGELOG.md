@@ -1,5 +1,20 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Added
+- Added GraphQL support for digital products. ([#46](https://github.com/craftcms/digital-products/issues/46))
+- Added `craft\digital-products\helpers\Gql`.
+- Added `craft\digital-products\elements\Products::getGqlTypeName()`.
+- Added `craft\digital-products\elements\Products::gqlTypeNameByContext()`.
+- Added `craft\digital-products\elements\Products::gqlScopesByContext()`.
+- Added `craft\digital-products\gql\arguments\elements\Product`.
+- Added `craft\digital-products\gql\interfaces\elements\Product`.
+- Added `craft\digital-products\gql\queries\Product`.
+- Added `craft\digital-products\gql\resolvers\elements\Product`.
+- Added `craft\digital-products\gql\types\elements\Product`.
+- Added `craft\digital-products\gql\types\gemerators\ProductType`.
+
 ## 2.3.1 - 2019-10-09
 
 ### Fixed
