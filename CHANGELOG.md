@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed a bug where the `afterSaveProductType` and `beforeSaveProductType` events triggered the wrong event object. ([#48](https://github.com/craftcms/digital-products/issues/48))
+
 ## 2.4.0 - 2020-05-05
 
 ### Added
