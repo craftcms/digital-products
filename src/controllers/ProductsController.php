@@ -240,7 +240,7 @@ class ProductsController extends BaseController
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
             'action' => 'digital-products/products/viewSharedProduct',
-            'params' => ['productId' => $productId, 'locale' => $product->getSite()]
+            'params' => ['productId' => $productId, 'site' => $product->getSite()]
         ]);
 
         $url = UrlHelper::urlWithToken($product->getUrl(), $token);
@@ -431,7 +431,7 @@ class ProductsController extends BaseController
                     'previewParams' => [
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,
-                        'locale' => $variables['product']->locale,
+                        'siteId' => $variables['product']->siteId,
                     ]
                 ]) . ');');
 
@@ -443,9 +443,9 @@ class ProductsController extends BaseController
                 if ($variables['product']->getStatus() === Product::STATUS_LIVE) {
                     $variables['shareUrl'] = $variables['product']->getUrl();
                 } else {
-                    $variables['shareUrl'] = UrlHelper::actionUrl('digital-roducts/products/share-roduct', [
+                    $variables['shareUrl'] = UrlHelper::actionUrl('digital-products/products/share-product', [
                         'productId' => $variables['product']->id,
-                        'locale' => $variables['product']->locale
+                        'siteId' => $variables['product']->siteId
                     ]);
                 }
             }
