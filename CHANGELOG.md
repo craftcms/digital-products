@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+- Fixed a javascript error that caused the “Add Products” button to not appear. ([#49(https://github.com/craftcms/digital-products/issues/49))
 - Fixed a bug where the `afterSaveProductType` and `beforeSaveProductType` events triggered the wrong event object. ([#48](https://github.com/craftcms/digital-products/issues/48))
 
 ## 2.4.0 - 2020-05-05
