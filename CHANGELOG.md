@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.4.2 - 2020-08-24
 
 ### Fixed
 - Fixed a deprecation warning in `craft\digitalproducts\controllers\ProductsController`.
