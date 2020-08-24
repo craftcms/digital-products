@@ -3,7 +3,7 @@
 namespace craft\digitalproducts\services;
 
 use Craft;
-use craft\commerce\events\ProductTypeEvent;
+use craft\digitalproducts\events\ProductTypeEvent;
 use craft\db\Query;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;

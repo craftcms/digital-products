@@ -17,6 +17,7 @@ trait Routes
             $event->rules['digital-products/producttypes/new'] = 'digital-products/product-types/edit';
             $event->rules['digital-products/producttypes/<productTypeId:\d+>'] = 'digital-products/product-types/edit';
 
+            $event->rules['digital-products/products/'] = 'digital-products/products/index';
             $event->rules['digital-products/products/<productTypeHandle:{handle}>'] = 'digital-products/products/index';
             $event->rules['digital-products/products/<productTypeHandle:{handle}>/new'] = 'digital-products/products/edit';
             $event->rules['digital-products/products/<productTypeHandle:{handle}>/new/<siteHandle:{handle}>'] = 'digital-products/products/edit';

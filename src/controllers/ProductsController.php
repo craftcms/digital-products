@@ -4,9 +4,10 @@ namespace craft\digitalproducts\controllers;
 
 use Craft;
 use craft\base\Field;
-use craft\commerce\models\ProductType;
 use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
+use craft\digitalproducts\web\assets\cp\Bundle;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\helpers\Localization;
@@ -53,7 +54,9 @@ class ProductsController extends BaseController
      */
     public function actionIndex(): Response
     {
-        return $this->renderTemplate('digital-products/products/index');
+        $editableProductTypes = \craft\digitalproducts\Plugin::getInstance()->getProductTypes()->getEditableProductTypes();
+        $this->getView()->registerAssetBundle(Bundle::class);
+        return $this->renderTemplate('digital-products/products/index', compact('editableProductTypes'));
     }
 
     /**
