@@ -705,8 +705,16 @@ class Product extends Purchasable
     {
         return [
             'title' => Craft::t('digital-products', 'Title'),
-            'postDate' => Craft::t('digital-products', 'Post Date'),
-            'expiryDate' => Craft::t('digital-products', 'Expiry Date'),
+            [
+                'label' => Craft::t('digital-products', 'Post Date'),
+                'orderBy' => 'postDate',
+                'defaultDir' => 'desc',
+            ],
+            [
+                'label' => Craft::t('digital-products', 'Expiry Date'),
+                'orderBy' => 'expiryDate',
+                'defaultDir' => 'desc',
+            ],
             'price' => Craft::t('digital-products', 'Price'),
         ];
     }
