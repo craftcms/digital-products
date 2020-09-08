@@ -619,7 +619,7 @@ class Product extends Purchasable
 
         return [
             'templates/render', [
-                'template' => $productTypeSiteSettings[$siteId]->template,
+                'template' => (string)$productTypeSiteSettings[$siteId]->template,
                 'variables' => [
                     'product' => $this,
                 ]

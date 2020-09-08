@@ -5,6 +5,9 @@
 ### Changed
 - Products’ and licenses’ date sort options are now sorted in descending order by default when selected (requires Craft 3.5.9 or later).
 
+### Fixed
+- Fixed a 400 error that could occur when a product type’s Template setting was blank.
+
 ## 2.4.2 - 2020-08-24
 
 ### Fixed
