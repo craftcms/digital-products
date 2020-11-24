@@ -7,6 +7,7 @@
 
 ### Fixed
 - Fixed a 400 error that could occur when a product type’s Template setting was blank.
+- Fixed plugin description that implied compatibility only with Craft Commerce 2.
 
 ## 2.4.2 - 2020-08-24
 
