@@ -9,6 +9,7 @@
 - Fixed a 400 error that could occur when a product type’s Template setting was blank.
 - Fixed plugin description that implied compatibility only with Craft Commerce 2.
 - Fixed a PHP error that could occur when saving a new product without a price. ([#58](https://github.com/craftcms/digital-products/issues/58))
+- Fixed a bug when changing a site on edit digital product page throws Product Type not found error and missing site handle on digital products index page. ([#54](https://github.com/craftcms/digital-products/issues/54))
 
 ## 2.4.2 - 2020-08-24
 
