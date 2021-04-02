@@ -1,7 +1,7 @@
 {
   "name": "craftcms/digital-products",
   "description": "Sell digital product licenses with Craft Commerce",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "type": "craft-plugin",
   "keywords": [
     "digital",
