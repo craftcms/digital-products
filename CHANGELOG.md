@@ -1,12 +1,14 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.4.3 - 2021-04-02
 
 ### Changed
 - Products’ and licenses’ date sort options are now sorted in descending order by default when selected (requires Craft 3.5.9 or later).
 
 ### Fixed
 - Fixed a 400 error that could occur when a product type’s Template setting was blank.
+- Fixed plugin description that implied compatibility only with Craft Commerce 2.
+- Fixed a PHP error that could occur when saving a new product without a price. ([#58](https://github.com/craftcms/digital-products/issues/58))
 
 ## 2.4.2 - 2020-08-24
 
