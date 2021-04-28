@@ -7,11 +7,11 @@ use craft\commerce\base\Purchasable;
 use craft\commerce\models\TaxCategory;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
-use craft\digitalproducts\elements\actions\DeleteProduct;
 use craft\digitalproducts\elements\db\ProductQuery;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\Product as ProductRecord;
+use craft\elements\actions\Delete;
 use craft\elements\actions\SetStatus;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
@@ -760,7 +760,7 @@ class Product extends Purchasable
             if ($canManage) {
                 // Allow deletion
                 $deleteAction = Craft::$app->getElements()->createAction([
-                    'type' => DeleteProduct::class,
+                    'type' => Delete::class,
                     'confirmationMessage' => Craft::t('digital-products', 'Are you sure you want to delete the selected products?'),
                     'successMessage' => Craft::t('digital-products', 'Products deleted.'),
                 ]);
