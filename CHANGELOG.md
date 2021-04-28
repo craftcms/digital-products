@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.4.3.1 - 2021-04-28
 
 ### Fixed
 - Fixed a PHP error that occurred when saving a product with a duplicate SKU. ([#61](https://github.com/craftcms/digital-products/issues/61))
