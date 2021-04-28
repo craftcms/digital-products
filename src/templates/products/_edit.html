@@ -94,7 +94,7 @@
         {% if craft.app.getIsMultiSite() %}
             <input type="hidden" name="siteId" value="{{ product.siteId }}">
         {% endif %}
-    
+
         {{ csrfInput() }}
         {% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
 
@@ -148,7 +148,7 @@
 
         {{ forms.field({
             id: 'enabled',
-            label: 'Enabled?'|t('digital-products')
+            label: 'Enabled'|t('commerce')
         }, statusInput) }}
     </div>
     <hr>
