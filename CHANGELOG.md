@@ -1,5 +1,13 @@
 # Release Notes for Digital Products
 
+## 2.4.3.1 - 2021-04-28
+
+### Fixed
+- Fixed a PHP error that occurred when saving a product with a duplicate SKU. ([#61](https://github.com/craftcms/digital-products/issues/61))
+- Fixed errors that could occur when switching the selected site from the Digital Products index page and Edit Digital Product pages. ([#54](https://github.com/craftcms/digital-products/issues/54))
+- Fixed a bug where it wasn’t possible to hard-delete digital products. ([#56](https://github.com/craftcms/digital-products/issues/56))
+- Fixed a bug where the “Product Types” nav item was shown for users that didn’t have permission to manage product types. ([#53](https://github.com/craftcms/digital-products/issues/53))
+
 ## 2.4.3 - 2021-04-02
 
 ### Changed
@@ -46,7 +54,7 @@
 
 ## 2.3.0 - 2019-07-24
 
-### Changed
+### Changed
 - Update Craft Commerce requirements to allow for Craft Commerce 3.
 
 ## 2.2.4.1 - 2019-07-18
@@ -72,7 +80,7 @@
 
 ## 2.2.1 - 2019-06-14
 
-### Added
+### Added
 - Added the `cp.digital-products.product.edit.details` template hook.
 
 ### Fixed

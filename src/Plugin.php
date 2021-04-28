@@ -102,7 +102,7 @@ class Plugin extends BasePlugin
             ];
         }
 
-        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
+        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductTypes')) {
             $navItems['subnav']['productTypes'] = [
                 'label' => Craft::t('digital-products', 'Product Types'),
                 'url' => 'digital-products/producttypes'
