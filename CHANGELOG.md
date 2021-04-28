@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 2.4.3 - 2021-04-02
 
 ### Changed
 - Products’ and licenses’ date sort options are now sorted in descending order by default when selected (requires Craft 3.5.9 or later).
