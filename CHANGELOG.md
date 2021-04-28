@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fixed a bug when saving a digital product in a multisite setup it redirects to the commerce url segment. ([#54](https://github.com/craftcms/digital-products/issues/54))
+- Fixed a bug when saving a digital product on a site other than the primary the site, it always saves the data to the primary site.
+
 ### Changed
 - Products’ and licenses’ date sort options are now sorted in descending order by default when selected (requires Craft 3.5.9 or later).
 
