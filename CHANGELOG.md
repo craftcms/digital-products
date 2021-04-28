@@ -52,7 +52,7 @@
 
 ## 2.3.0 - 2019-07-24
 
-### Changed
+### Changed
 - Update Craft Commerce requirements to allow for Craft Commerce 3.
 
 ## 2.2.4.1 - 2019-07-18
@@ -78,7 +78,7 @@
 
 ## 2.2.1 - 2019-06-14
 
-### Added
+### Added
 - Added the `cp.digital-products.product.edit.details` template hook.
 
 ### Fixed
