@@ -464,7 +464,7 @@ class ProductsController extends BaseController
     {
         $request = Craft::$app->getRequest();
         $productId = $request->getParam('productId');
-        $site = $request->getParam('site');
+        $site = $request->getParam('siteId');
 
         if ($productId) {
             $product = Craft::$app->getElements()->getElementById($productId, Product::class, $site);

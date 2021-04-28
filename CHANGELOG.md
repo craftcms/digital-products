@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed a bug when changing a site on edit digital product page throws Product Type not found error and missing site handle on digital products index page. ([#54](https://github.com/craftcms/digital-products/issues/54))
+
 ## 2.4.3 - 2021-04-02
 
 ### Changed

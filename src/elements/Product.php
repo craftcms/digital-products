@@ -366,11 +366,16 @@ class Product extends Purchasable
     {
         $productType = $this->getType();
 
+        $url = '';
         if ($productType) {
-            return UrlHelper::cpUrl('digital-products/products/' . $productType->handle . '/' . $this->id);
+            $url = UrlHelper::cpUrl('digital-products/products/' . $productType->handle . '/' . $this->id);
         }
 
-        return null;
+        if (Craft::$app->getIsMultiSite()) {
+            $url .= '/' . $this->getSite()->handle;
+        }
+
+        return $url;
     }
 
     /**

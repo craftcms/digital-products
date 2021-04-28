@@ -75,7 +75,7 @@
                                 <div class="status {{ status }}"></div>{{ site.name|t('site') }}
                             </a>
                         {% else %}
-                            {% set url = url("commerce/products/#{productTypeHandle}/#{craft.app.request.getSegment(4)}/#{site.handle}") %}
+                            {% set url = url("digital-products/products/#{productTypeHandle}/#{craft.app.request.getSegment(4)}/#{site.handle}") %}
                             <a href="{{ url }}">
                                 <div class="status {{ status }}"></div>{{ site.name|t('site') }}
                             </a>
@@ -91,6 +91,10 @@
         <input type="hidden" name="action" value="digital-products/products/save">
         <input type="hidden" name="redirect" value="{{ 'digital-products/products'|hash }}">
         <input type="hidden" name="typeId" value="{{ productType.id }}">
+        {% if craft.app.getIsMultiSite() %}
+            <input type="hidden" name="siteId" value="{{ product.siteId }}">
+        {% endif %}
+    
         {{ csrfInput() }}
         {% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
 
