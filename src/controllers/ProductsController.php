@@ -3,6 +3,7 @@
 namespace craft\digitalproducts\controllers;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Field;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
@@ -179,6 +180,9 @@ class ProductsController extends BaseController
         $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
 
         $existingProduct = (bool)$product->id;
+
+        // Always use live scenario until we implement temporary SKUs
+        $product->setScenario(Element::SCENARIO_LIVE);
 
         if (!Craft::$app->getElements()->saveElement($product)) {
             if (!$existingProduct) {

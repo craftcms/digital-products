@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+- Fixed a PHP error that occurred when saving a product with a duplicate SKU. ([#61](https://github.com/craftcms/digital-products/issues/61))
 - Fixed a bug when changing a site on edit digital product page throws Product Type not found error and missing site handle on digital products index page. ([#54](https://github.com/craftcms/digital-products/issues/54))
 
 ## 2.4.3 - 2021-04-02

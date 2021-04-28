@@ -312,12 +312,12 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
 
         $rules[] = [['typeId', 'sku', 'price'], 'required'];
-        $rules[] = [['sku'], 'string'];
+        $rules[] = [['sku'], 'string', 'max' => 255];
 
         return $rules;
     }
