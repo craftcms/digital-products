@@ -26,9 +26,6 @@ use yii\db\Connection;
  */
 class ProductQuery extends ElementQuery
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool Whether to only return products that the user has permission to edit.
      */
@@ -53,9 +50,6 @@ class ProductQuery extends ElementQuery
      * @var int|int[]|null The product type ID(s) that the resulting products must have.
      */
     public $typeId;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -301,9 +295,6 @@ class ProductQuery extends ElementQuery
                 return parent::statusCondition($status);
         }
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Applies the 'editable' param to the query being prepared.

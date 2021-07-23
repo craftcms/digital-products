@@ -12,9 +12,6 @@ use craft\digitalproducts\services\ProductTypes;
  */
 trait Services
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Returns the license service.
      *
@@ -44,9 +41,6 @@ trait Services
     {
         return $this->get('productTypes');
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Set the components of the commerce plugin

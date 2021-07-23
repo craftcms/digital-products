@@ -32,15 +32,9 @@ use yii\base\Exception;
  */
 class Product extends Purchasable
 {
-    // Constants
-    // =========================================================================
-
     const STATUS_LIVE = 'live';
     const STATUS_PENDING = 'pending';
     const STATUS_EXPIRED = 'expired';
-
-    // Properties
-    // =========================================================================
 
     /**
      * @var int ID
@@ -91,9 +85,6 @@ class Product extends Purchasable
      * @var License[]
      */
     private $_existingLicenses;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -532,9 +523,6 @@ class Product extends Purchasable
         return parent::afterSave($isNew);
     }
 
-    // Implement Purchasable
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -607,8 +595,6 @@ class Product extends Purchasable
         return (bool)$this->promotable;
     }
 
-    // Protected methods
-    // =========================================================================
     /**
      * @inheritdoc
      */

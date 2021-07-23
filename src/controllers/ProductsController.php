@@ -36,9 +36,6 @@ class ProductsController extends BaseController
      */
     protected $allowAnonymous = ['actionViewSharedProduct'];
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -274,9 +271,6 @@ class ProductsController extends BaseController
 
         return $this->_showProduct($product);
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Displays a product.

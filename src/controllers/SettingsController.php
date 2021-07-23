@@ -16,9 +16,6 @@ use yii\web\Response;
  */
 class SettingsController extends BaseController
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @return Response
      */

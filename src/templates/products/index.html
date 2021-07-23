@@ -7,17 +7,17 @@
 {% set selectedSubnavItem = "products" %}
 
 {% js %}
-    if (typeof Craft.DigitalProducts === 'undefined') {
-        Craft.DigitalProducts = {};
-    }
+  if (typeof Craft.DigitalProducts === 'undefined') {
+    Craft.DigitalProducts = {};
+  }
 
-    Craft.DigitalProducts.editableProductTypes = [
-        {% for productType in editableProductTypes %}
-            {id: "{{ productType.uid }}", name: "{{ productType.name|t('digital-products')|e('js') }}", handle: "{{ productType.handle|e('js') }}"}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ];
+  Craft.DigitalProducts.editableProductTypes = [
+    {% for productType in editableProductTypes %}
+      {id: "{{ productType.uid }}", name: "{{ productType.name|t('digital-products')|e('js') }}", handle: "{{ productType.handle|e('js') }}"}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-    {% if productTypeHandle is defined %}
-        window.defaultProductTypeHandle = '{{ productTypeHandle }}';
-    {% endif %}
+  {% if productTypeHandle is defined %}
+    window.defaultProductTypeHandle = '{{ productTypeHandle }}';
+  {% endif %}
 {% endjs %}

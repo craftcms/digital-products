@@ -28,9 +28,6 @@ use yii\db\ActiveQueryInterface;
  */
 class License extends ActiveRecord
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

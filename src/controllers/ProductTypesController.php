@@ -20,9 +20,6 @@ use yii\web\Response;
  */
 class ProductTypesController extends BaseController
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

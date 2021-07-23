@@ -28,17 +28,10 @@ use yii\base\InvalidConfigException;
  */
 class License extends Element
 {
-
-    // Constants
-    // =========================================================================
-
     /**
      * @event GenerateKeyEvent The event that is triggered after a payment request is being built
      */
     const EVENT_GENERATE_LICENSE_KEY = 'beforeGenerateLicenseKey';
-
-    // Properties
-    // =========================================================================
 
     /**
      * @var int ID
@@ -94,9 +87,6 @@ class License extends Element
      * @var Order
      */
     private $_order;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @return null|string
@@ -411,9 +401,6 @@ class License extends Element
         $licenseRecord->save(false);
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
      * Generate a new license key.
      *
@@ -521,10 +508,6 @@ class License extends Element
             ],
         ];
     }
-
-
-    // Protected methods
-    // =========================================================================
 
     /**
      * @inheritdoc

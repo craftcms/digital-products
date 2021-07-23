@@ -23,9 +23,6 @@ use yii\db\ActiveQueryInterface;
  */
 class ProductTypeSite extends ActiveRecord
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

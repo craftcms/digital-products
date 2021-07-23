@@ -18,9 +18,6 @@ use craft\db\Query;
  */
 class ProjectConfigData
 {
-    // Public Methods
-    // =========================================================================
-
     // Project config rebuild methods
     // -------------------------------------------------------------------------
 

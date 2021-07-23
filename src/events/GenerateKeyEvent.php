@@ -13,9 +13,6 @@ use yii\base\Event;
  */
 class GenerateKeyEvent extends Event
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var License The license information
      */
