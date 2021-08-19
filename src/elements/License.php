@@ -399,6 +399,8 @@ class License extends Element
         }
 
         $licenseRecord->save(false);
+
+        parent::afterSave($isNew);
     }
 
     /**

@@ -520,7 +520,7 @@ class Product extends Purchasable
 
         $productRecord->save(false);
 
-        return parent::afterSave($isNew);
+        parent::afterSave($isNew);
     }
 
     /**

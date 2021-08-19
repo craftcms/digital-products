@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed a bug where the `Element::EVENT_AFTER_SAVE` event was not being triggered for license elements.
+
 ## 2.4.3.1 - 2021-04-28
 
 ### Fixed
