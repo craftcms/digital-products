@@ -21,9 +21,6 @@ use yii\base\Event;
  */
 class Licenses extends Component
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Returns true if a given license key is unique.
      *

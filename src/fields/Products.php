@@ -14,9 +14,6 @@ use craft\fields\BaseRelationField;
  */
 class Products extends BaseRelationField
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

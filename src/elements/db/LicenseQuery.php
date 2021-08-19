@@ -26,9 +26,6 @@ use yii\db\Connection;
  */
 class LicenseQuery extends ElementQuery
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var string Either owner or user email on the license
      */
@@ -73,9 +70,6 @@ class LicenseQuery extends ElementQuery
      * @var string The license key.
      */
     public $licenseKey;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -332,9 +326,6 @@ class LicenseQuery extends ElementQuery
         $this->licenseDate = $value;
         return $this;
     }
-
-    // Protected Methods
-    // =========================================================================
 
     /**
      * @inheritdoc

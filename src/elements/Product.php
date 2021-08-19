@@ -7,11 +7,11 @@ use craft\commerce\base\Purchasable;
 use craft\commerce\models\TaxCategory;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
-use craft\digitalproducts\elements\actions\DeleteProduct;
 use craft\digitalproducts\elements\db\ProductQuery;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\Product as ProductRecord;
+use craft\elements\actions\Delete;
 use craft\elements\actions\SetStatus;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
@@ -32,15 +32,9 @@ use yii\base\Exception;
  */
 class Product extends Purchasable
 {
-    // Constants
-    // =========================================================================
-
     const STATUS_LIVE = 'live';
     const STATUS_PENDING = 'pending';
     const STATUS_EXPIRED = 'expired';
-
-    // Properties
-    // =========================================================================
 
     /**
      * @var int ID
@@ -91,9 +85,6 @@ class Product extends Purchasable
      * @var License[]
      */
     private $_existingLicenses;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -312,12 +303,12 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
 
         $rules[] = [['typeId', 'sku', 'price'], 'required'];
-        $rules[] = [['sku'], 'string'];
+        $rules[] = [['sku'], 'string', 'max' => 255];
 
         return $rules;
     }
@@ -366,11 +357,16 @@ class Product extends Purchasable
     {
         $productType = $this->getType();
 
+        $url = '';
         if ($productType) {
-            return UrlHelper::cpUrl('digital-products/products/' . $productType->handle . '/' . $this->id);
+            $url = UrlHelper::cpUrl('digital-products/products/' . $productType->handle . '/' . $this->id);
         }
 
-        return null;
+        if (Craft::$app->getIsMultiSite()) {
+            $url .= '/' . $this->getSite()->handle;
+        }
+
+        return $url;
     }
 
     /**
@@ -524,11 +520,8 @@ class Product extends Purchasable
 
         $productRecord->save(false);
 
-        return parent::afterSave($isNew);
+        parent::afterSave($isNew);
     }
-
-    // Implement Purchasable
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -551,7 +544,7 @@ class Product extends Purchasable
      */
     public function getPrice(): float
     {
-        return $this->price;
+        return (float)$this->price;
     }
 
     /**
@@ -602,8 +595,6 @@ class Product extends Purchasable
         return (bool)$this->promotable;
     }
 
-    // Protected methods
-    // =========================================================================
     /**
      * @inheritdoc
      */
@@ -619,7 +610,7 @@ class Product extends Purchasable
 
         return [
             'templates/render', [
-                'template' => $productTypeSiteSettings[$siteId]->template,
+                'template' => (string)$productTypeSiteSettings[$siteId]->template,
                 'variables' => [
                     'product' => $this,
                 ]
@@ -705,8 +696,16 @@ class Product extends Purchasable
     {
         return [
             'title' => Craft::t('digital-products', 'Title'),
-            'postDate' => Craft::t('digital-products', 'Post Date'),
-            'expiryDate' => Craft::t('digital-products', 'Expiry Date'),
+            [
+                'label' => Craft::t('digital-products', 'Post Date'),
+                'orderBy' => 'postDate',
+                'defaultDir' => 'desc',
+            ],
+            [
+                'label' => Craft::t('digital-products', 'Expiry Date'),
+                'orderBy' => 'expiryDate',
+                'defaultDir' => 'desc',
+            ],
             'price' => Craft::t('digital-products', 'Price'),
         ];
     }
@@ -747,7 +746,7 @@ class Product extends Purchasable
             if ($canManage) {
                 // Allow deletion
                 $deleteAction = Craft::$app->getElements()->createAction([
-                    'type' => DeleteProduct::class,
+                    'type' => Delete::class,
                     'confirmationMessage' => Craft::t('digital-products', 'Are you sure you want to delete the selected products?'),
                     'successMessage' => Craft::t('digital-products', 'Products deleted.'),
                 ]);

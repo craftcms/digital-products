@@ -12,9 +12,6 @@ use craft\commerce\base\Model;
  */
 class Settings extends Model
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool Whether license should automatically be assigned to existing users if the emails match.
      */

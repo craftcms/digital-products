@@ -58,15 +58,8 @@ class Plugin extends BasePlugin
      */
     public $schemaVersion = '2.1.0';
 
-    // Traits
-    // =========================================================================
-
     use Services;
     use Routes;
-
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * Initialize the plugin.
@@ -102,7 +95,7 @@ class Plugin extends BasePlugin
             ];
         }
 
-        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
+        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductTypes')) {
             $navItems['subnav']['productTypes'] = [
                 'label' => Craft::t('digital-products', 'Product Types'),
                 'url' => 'digital-products/producttypes'
@@ -153,28 +146,63 @@ class Plugin extends BasePlugin
      */
     private function _registerEventHandlers()
     {
-        Event::on(UsersService::class, UsersService::EVENT_AFTER_ACTIVATE_USER, [$this->getLicenses(), 'handleUserActivation']);
-        Event::on(PaymentService::class, PaymentService::EVENT_BEFORE_PROCESS_PAYMENT, [$this->getLicenses(), 'maybePreventPayment']);
+        Event::on(
+            UsersService::class,
+            UsersService::EVENT_AFTER_ACTIVATE_USER,
+            [$this->getLicenses(), 'handleUserActivation']
+        );
+
+        Event::on(
+            PaymentService::class,
+            PaymentService::EVENT_BEFORE_PROCESS_PAYMENT,
+            [$this->getLicenses(), 'maybePreventPayment']
+        );
 
         if ($this->getSettings()->generateLicenseOnOrderPaid) {
-            Event::on(Order::class, Order::EVENT_AFTER_ORDER_PAID, [$this->getLicenses(), 'handleCompletedOrder']);
+            Event::on(
+                Order::class,
+                Order::EVENT_AFTER_ORDER_PAID,
+                [$this->getLicenses(), 'handleCompletedOrder']
+            );
         } else {
-            Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER, [$this->getLicenses(), 'handleCompletedOrder']);
+            Event::on(
+                Order::class,
+                Order::EVENT_AFTER_COMPLETE_ORDER,
+                [$this->getLicenses(), 'handleCompletedOrder']
+            );
         }
 
-        Event::on(Sites::class, Sites::EVENT_AFTER_SAVE_SITE, [$this->getProductTypes(), 'afterSaveSiteHandler']);
-        Event::on(Sites::class, Sites::EVENT_AFTER_SAVE_SITE, [$this->getProducts(), 'afterSaveSiteHandler']);
+        Event::on(
+            Sites::class,
+            Sites::EVENT_AFTER_SAVE_SITE,
+            [$this->getProductTypes(), 'afterSaveSiteHandler']
+        );
+
+        Event::on(
+            Sites::class,
+            Sites::EVENT_AFTER_SAVE_SITE,
+            [$this->getProducts(), 'afterSaveSiteHandler']
+        );
 
         $projectConfigService = Craft::$app->getProjectConfig();
         $productTypeService = $this->getProductTypes();
         $projectConfigService->onAdd(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
             ->onUpdate(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
             ->onRemove(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleDeletedProductType']);
-        Event::on(Sites::class, Sites::EVENT_AFTER_DELETE_SITE, [$productTypeService, 'pruneDeletedSite']);
 
-        Event::on(ProjectConfig::class, ProjectConfig::EVENT_REBUILD, function(RebuildConfigEvent $event) {
-            $event->config['digital-products'] = ProjectConfigData::rebuildProjectConfig();
-        });
+        Event::on(
+            Sites::class,
+            Sites::EVENT_AFTER_DELETE_SITE,
+            [$productTypeService, 'pruneDeletedSite']
+        );
+
+        Event::on(
+            ProjectConfig::class,
+            ProjectConfig::EVENT_REBUILD,
+            function(RebuildConfigEvent $event) {
+                $event->config['digital-products'] = ProjectConfigData::rebuildProjectConfig();
+            }
+        );
     }
 
     /**
@@ -182,9 +210,14 @@ class Plugin extends BasePlugin
      */
     private function _registerFieldTypes()
     {
-        Event::on(Fields::class, Fields::EVENT_REGISTER_FIELD_TYPES, function(RegisterComponentTypesEvent $event) {
-            $event->types[] = Products::class;
-        });
+        Event::on(
+            Fields::class,
+            Fields::EVENT_REGISTER_FIELD_TYPES,
+            function(RegisterComponentTypesEvent $event)
+            {
+                $event->types[] = Products::class;
+            }
+        );
     }
 
     /**
@@ -192,9 +225,13 @@ class Plugin extends BasePlugin
      */
     private function _registerPurchasableTypes()
     {
-        Event::on(Purchasables::class, Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES, function(RegisterComponentTypesEvent $event) {
-            $event->types[] = Product::class;
-        });
+        Event::on(
+            Purchasables::class,
+            Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = Product::class;
+            }
+        );
     }
 
     /**
@@ -202,22 +239,26 @@ class Plugin extends BasePlugin
      */
     private function _registerPermissions()
     {
-        Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
-            $productTypes = $this->getProductTypes()->getAllProductTypes();
+        Event::on(
+            UserPermissions::class,
+            UserPermissions::EVENT_REGISTER_PERMISSIONS,
+            function(RegisterUserPermissionsEvent $event) {
+                $productTypes = $this->getProductTypes()->getAllProductTypes();
 
-            $productTypePermissions = [];
+                $productTypePermissions = [];
 
-            foreach ($productTypes as $productType) {
-                $suffix = ':' . $productType->uid;
-                $productTypePermissions['digitalProducts-manageProductType' . $suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
+                foreach ($productTypes as $productType) {
+                    $suffix = ':' . $productType->uid;
+                    $productTypePermissions['digitalProducts-manageProductType' . $suffix] = ['label' => Craft::t('digital-products', 'Manage “{type}” products', ['type' => $productType->name])];
+                }
+
+                $event->permissions[Craft::t('digital-products', 'Digital Products')] = [
+                    'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
+                    'digitalProducts-manageProducts' => ['label' => Craft::t('digital-products', 'Manage products'), 'nested' => $productTypePermissions],
+                    'digitalProducts-manageLicenses' => ['label' => Craft::t('digital-products', 'Manage licenses')],
+                ];
             }
-
-            $event->permissions[Craft::t('digital-products', 'Digital Products')] = [
-                'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
-                'digitalProducts-manageProducts' => ['label' => Craft::t('digital-products', 'Manage products'), 'nested' => $productTypePermissions],
-                'digitalProducts-manageLicenses' => ['label' => Craft::t('digital-products', 'Manage licenses')],
-            ];
-        });
+        );
     }
 
     /**
@@ -225,11 +266,15 @@ class Plugin extends BasePlugin
      */
     private function _registerVariable()
     {
-        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
-            /** @var CraftVariable $variable */
-            $variable = $event->sender;
-            $variable->set('digitalProducts', DigitalProducts::class);
-        });
+        Event::on(
+            CraftVariable::class,
+            CraftVariable::EVENT_INIT,
+            function(Event $event) {
+                /** @var CraftVariable $variable */
+                $variable = $event->sender;
+                $variable->set('digitalProducts', DigitalProducts::class);
+            }
+        );
     }
 
     /**
@@ -237,10 +282,14 @@ class Plugin extends BasePlugin
      */
     private function _registerElementTypes()
     {
-        Event::on(Elements::class, Elements::EVENT_REGISTER_ELEMENT_TYPES, function(RegisterComponentTypesEvent $e) {
-            $e->types[] = Product::class;
-            $e->types[] = License::class;
-        });
+        Event::on(
+            Elements::class,
+            Elements::EVENT_REGISTER_ELEMENT_TYPES,
+            function(RegisterComponentTypesEvent $e) {
+                $e->types[] = Product::class;
+                $e->types[] = License::class;
+            }
+        );
     }
 
     /**
@@ -248,12 +297,16 @@ class Plugin extends BasePlugin
      */
     private function _registerGqlInterfaces()
     {
-        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_TYPES, function(RegisterGqlTypesEvent $event) {
-            // Add my GraphQL types
-            $types = $event->types;
-            $types[] = GqlProductInterface::class;
-            $event->types = $types;
-        });
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_TYPES,
+            function(RegisterGqlTypesEvent $event) {
+                // Add my GraphQL types
+                $types = $event->types;
+                $types[] = GqlProductInterface::class;
+                $event->types = $types;
+            }
+        );
     }
 
     /**
@@ -261,10 +314,14 @@ class Plugin extends BasePlugin
      */
     private function _registerGqlQueries()
     {
-        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_QUERIES, function(RegisterGqlQueriesEvent $event) {
-            // Add my GraphQL queries
-            $event->queries = array_merge($event->queries, GqlProductQueries::getQueries());
-        });
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_QUERIES,
+            function(RegisterGqlQueriesEvent $event) {
+                // Add my GraphQL queries
+                $event->queries = array_merge($event->queries, GqlProductQueries::getQueries());
+            }
+        );
     }
 
     /**
@@ -272,24 +329,28 @@ class Plugin extends BasePlugin
      */
     private function _registerGqlPermissions()
     {
-        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_PERMISSIONS, function(RegisterGqlPermissionsEvent $event) {
-            $permissions = [];
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_PERMISSIONS,
+            function(RegisterGqlPermissionsEvent $event) {
+                $permissions = [];
 
-            $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
+                $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
 
-            if (!empty($productTypes)) {
-                $label = Craft::t('digital-products', 'Digital Products');
-                $productPermissions = [];
+                if (!empty($productTypes)) {
+                    $label = Craft::t('digital-products', 'Digital Products');
+                    $productPermissions = [];
 
-                foreach ($productTypes as $productType) {
-                    $suffix = 'digitalProductTypes.' . $productType->uid;
-                    $productPermissions[$suffix . ':read'] = ['label' => Craft::t('digital-products', 'View digital product type - {productType}', ['productType' => Craft::t('site', $productType->name)])];
+                    foreach ($productTypes as $productType) {
+                        $suffix = 'digitalProductTypes.' . $productType->uid;
+                        $productPermissions[$suffix . ':read'] = ['label' => Craft::t('digital-products', 'View digital product type - {productType}', ['productType' => Craft::t('site', $productType->name)])];
+                    }
+
+                    $permissions[$label] = $productPermissions;
                 }
 
-                $permissions[$label] = $productPermissions;
+                $event->permissions = array_merge($event->permissions, $permissions);
             }
-
-            $event->permissions = array_merge($event->permissions, $permissions);
-        });
+        );
     }
 }

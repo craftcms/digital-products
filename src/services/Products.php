@@ -16,9 +16,6 @@ use yii\base\Component;
  */
 class Products extends Component
 {
-    // Public methods
-    // =========================================================================
-
     /**
      * Handle a Site being saved.
      *

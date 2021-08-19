@@ -16,9 +16,6 @@ use yii\base\InvalidConfigException;
  */
 class ProductTypeSite extends Model
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var int ID
      */
@@ -63,9 +60,6 @@ class ProductTypeSite extends Model
      * @var Site
      */
     private $_site = null;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * Returns the Product Type.

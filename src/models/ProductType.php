@@ -25,9 +25,6 @@ use craft\models\FieldLayout;
  */
 class ProductType extends Model
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var int ID
      */
@@ -62,9 +59,6 @@ class ProductType extends Model
      * @var ProductTypeSite[]
      */
     private $_siteSettings;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc

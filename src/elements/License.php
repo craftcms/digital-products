@@ -28,17 +28,10 @@ use yii\base\InvalidConfigException;
  */
 class License extends Element
 {
-
-    // Constants
-    // =========================================================================
-
     /**
      * @event GenerateKeyEvent The event that is triggered after a payment request is being built
      */
     const EVENT_GENERATE_LICENSE_KEY = 'beforeGenerateLicenseKey';
-
-    // Properties
-    // =========================================================================
 
     /**
      * @var int ID
@@ -94,9 +87,6 @@ class License extends Element
      * @var Order
      */
     private $_order;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @return null|string
@@ -409,10 +399,9 @@ class License extends Element
         }
 
         $licenseRecord->save(false);
-    }
 
-    // Protected Methods
-    // =========================================================================
+        parent::afterSave($isNew);
+    }
 
     /**
      * Generate a new license key.
@@ -514,13 +503,13 @@ class License extends Element
         return [
             'slug' => Craft::t('digital-products', 'Product name'),
             'ownerEmail' => Craft::t('digital-products', 'Owner'),
-            'dateCreated' => Craft::t('digital-products', 'License issue date'),
+            [
+                'label' => Craft::t('digital-products', 'License issue date'),
+                'orderBy' => 'dateCreated',
+                'defaultDir' => 'desc',
+            ],
         ];
     }
-
-
-    // Protected methods
-    // =========================================================================
 
     /**
      * @inheritdoc

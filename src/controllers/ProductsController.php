@@ -3,6 +3,7 @@
 namespace craft\digitalproducts\controllers;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Field;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
@@ -34,9 +35,6 @@ class ProductsController extends BaseController
      * @inheritdoc
      */
     protected $allowAnonymous = ['actionViewSharedProduct'];
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -180,6 +178,9 @@ class ProductsController extends BaseController
 
         $existingProduct = (bool)$product->id;
 
+        // Always use live scenario until we implement temporary SKUs
+        $product->setScenario(Element::SCENARIO_LIVE);
+
         if (!Craft::$app->getElements()->saveElement($product)) {
             if (!$existingProduct) {
                 $product->id = null;
@@ -240,7 +241,7 @@ class ProductsController extends BaseController
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
             'action' => 'digital-products/products/viewSharedProduct',
-            'params' => ['productId' => $productId, 'locale' => $product->getSite()]
+            'params' => ['productId' => $productId, 'site' => $product->getSite()]
         ]);
 
         $url = UrlHelper::urlWithToken($product->getUrl(), $token);
@@ -270,9 +271,6 @@ class ProductsController extends BaseController
 
         return $this->_showProduct($product);
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Displays a product.
@@ -431,7 +429,7 @@ class ProductsController extends BaseController
                     'previewParams' => [
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,
-                        'locale' => $variables['product']->locale,
+                        'siteId' => $variables['product']->siteId,
                     ]
                 ]) . ');');
 
@@ -443,9 +441,9 @@ class ProductsController extends BaseController
                 if ($variables['product']->getStatus() === Product::STATUS_LIVE) {
                     $variables['shareUrl'] = $variables['product']->getUrl();
                 } else {
-                    $variables['shareUrl'] = UrlHelper::actionUrl('digital-roducts/products/share-roduct', [
+                    $variables['shareUrl'] = UrlHelper::actionUrl('digital-products/products/share-product', [
                         'productId' => $variables['product']->id,
-                        'locale' => $variables['product']->locale
+                        'siteId' => $variables['product']->siteId
                     ]);
                 }
             }
@@ -464,7 +462,7 @@ class ProductsController extends BaseController
     {
         $request = Craft::$app->getRequest();
         $productId = $request->getParam('productId');
-        $site = $request->getParam('site');
+        $site = $request->getParam('siteId');
 
         if ($productId) {
             $product = Craft::$app->getElements()->getElementById($productId, Product::class, $site);
