@@ -39,7 +39,6 @@ use craft\services\Users as UsersService;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 
-
 /**
  * Digital Products Plugin for Craft Commerce.
  *
@@ -132,8 +131,6 @@ class Plugin extends BasePlugin
     {
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('digital-products/settings'));
     }
-
-
 
     // Protected Methods
     // =========================================================================
