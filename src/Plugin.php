@@ -24,6 +24,10 @@ use craft\events\RegisterGqlPermissionsEvent;
 use craft\events\RegisterGqlQueriesEvent;
 use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\events\DefineConsoleActionsEvent;
+use craft\console\Application as ConsoleApplication;
+use craft\console\Controller as ConsoleController;
+use craft\console\controllers\ResaveController;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
@@ -34,6 +38,7 @@ use craft\services\UserPermissions;
 use craft\services\Users as UsersService;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
+
 
 /**
  * Digital Products Plugin for Craft Commerce.
@@ -79,6 +84,7 @@ class Plugin extends BasePlugin
         $this->_registerGqlInterfaces();
         $this->_registerGqlQueries();
         $this->_registerGqlPermissions();
+		$this->_defineResaveCommand();
     }
 
     /**
@@ -127,6 +133,8 @@ class Plugin extends BasePlugin
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('digital-products/settings'));
     }
 
+	
+
     // Protected Methods
     // =========================================================================
 
@@ -140,6 +148,38 @@ class Plugin extends BasePlugin
 
     // Private Methods
     // =========================================================================
+
+/**
+     * Defines the `resave/digital-products` command.
+     */
+    private function _defineResaveCommand()
+    {
+        if (
+            !Craft::$app instanceof ConsoleApplication ||
+            version_compare(Craft::$app->version, '3.2.0-beta.3', '<')
+        ) {
+            return;
+        }
+
+		Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, function(DefineConsoleActionsEvent $e) {
+            $e->actions['digital-products'] = [
+                'action' => function(): int {
+                    /** @var ResaveController $controller */
+                    $controller = Craft::$app->controller;
+                    $query = Product::find();
+                    if ($controller->type !== null) {
+                        $query->type(explode(',', $controller->type));
+                    }
+                    return $controller->saveElements($query);
+                },
+                'options' => ['type'],
+                'helpSummary' => 'Re-saves Commerce digital products.',
+                'optionsHelp' => [
+                    'type' => 'The product type handle(s) of the digital products to resave.',
+                ],
+            ];
+        });
+    }
 
     /**
      * Register the event handlers.
