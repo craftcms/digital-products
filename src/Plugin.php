@@ -84,7 +84,7 @@ class Plugin extends BasePlugin
         $this->_registerGqlInterfaces();
         $this->_registerGqlQueries();
         $this->_registerGqlPermissions();
-		$this->_defineResaveCommand();
+        $this->_defineResaveCommand();
     }
 
     /**
@@ -133,7 +133,7 @@ class Plugin extends BasePlugin
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('digital-products/settings'));
     }
 
-	
+
 
     // Protected Methods
     // =========================================================================
@@ -149,7 +149,7 @@ class Plugin extends BasePlugin
     // Private Methods
     // =========================================================================
 
-/**
+    /**
      * Defines the `resave/digital-products` command.
      */
     private function _defineResaveCommand()
@@ -161,9 +161,9 @@ class Plugin extends BasePlugin
             return;
         }
 
-		Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, function(DefineConsoleActionsEvent $e) {
+        Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, function (DefineConsoleActionsEvent $e) {
             $e->actions['digital-products'] = [
-                'action' => function(): int {
+                'action' => function (): int {
                     /** @var ResaveController $controller */
                     $controller = Craft::$app->controller;
                     $query = Product::find();
@@ -239,7 +239,7 @@ class Plugin extends BasePlugin
         Event::on(
             ProjectConfig::class,
             ProjectConfig::EVENT_REBUILD,
-            function(RebuildConfigEvent $event) {
+            function (RebuildConfigEvent $event) {
                 $event->config['digital-products'] = ProjectConfigData::rebuildProjectConfig();
             }
         );
@@ -253,8 +253,7 @@ class Plugin extends BasePlugin
         Event::on(
             Fields::class,
             Fields::EVENT_REGISTER_FIELD_TYPES,
-            function(RegisterComponentTypesEvent $event)
-            {
+            function (RegisterComponentTypesEvent $event) {
                 $event->types[] = Products::class;
             }
         );
@@ -268,7 +267,7 @@ class Plugin extends BasePlugin
         Event::on(
             Purchasables::class,
             Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES,
-            function(RegisterComponentTypesEvent $event) {
+            function (RegisterComponentTypesEvent $event) {
                 $event->types[] = Product::class;
             }
         );
@@ -282,7 +281,7 @@ class Plugin extends BasePlugin
         Event::on(
             UserPermissions::class,
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
-            function(RegisterUserPermissionsEvent $event) {
+            function (RegisterUserPermissionsEvent $event) {
                 $productTypes = $this->getProductTypes()->getAllProductTypes();
 
                 $productTypePermissions = [];
@@ -309,7 +308,7 @@ class Plugin extends BasePlugin
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function(Event $event) {
+            function (Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('digitalProducts', DigitalProducts::class);
@@ -325,7 +324,7 @@ class Plugin extends BasePlugin
         Event::on(
             Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
-            function(RegisterComponentTypesEvent $e) {
+            function (RegisterComponentTypesEvent $e) {
                 $e->types[] = Product::class;
                 $e->types[] = License::class;
             }
@@ -340,7 +339,7 @@ class Plugin extends BasePlugin
         Event::on(
             Gql::class,
             Gql::EVENT_REGISTER_GQL_TYPES,
-            function(RegisterGqlTypesEvent $event) {
+            function (RegisterGqlTypesEvent $event) {
                 // Add my GraphQL types
                 $types = $event->types;
                 $types[] = GqlProductInterface::class;
@@ -357,7 +356,7 @@ class Plugin extends BasePlugin
         Event::on(
             Gql::class,
             Gql::EVENT_REGISTER_GQL_QUERIES,
-            function(RegisterGqlQueriesEvent $event) {
+            function (RegisterGqlQueriesEvent $event) {
                 // Add my GraphQL queries
                 $event->queries = array_merge($event->queries, GqlProductQueries::getQueries());
             }
@@ -372,7 +371,7 @@ class Plugin extends BasePlugin
         Event::on(
             Gql::class,
             Gql::EVENT_REGISTER_GQL_PERMISSIONS,
-            function(RegisterGqlPermissionsEvent $event) {
+            function (RegisterGqlPermissionsEvent $event) {
                 $permissions = [];
 
                 $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
