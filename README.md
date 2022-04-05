@@ -102,7 +102,7 @@ Both licenses and products have several eager-loadable properties.
     {% set licenses = craft.digitalProducts
         .licenses
         .owner(currentUser)
-        .with(['products', 'order'])
+        .with(['product', 'order'])
         .all()
     %}
 
