@@ -11,7 +11,7 @@ use yii\db\ActiveQueryInterface;
  *
  * @property int $id            Setting id
  * @property int $productTypeId Product type id
- * @property int $siteId        Site id
+ * @property int|null $siteId        Site id
  * @property string $uriFormat     Uri format
  * @property bool $hasUrls       Do products with this site/type combo have urls?
  * @property string $template      Template to use

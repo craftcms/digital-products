@@ -42,22 +42,22 @@ class LicenseQuery extends ElementQuery
     public $userEmail;
 
     /**
-     * @var int|int[] The user id for the user that the license belongs to.
+     * @var int|int[]|null The user id for the user that the license belongs to.
      */
     public $ownerId;
 
     /**
-     * @var int The product id for the product that is licensed
+     * @var int|int[]|null The product id for the product that is licensed
      */
     public $productId;
 
     /**
-     * @var int|int[] The product type id for the product that is licensed
+     * @var int|int[]|null The product type id for the product that is licensed
      */
     public $typeId;
 
     /**
-     * @var int The license date on the license
+     * @var int|string The license date on the license
      */
     public $licenseDate;
 

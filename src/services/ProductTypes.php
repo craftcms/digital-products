@@ -387,6 +387,7 @@ class ProductTypes extends Component
             $siteIdMap = Db::idsByUids('{{%sites}}', array_keys($siteSettingData));
 
             foreach ($siteSettingData as $siteUid => $siteSettings) {
+                /** @var int $siteId */
                 $siteId = $siteIdMap[$siteUid];
 
                 // Was this already selected?

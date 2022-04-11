@@ -16,7 +16,7 @@ use yii\db\ActiveQueryInterface;
  * @property int $orderId    Order id
  * @property string $licenseKey License key
  * @property string $ownerName  Name of the license owner
- * @property float $ownerEmail Email of the license owner
+ * @property string $ownerEmail Email of the license owner
  * @property int $userId     User id
  * @property Element $element    Element
  * @property Product $product    Product

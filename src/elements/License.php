@@ -74,17 +74,17 @@ class License extends Element
     private $_licensedTo;
 
     /**
-     * @var Product
+     * @var Product|null
      */
     private $_product;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $_user;
 
     /**
-     * @var Order
+     * @var Order|null
      */
     private $_order;
 
@@ -309,7 +309,8 @@ class License extends Element
     }
 
     /**
-     * @inheritdoc
+     * @param string $handle
+     * @param array|Product[]|User[]|Order[] $elements
      */
     public function setEagerLoadedElements(string $handle, array $elements)
     {

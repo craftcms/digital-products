@@ -37,7 +37,7 @@ class Product extends Purchasable
     const STATUS_EXPIRED = 'expired';
 
     /**
-     * @var int ID
+     * @var int|null ID
      */
     public $id;
 
@@ -225,7 +225,8 @@ class Product extends Purchasable
     }
 
     /**
-     * @inheritdoc
+     * @param string $handle
+     * @param array|License[] $elements
      */
     public function setEagerLoadedElements(string $handle, array $elements)
     {
@@ -447,7 +448,9 @@ class Product extends Purchasable
             $userId = Craft::$app->getUser()->getId();
 
             if ($userId) {
-                $this->_existingLicenses = License::find()->ownerId($userId)->all();
+                /** @var License[]|null $existingLicenses */
+                $existingLicenses = License::find()->ownerId($userId)->all();
+                $this->_existingLicenses = $existingLicenses;
             }
         }
 

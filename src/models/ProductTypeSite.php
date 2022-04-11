@@ -37,12 +37,12 @@ class ProductTypeSite extends Model
     public $hasUrls;
 
     /**
-     * @var string URL Format
+     * @var string|null URL Format
      */
     public $uriFormat;
 
     /**
-     * @var string Template Path
+     * @var string|null Template Path
      */
     public $template;
 
