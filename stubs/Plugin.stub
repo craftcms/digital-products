@@ -1,0 +1,15 @@
+<?php
+
+namespace craft\digitalproducts;
+
+class Plugin
+{
+    /**
+     * @return \craft\digitalproducts\models\Settings
+     */
+    public function getSettings();
+}
+
+namespace craft\digitalproducts\models;
+
+class Settings {}

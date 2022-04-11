@@ -15,6 +15,7 @@ use craft\helpers\Localization;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
 use craft\web\Controller as BaseController;
+use craft\web\UrlManager;
 use DateTime;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
@@ -30,7 +31,6 @@ use yii\web\ServerErrorHttpException;
  */
 class ProductsController extends BaseController
 {
-
     /**
      * @inheritdoc
      */
@@ -74,7 +74,7 @@ class ProductsController extends BaseController
         $variables = [
             'productTypeHandle' => $productTypeHandle,
             'productId' => $productId,
-            'product' => $product
+            'product' => $product,
         ];
 
         // Make sure a correct product type handle was passed so we can check permissions
@@ -99,8 +99,10 @@ class ProductsController extends BaseController
 
         $this->_prepareVariableArray($variables);
 
-        if (!empty($variables['product']->id)) {
-            $variables['title'] = $variables['product']->title;
+        /** @var Product $product */
+        $product = $variables['product'];
+        if (!empty($product->id)) {
+            $variables['title'] = $product->title;
         } else {
             $variables['title'] = Craft::t('digital-products', 'Create a new product');
         }
@@ -147,8 +149,10 @@ class ProductsController extends BaseController
             }
 
             Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete product.'));
-            Craft::$app->getUrlManager()->setRouteParams([
-                'product' => $product
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
+                'product' => $product,
             ]);
 
             return null;
@@ -187,8 +191,10 @@ class ProductsController extends BaseController
             }
 
             Craft::$app->getSession()->setError(Craft::t('app', 'Couldn’t save product.'));
-            Craft::$app->getUrlManager()->setRouteParams([
-                'product' => $product
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
+                'product' => $product,
             ]);
 
             return null;
@@ -241,7 +247,7 @@ class ProductsController extends BaseController
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
             'action' => 'digital-products/products/viewSharedProduct',
-            'params' => ['productId' => $productId, 'site' => $product->getSite()]
+            'params' => ['productId' => $productId, 'site' => $product->getSite()],
         ]);
 
         $url = UrlHelper::urlWithToken($product->getUrl(), $token);
@@ -282,7 +288,6 @@ class ProductsController extends BaseController
      */
     private function _showProduct(Product $product): Response
     {
-
         $productType = $product->getType();
 
         if (!$productType) {
@@ -311,7 +316,7 @@ class ProductsController extends BaseController
         $this->getView()->getTwig()->disableStrictVariables();
 
         return $this->renderTemplate($siteSettings[$product->siteId]->template, [
-            'product' => $product
+            'product' => $product,
         ]);
     }
 
@@ -405,7 +410,7 @@ class ProductsController extends BaseController
             $variables['tabs'][] = [
                 'label' => Craft::t('commerce', $tab->name),
                 'url' => '#tab' . ($index + 1),
-                'class' => $hasErrors ? 'error' : null
+                'class' => $hasErrors ? 'error' : null,
             ];
         }
     }
@@ -430,7 +435,7 @@ class ProductsController extends BaseController
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,
                         'siteId' => $variables['product']->siteId,
-                    ]
+                    ],
                 ]) . ');');
 
             $variables['showPreviewBtn'] = true;
@@ -443,7 +448,7 @@ class ProductsController extends BaseController
                 } else {
                     $variables['shareUrl'] = UrlHelper::actionUrl('digital-products/products/share-product', [
                         'productId' => $variables['product']->id,
-                        'siteId' => $variables['product']->siteId
+                        'siteId' => $variables['product']->siteId,
                     ]);
                 }
             }
@@ -465,6 +470,7 @@ class ProductsController extends BaseController
         $site = $request->getParam('siteId');
 
         if ($productId) {
+            /** @var Product $product */
             $product = Craft::$app->getElements()->getElementById($productId, Product::class, $site);
 
             if (!$product) {

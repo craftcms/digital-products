@@ -156,7 +156,7 @@ class LicenseQuery extends ElementQuery
     {
         if ($value instanceof User) {
             $this->ownerId = $value->id;
-        } else if ($value !== null) {
+        } elseif ($value !== null) {
             $this->ownerId = (new Query())
                 ->select(['id'])
                 ->from(['{{%users}}'])
@@ -179,7 +179,7 @@ class LicenseQuery extends ElementQuery
     {
         if ($value instanceof Product) {
             $this->productId = $value->id;
-        } else if ($value !== null) {
+        } elseif ($value !== null) {
             $this->productId = (new Query())
                 ->select(['id'])
                 ->from(['{{%digitalproducts_products}}'])
@@ -202,7 +202,7 @@ class LicenseQuery extends ElementQuery
     {
         if ($value instanceof ProductType) {
             $this->typeId = $value->id;
-        } else if ($value !== null) {
+        } elseif ($value !== null) {
             $this->typeId = (new Query())
                 ->select(['id'])
                 ->from(['{{%digitalproducts_producttypes}}'])
@@ -398,11 +398,11 @@ class LicenseQuery extends ElementQuery
         switch ($status) {
             case License::STATUS_ENABLED:
                 return [
-                    'elements.enabled' => '1'
+                    'elements.enabled' => '1',
                 ];
             case License::STATUS_DISABLED:
                 return [
-                    'elements.disabled' => '1'
+                    'elements.disabled' => '1',
                 ];
             default:
                 return parent::statusCondition($status);

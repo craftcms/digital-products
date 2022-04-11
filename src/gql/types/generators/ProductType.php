@@ -8,6 +8,7 @@
 namespace craft\digitalproducts\gql\types\generators;
 
 use craft\base\Field;
+use craft\behaviors\FieldLayoutBehavior;
 use craft\digitalproducts\elements\Product as ProductElement;
 use craft\digitalproducts\gql\interfaces\elements\Product as ProductInterface;
 use craft\digitalproducts\gql\types\elements\Product as ProductTypeElement;
@@ -34,7 +35,7 @@ class ProductType implements GeneratorInterface
         $gqlTypes = [];
 
         foreach ($productTypes as $productType) {
-            /** @var ProductType $productType */
+            /** @var ProductType|FieldLayoutBehavior $productType */
             $typeName = ProductElement::gqlTypeNameByContext($productType);
             $requiredContexts = ProductElement::gqlScopesByContext($productType);
 
@@ -57,7 +58,7 @@ class ProductType implements GeneratorInterface
                 'name' => $typeName,
                 'fields' => function() use ($productTypeFields) {
                     return $productTypeFields;
-                }
+                },
             ]));
         }
 

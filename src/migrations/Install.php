@@ -112,19 +112,19 @@ class Install extends Migration
      */
     protected function createIndexes()
     {
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_licenses}}', 'licenseKey', true), '{{%digitalproducts_licenses}}', 'licenseKey', true);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_licenses}}', 'orderId', false), '{{%digitalproducts_licenses}}', 'orderId', false);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_licenses}}', 'productId', false), '{{%digitalproducts_licenses}}', 'productId', false);
+        $this->createIndex(null, '{{%digitalproducts_licenses}}', 'licenseKey', true);
+        $this->createIndex(null, '{{%digitalproducts_licenses}}', 'orderId', false);
+        $this->createIndex(null, '{{%digitalproducts_licenses}}', 'productId', false);
 
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_products}}', 'sku', true), '{{%digitalproducts_products}}', 'sku', true);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_products}}', 'typeId', false), '{{%digitalproducts_products}}', 'typeId', false);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_products}}', 'taxCategoryId', false), '{{%digitalproducts_products}}', 'taxCategoryId', false);
+        $this->createIndex(null, '{{%digitalproducts_products}}', 'sku', true);
+        $this->createIndex(null, '{{%digitalproducts_products}}', 'typeId', false);
+        $this->createIndex(null, '{{%digitalproducts_products}}', 'taxCategoryId', false);
 
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_producttypes}}', 'handle', true), '{{%digitalproducts_producttypes}}', 'handle', true);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_producttypes}}', 'fieldLayoutId', false), '{{%digitalproducts_producttypes}}', 'fieldLayoutId', false);
+        $this->createIndex(null, '{{%digitalproducts_producttypes}}', 'handle', true);
+        $this->createIndex(null, '{{%digitalproducts_producttypes}}', 'fieldLayoutId', false);
 
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_producttypes_sites}}', ['productTypeId', 'siteId'], true), '{{%digitalproducts_producttypes_sites}}', ['productTypeId', 'siteId'], true);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_producttypes_sites}}', 'siteId', false), '{{%digitalproducts_producttypes_sites}}', 'siteId', false);
+        $this->createIndex(null, '{{%digitalproducts_producttypes_sites}}', ['productTypeId', 'siteId'], true);
+        $this->createIndex(null, '{{%digitalproducts_producttypes_sites}}', 'siteId', false);
     }
 
     /**
@@ -132,19 +132,19 @@ class Install extends Migration
      */
     protected function addForeignKeys()
     {
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'id'), '{{%digitalproducts_licenses}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'orderId'), '{{%digitalproducts_licenses}}', 'orderId', '{{%commerce_orders}}', 'id', 'SET NULL', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'productId'), '{{%digitalproducts_licenses}}', 'productId', '{{%digitalproducts_products}}', 'id', 'RESTRICT', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'userId'), '{{%digitalproducts_licenses}}', 'userId', '{{%users}}', 'id', 'SET NULL', null);
+        $this->addForeignKey(null, '{{%digitalproducts_licenses}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%digitalproducts_licenses}}', 'orderId', '{{%commerce_orders}}', 'id', 'SET NULL', null);
+        $this->addForeignKey(null, '{{%digitalproducts_licenses}}', 'productId', '{{%digitalproducts_products}}', 'id', 'RESTRICT', null);
+        $this->addForeignKey(null, '{{%digitalproducts_licenses}}', 'userId', '{{%users}}', 'id', 'SET NULL', null);
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_products}}', 'id'), '{{%digitalproducts_products}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_products}}', 'taxCategoryId'), '{{%digitalproducts_products}}', 'taxCategoryId', '{{%commerce_taxcategories}}', 'id', 'RESTRICT', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_products}}', 'typeId'), '{{%digitalproducts_products}}', 'typeId', '{{%digitalproducts_producttypes}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%digitalproducts_products}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%digitalproducts_products}}', 'taxCategoryId', '{{%commerce_taxcategories}}', 'id', 'RESTRICT', null);
+        $this->addForeignKey(null, '{{%digitalproducts_products}}', 'typeId', '{{%digitalproducts_producttypes}}', 'id', 'CASCADE', null);
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_producttypes}}', 'fieldLayoutId'), '{{%digitalproducts_producttypes}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'SET NULL', null);
+        $this->addForeignKey(null, '{{%digitalproducts_producttypes}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'SET NULL', null);
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_producttypes_sites}}', 'siteId'), '{{%digitalproducts_producttypes_sites}}', 'siteId', '{{%sites}}', 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_producttypes_sites}}', 'productTypeId'), '{{%digitalproducts_producttypes_sites}}', 'productTypeId', '{{%digitalproducts_producttypes}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%digitalproducts_producttypes_sites}}', 'siteId', '{{%sites}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, '{{%digitalproducts_producttypes_sites}}', 'productTypeId', '{{%digitalproducts_producttypes}}', 'id', 'CASCADE', null);
     }
 
     /**

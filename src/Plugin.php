@@ -40,6 +40,8 @@ use yii\base\Event;
  *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
+ *
+ * @method Settings getSettings()
  */
 class Plugin extends BasePlugin
 {
@@ -91,28 +93,28 @@ class Plugin extends BasePlugin
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
             $navItems['subnav']['products'] = [
                 'label' => Craft::t('digital-products', 'Products'),
-                'url' => 'digital-products/products'
+                'url' => 'digital-products/products',
             ];
         }
 
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductTypes')) {
             $navItems['subnav']['productTypes'] = [
                 'label' => Craft::t('digital-products', 'Product Types'),
-                'url' => 'digital-products/producttypes'
+                'url' => 'digital-products/producttypes',
             ];
         }
 
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageLicenses')) {
             $navItems['subnav']['licenses'] = [
                 'label' => Craft::t('digital-products', 'Licenses'),
-                'url' => 'digital-products/licenses'
+                'url' => 'digital-products/licenses',
             ];
         }
 
         if (Craft::$app->getUser()->getIsAdmin()) {
             $navItems['subnav']['settings'] = [
                 'label' => Craft::t('digital-products', 'Settings'),
-                'url' => 'digital-products/settings'
+                'url' => 'digital-products/settings',
             ];
         }
 
@@ -213,8 +215,7 @@ class Plugin extends BasePlugin
         Event::on(
             Fields::class,
             Fields::EVENT_REGISTER_FIELD_TYPES,
-            function(RegisterComponentTypesEvent $event)
-            {
+            function(RegisterComponentTypesEvent $event) {
                 $event->types[] = Products::class;
             }
         );

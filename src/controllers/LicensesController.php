@@ -7,6 +7,7 @@ use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\elements\User;
 use craft\web\Controller as BaseController;
+use craft\web\UrlManager;
 use yii\base\Exception;
 use yii\web\Response;
 
@@ -41,6 +42,7 @@ class LicensesController extends BaseController
             if ($licenseId === null) {
                 $license = new License();
             } else {
+                /** @var License|null $license */
                 $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
                 if (!$license) {
@@ -49,7 +51,7 @@ class LicensesController extends BaseController
             }
         }
 
-        $variables['title'] = $license->id ? (string)$license : Craft::t('digital-products', 'Create a new License');
+        $variables['title'] = $license->id ? $license->__toString() : Craft::t('digital-products', 'Create a new License');
         $variables['license'] = $license;
         $variables['userElementType'] = User::class;
         $variables['productElementType'] = Product::class;
@@ -101,7 +103,9 @@ class LicensesController extends BaseController
         // Save it
         if (!Craft::$app->getElements()->saveElement($license)) {
             Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t save license.'));
-            Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams(['license' => $license]);
 
             return null;
         }
@@ -142,7 +146,10 @@ class LicensesController extends BaseController
         }
 
         Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete license.'));
-        Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
+
+        /** @var UrlManager $urlManager */
+        $urlManager = Craft::$app->getUrlManager();
+        $urlManager->setRouteParams(['license' => $license]);
 
         return null;
     }

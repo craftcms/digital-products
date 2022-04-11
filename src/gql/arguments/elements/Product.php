@@ -32,7 +32,7 @@ class Product extends ElementArguments
             'sku' => [
                 'name' => 'sku',
                 'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Narrows the query results based on the SKU of the digital product.'
+                'description' => 'Narrows the query results based on the SKU of the digital product.',
             ],
             'before' => [
                 'name' => 'before',
@@ -47,12 +47,12 @@ class Product extends ElementArguments
             'type' => [
                 'name' => 'type',
                 'type' => Type::listOf(Type::string()),
-                'description' => 'Narrows the query results based on the product type the products belong to per the product type’s handles.'
+                'description' => 'Narrows the query results based on the product type the products belong to per the product type’s handles.',
             ],
             'typeId' => [
                 'name' => 'typeId',
                 'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Narrows the query results based on the product types the products belong to, per the product type IDs.'
+                'description' => 'Narrows the query results based on the product types the products belong to, per the product type IDs.',
             ],
         ]);
     }

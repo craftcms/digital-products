@@ -178,7 +178,7 @@ class ProductQuery extends ElementQuery
     {
         if ($value instanceof ProductType) {
             $this->typeId = $value->id;
-        } else if ($value !== null) {
+        } elseif ($value !== null) {
             $this->typeId = (new Query())
                 ->select(['id'])
                 ->from(['{{%digitalproducts_producttypes}}'])
@@ -226,7 +226,7 @@ class ProductQuery extends ElementQuery
             'digitalproducts_products.promotable',
             'digitalproducts_products.sku',
             'digitalproducts_products.taxCategoryId',
-            'digitalproducts_products.typeId'
+            'digitalproducts_products.typeId',
         ]);
 
         if ($this->expiryDate) {
@@ -263,14 +263,14 @@ class ProductQuery extends ElementQuery
                     'and',
                     [
                         'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1'
+                        'elements_sites.enabled' => '1',
                     ],
                     ['<=', 'digitalproducts_products.postDate', $currentTimeDb],
                     [
                         'or',
                         ['digitalproducts_products.expiryDate' => null],
-                        ['>', 'digitalproducts_products.expiryDate', $currentTimeDb]
-                    ]
+                        ['>', 'digitalproducts_products.expiryDate', $currentTimeDb],
+                    ],
                 ];
             case Product::STATUS_PENDING:
                 return [
@@ -279,17 +279,17 @@ class ProductQuery extends ElementQuery
                         'elements.enabled' => '1',
                         'elements_sites.enabled' => '1',
                     ],
-                    ['>', 'digitalproducts_products.postDate', $currentTimeDb]
+                    ['>', 'digitalproducts_products.postDate', $currentTimeDb],
                 ];
             case Product::STATUS_EXPIRED:
                 return [
                     'and',
                     [
                         'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1'
+                        'elements_sites.enabled' => '1',
                     ],
                     ['not', ['digitalproducts_products.expiryDate' => null]],
-                    ['<=', 'digitalproducts_products.expiryDate', $currentTimeDb]
+                    ['<=', 'digitalproducts_products.expiryDate', $currentTimeDb],
                 ];
             default:
                 return parent::statusCondition($status);
@@ -316,7 +316,7 @@ class ProductQuery extends ElementQuery
 
         // Limit the query to only the sections the user has permission to edit
         $this->subQuery->andWhere([
-            'digitalproducts_products.typeId' => DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypeIds()
+            'digitalproducts_products.typeId' => DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypeIds(),
         ]);
     }
 }

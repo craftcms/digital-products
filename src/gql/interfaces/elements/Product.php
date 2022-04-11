@@ -46,7 +46,7 @@ class Product extends Element
             'description' => 'This is the interface implemented by all digital products.',
             'resolveType' => function(ProductElement $value) {
                 return $value->getGqlTypeName();
-            }
+            },
         ]));
 
         ProductType::generateTypes();
@@ -71,22 +71,22 @@ class Product extends Element
             'price' => [
                 'name' => 'price',
                 'type' => Type::float(),
-                'description' => 'The price of the digital product.'
+                'description' => 'The price of the digital product.',
             ],
             'sku' => [
                 'name' => 'sku',
                 'type' => Type::string(),
-                'description' => 'The sku of the digital product.'
+                'description' => 'The sku of the digital product.',
             ],
             'productTypeId' => [
                 'name' => 'productTypeId',
                 'type' => Type::int(),
-                'description' => 'The ID of the product type that contains the digital product.'
+                'description' => 'The ID of the product type that contains the digital product.',
             ],
             'productTypeHandle' => [
                 'name' => 'productTypeHandle',
                 'type' => Type::string(),
-                'description' => 'The handle of the product type that contains the digital product.'
+                'description' => 'The handle of the product type that contains the digital product.',
             ],
         ]), self::getName());
     }

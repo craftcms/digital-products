@@ -25,15 +25,15 @@ class m171129_154500_craft3_upgrade extends Migration
         // =====================================================================
 
         $this->update('{{%elements}}', [
-            'type' => Product::class
+            'type' => Product::class,
         ], ['type' => 'DigitalProducts_Product']);
 
         $this->update('{{%elements}}', [
-            'type' => License::class
+            'type' => License::class,
         ], ['type' => 'DigitalProducts_License']);
 
         $this->update('{{%fields}}', [
-            'type' => Products::class
+            'type' => Products::class,
         ], ['type' => 'DigitalProducts_Products']);
 
         // Update field settings
@@ -42,8 +42,8 @@ class m171129_154500_craft3_upgrade extends Migration
             ->from(['{{%fields}}'])
             ->where([
                 'type' => [
-                    Products::class
-                ]
+                    Products::class,
+                ],
             ])
             ->all($this->db);
 
@@ -119,17 +119,17 @@ class m171129_154500_craft3_upgrade extends Migration
         MigrationHelper::renameColumn('{{%digitalproducts_producttypes_i18n}}', 'locale__siteId', 'siteId', $this);
 
         // And then just recreate them.
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_producttypes_i18n}}', 'productTypeId,siteId', true), '{{%digitalproducts_producttypes_i18n}}', 'productTypeId,siteId', true);
-        $this->createIndex($this->db->getIndexName('{{%digitalproducts_producttypes_i18n}}', 'siteId', false), '{{%digitalproducts_producttypes_i18n}}', 'siteId', false);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_producttypes_i18n}}', 'siteId'), '{{%digitalproducts_producttypes_i18n}}', 'siteId', '{{%sites}}', 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_producttypes_i18n}}', 'productTypeId'), '{{%digitalproducts_producttypes_i18n}}', 'productTypeId', '{{%digitalproducts_producttypes}}', 'id', 'CASCADE', null);
+        $this->createIndex(null, '{{%digitalproducts_producttypes_i18n}}', 'productTypeId,siteId', true);
+        $this->createIndex(null, '{{%digitalproducts_producttypes_i18n}}', 'siteId', false);
+        $this->addForeignKey(null, '{{%digitalproducts_producttypes_i18n}}', 'siteId', '{{%sites}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, '{{%digitalproducts_producttypes_i18n}}', 'productTypeId', '{{%digitalproducts_producttypes}}', 'id', 'CASCADE', null);
 
         // Rename the locale table and some columns
         MigrationHelper::renameTable('{{%digitalproducts_producttypes_i18n}}', '{{%digitalproducts_producttypes_sites}}', $this);
 
         // Add some new foreign keys
         // =====================================================================
-        $this->addForeignKey($this->db->getForeignKeyName('{{%digitalproducts_licenses}}', 'userId'), '{{%digitalproducts_licenses}}', 'userId', '{{%users}}', 'id', 'SET NULL', 'NO ACTION');
+        $this->addForeignKey(null, '{{%digitalproducts_licenses}}', 'userId', '{{%users}}', 'id', 'SET NULL', 'NO ACTION');
 
         // Now populate the email field for all user licenses
         // =====================================================================

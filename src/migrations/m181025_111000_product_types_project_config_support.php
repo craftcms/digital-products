@@ -73,7 +73,7 @@ class m181025_111000_product_types_project_config_support extends Migration
                 'handle' => $typeRow['handle'],
                 'skuFormat' => $typeRow['skuFormat'],
                 'siteSettings' => $typeSiteData[$typeRow['uid']],
-                'fieldLayouts' => [$layoutUid => $layout]
+                'fieldLayouts' => [$layoutUid => $layout],
             ];
         }
 

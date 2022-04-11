@@ -22,5 +22,4 @@ class GenerateKeyEvent extends Event
      * @var string License key to use
      */
     public $licenseKey;
-
 }

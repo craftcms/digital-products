@@ -236,8 +236,8 @@ class License extends Element
             '*' => [
                 'label' => Craft::t('digital-products', 'All product types'),
                 'criteria' => ['typeId' => $productTypeIds],
-                'defaultSort' => ['dateCreated', 'desc']
-            ]
+                'defaultSort' => ['dateCreated', 'desc'],
+            ],
         ];
 
         $sources[] = ['heading' => Craft::t('digital-products', 'Product Types')];
@@ -249,9 +249,9 @@ class License extends Element
                 'key' => $key,
                 'label' => $productType->name,
                 'data' => [
-                    'handle' => $productType->handle
+                    'handle' => $productType->handle,
                 ],
-                'criteria' => ['typeId' => $productType->id]
+                'criteria' => ['typeId' => $productType->id],
             ];
         }
 
@@ -274,7 +274,7 @@ class License extends Element
 
             return [
                 'elementType' => Product::class,
-                'map' => $map
+                'map' => $map,
             ];
         }
 
@@ -287,7 +287,7 @@ class License extends Element
 
             return [
                 'elementType' => Order::class,
-                'map' => $map
+                'map' => $map,
             ];
         }
 
@@ -301,7 +301,7 @@ class License extends Element
 
             return [
                 'elementType' => User::class,
-                'map' => $map
+                'map' => $map,
             ];
         }
 
@@ -345,7 +345,7 @@ class License extends Element
             'message' => Craft::t('digital-products', 'A license must have either an email or an owner assigned to it.'),
             'when' => function($model) {
                 return empty($model->ownerEmail);
-            }
+            },
         ];
 
         return $rules;
@@ -439,7 +439,7 @@ class License extends Element
             'productType' => ['label' => Craft::t('digital-products', 'Product Type')],
             'dateCreated' => ['label' => Craft::t('digital-products', 'License Issue Date')],
             'licensedTo' => ['label' => Craft::t('digital-products', 'Licensed To')],
-            'orderLink' => ['label' => Craft::t('digital-products', 'Associated Order')]
+            'orderLink' => ['label' => Craft::t('digital-products', 'Associated Order')],
         ];
     }
 

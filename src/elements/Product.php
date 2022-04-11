@@ -168,10 +168,10 @@ class Product extends Purchasable
                 'label' => Craft::t('digital-products', 'All products'),
                 'criteria' => [
                     'typeId' => $productTypeIds,
-                    'editable' => $editable
+                    'editable' => $editable,
                 ],
-                'defaultSort' => ['postDate', 'desc']
-            ]
+                'defaultSort' => ['postDate', 'desc'],
+            ],
         ];
 
         $sources[] = ['heading' => Craft::t('digital-products', 'Product Types')];
@@ -185,9 +185,9 @@ class Product extends Purchasable
                 'label' => $productType->name,
                 'data' => [
                     'handle' => $productType->handle,
-                    'editable' => $canEditProducts
+                    'editable' => $canEditProducts,
                 ],
-                'criteria' => ['typeId' => $productType->id, 'editable' => $editable]
+                'criteria' => ['typeId' => $productType->id, 'editable' => $editable],
             ];
         }
 
@@ -203,7 +203,7 @@ class Product extends Purchasable
             self::STATUS_LIVE => Craft::t('digital-products', 'Live'),
             self::STATUS_PENDING => Craft::t('digital-products', 'Pending'),
             self::STATUS_EXPIRED => Craft::t('digital-products', 'Expired'),
-            self::STATUS_DISABLED => Craft::t('digital-products', 'Disabled')
+            self::STATUS_DISABLED => Craft::t('digital-products', 'Disabled'),
         ];
     }
 
@@ -258,7 +258,7 @@ class Product extends Purchasable
 
                 return [
                     'elementType' => License::class,
-                    'map' => $map
+                    'map' => $map,
                 ];
             }
         }
@@ -613,8 +613,8 @@ class Product extends Purchasable
                 'template' => (string)$productTypeSiteSettings[$siteId]->template,
                 'variables' => [
                     'product' => $this,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -676,7 +676,7 @@ class Product extends Purchasable
 
                 return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
 
-            case 'defaultPrice':
+            case 'price':
                 $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
 
                 return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
@@ -721,13 +721,13 @@ class Product extends Purchasable
         // Get the section(s) we need to check permissions on
         if ($source == '*') {
             $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
-        } else if (preg_match('/^productType:(\d+)$/', $source, $matches)) {
+        } elseif (preg_match('/^productType:(\d+)$/', $source, $matches)) {
             $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($matches[1]);
 
             if ($productType) {
                 $productTypes = [$productType];
             }
-        } else if (preg_match('/^productType:(.+)$/', $source, $matches)) {
+        } elseif (preg_match('/^productType:(.+)$/', $source, $matches)) {
             $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeByUid($matches[1]);
 
             if ($productType) {

@@ -76,7 +76,7 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                     foreach ($productTypePermissions as $permission) {
                         $this->insert(Table::USERPERMISSIONS_USERGROUPS, [
                             'permissionId' => $permissionIdsByName[$permission],
-                            'groupId' => Db::idByUid(Table::USERGROUPS, $groupUid)
+                            'groupId' => Db::idByUid(Table::USERGROUPS, $groupUid),
                         ]);
                     }
                 }
@@ -93,7 +93,7 @@ class m190425_152400_fix_product_edit_permissions extends Migration
                         ->innerJoin(Table::USERPERMISSIONS . ' AS editProduct', [
                             'and',
                             '[[editProduct.id]] = [[editProductPermissions.permissionId]]',
-                            ['editProduct.name' => 'digitalproducts-manageproducts']
+                            ['editProduct.name' => 'digitalproducts-manageproducts'],
                         ])
                         ->column();
 
