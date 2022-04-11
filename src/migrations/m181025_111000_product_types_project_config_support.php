@@ -140,6 +140,7 @@ class m181025_111000_product_types_project_config_support extends Migration
         foreach ($fieldRows as $fieldRow) {
             $layout = &$fieldLayouts[$fieldRow['layoutId']];
 
+            /** @phpstan-ignore-next-line */
             if (empty($layout['tabs'][$fieldRow['tabUid']])) {
                 $layout['tabs'][$fieldRow['tabUid']] =
                     [

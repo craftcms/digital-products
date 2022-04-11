@@ -72,6 +72,7 @@ class Licenses extends Component
             return;
         }
 
+        /** @var Order|null $order */
         $order = $event->order;
 
         if (!$order) {

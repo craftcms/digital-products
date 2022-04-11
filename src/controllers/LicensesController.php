@@ -74,7 +74,7 @@ class LicensesController extends BaseController
         $licenseId = $request->getBodyParam('licenseId');
 
         if ($licenseId) {
-            /** @var License $license */
+            /** @var License|null $license */
             $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
             if (!$license) {
@@ -125,7 +125,7 @@ class LicensesController extends BaseController
         $this->requirePostRequest();
 
         $licenseId = Craft::$app->getRequest()->getRequiredBodyParam('licenseId');
-        /** @var License $license */
+        /** @var License|null $license */
         $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
         if (!$license) {

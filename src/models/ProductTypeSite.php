@@ -57,7 +57,7 @@ class ProductTypeSite extends Model
     public $uriFormatIsRequired = true;
 
     /**
-     * @var Site
+     * @var Site|null
      */
     private $_site = null;
 

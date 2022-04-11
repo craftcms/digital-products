@@ -231,7 +231,7 @@ class ProductsController extends BaseController
      */
     public function actionShareProduct(int $productId, int $siteId = null): Response
     {
-        /** @var Product $product */
+        /** @var Product|null $product */
         $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
         if (!$product) {
@@ -268,7 +268,7 @@ class ProductsController extends BaseController
     {
         $this->requireToken();
 
-        /** @var Product $product */
+        /** @var Product|null $product */
         $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
         if (!$product) {
@@ -470,7 +470,7 @@ class ProductsController extends BaseController
         $site = $request->getParam('siteId');
 
         if ($productId) {
-            /** @var Product $product */
+            /** @var Product|null $product */
             $product = Craft::$app->getElements()->getElementById($productId, Product::class, $site);
 
             if (!$product) {

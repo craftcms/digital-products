@@ -52,12 +52,12 @@ class Product extends Purchasable
     public $taxCategoryId;
 
     /**
-     * @var DateTime Post date
+     * @var DateTime|null Post date
      */
     public $postDate;
 
     /**
-     * @var DateTime Expiry date
+     * @var DateTime|null Expiry date
      */
     public $expiryDate;
 
@@ -77,9 +77,9 @@ class Product extends Purchasable
     public $price;
 
     /**
-     * @var ProductType
+     * @var ProductType|null
      */
-    private $_productType;
+    private $_productType = null;
 
     /**
      * @var License[]
@@ -387,6 +387,10 @@ class Product extends Purchasable
     {
         $productType = $this->getType();
 
+        if ($productType === null) {
+            return null;
+        }
+
         $siteId = $this->siteId ?: Craft::$app->getSites()->currentSite->id;
 
         if (isset($productType->siteSettings[$siteId]) && $productType->siteSettings[$siteId]->hasUrls) {
@@ -411,15 +415,15 @@ class Product extends Purchasable
     /**
      * Returns the product's product type model.
      *
-     * @return ProductType
+     * @return ProductType|null
      */
     public function getType()
     {
-        if ($this->_productType) {
-            return $this->_productType;
+        if ($this->_productType === null && $this->typeId) {
+            $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
         }
 
-        return $this->typeId ? $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId) : null;
+        return $this->_productType;
     }
 
     /**

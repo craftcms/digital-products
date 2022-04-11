@@ -149,7 +149,7 @@ class LicenseQuery extends ElementQuery
     /**
      * Sets the [[productId]] property based on a given product or the sku.
      *
-     * @param User $value
+     * @param User|string|null $value
      * @return static self reference
      */
     public function owner($value)
@@ -172,7 +172,7 @@ class LicenseQuery extends ElementQuery
     /**
      * Sets the [[productId]] property based on a given product or the sku.
      *
-     * @param Product $value
+     * @param Product|string|null $value
      * @return static self reference
      */
     public function product($value)
@@ -195,7 +195,7 @@ class LicenseQuery extends ElementQuery
     /**
      * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
      *
-     * @param string|string[]|ProductType $value The property value
+     * @param string|string[]|ProductType|null $value The property value
      * @return static self reference
      */
     public function type($value)
