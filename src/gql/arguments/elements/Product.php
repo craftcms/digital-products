@@ -8,7 +8,9 @@
 namespace craft\digitalproducts\gql\arguments\elements;
 
 use Craft;
+use craft\behaviors\FieldLayoutBehavior;
 use craft\digitalproducts\elements\Product as ProductElement;
+use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin;
 use craft\gql\base\ElementArguments;
 use craft\gql\types\DateTime;
@@ -62,7 +64,9 @@ class Product extends ElementArguments
      */
     public static function getContentArguments(): array
     {
-        $productTypeFieldArguments = Craft::$app->getGql()->getContentArguments(Plugin::getInstance()->getProductTypes()->getAllProductTypes(), ProductElement::class);
+        /** @var ProductType[]|FieldLayoutBehavior[] $productTypes */
+        $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
+        $productTypeFieldArguments = Craft::$app->getGql()->getContentArguments($productTypes, ProductElement::class);
 
         return array_merge(parent::getContentArguments(), $productTypeFieldArguments);
     }

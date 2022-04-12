@@ -71,6 +71,7 @@ class LicensesController extends BaseController
 
         $request = Craft::$app->getRequest();
 
+        /** @var int|string $licenseId */
         $licenseId = $request->getBodyParam('licenseId');
 
         if ($licenseId) {
@@ -78,7 +79,7 @@ class LicensesController extends BaseController
             $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
             if (!$license) {
-                throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
+                throw new Exception(Craft::t('digital-products','No license with the ID “{id}”', ['id' => $licenseId]));
             }
         } else {
             $license = new License();
@@ -124,12 +125,13 @@ class LicensesController extends BaseController
     {
         $this->requirePostRequest();
 
+        /** @var int|string $licenseId */
         $licenseId = Craft::$app->getRequest()->getRequiredBodyParam('licenseId');
         /** @var License|null $license */
         $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
         if (!$license) {
-            throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
+            throw new Exception(Craft::t('digital-products','No license with the ID “{id}”', ['id' => $licenseId]));
         }
 
         if (Craft::$app->getElements()->deleteElement($license)) {
