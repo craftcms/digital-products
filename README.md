@@ -102,7 +102,8 @@ Both licenses and products have several eager-loadable properties.
     {% set licenses = craft.digitalProducts
         .licenses
         .owner(currentUser)
-        .with(['products', 'order']) 
+        .with(['product', 'order'])
+        .all()
     %}
 
     <div class="panel panel-default">
@@ -146,7 +147,8 @@ Both licenses and products have several eager-loadable properties.
 {% set products = craft.digitalProducts
     .products
     .type('onlineCourses')
-    .with(['existingLicenses']) 
+    .with(['existingLicenses'])
+    .all()
 %}
 
 {% if products|length %}
