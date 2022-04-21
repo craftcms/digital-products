@@ -28,7 +28,7 @@ jobs:
     uses: craftcms/.github/.github/workflows/notify-slack.yml@v2
     with:
       success: ${{ needs.ecs.result == 'success' && needs.phpstan.result == 'success' }}
-      success: ${{ needs.ecs.result == 'failure' || needs.phpstan.result == 'failure' }}
+      failure: ${{ needs.ecs.result == 'failure' || needs.phpstan.result == 'failure' }}
       failure_text_prefix: <!subteam^S01CWPYH9D5>
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
