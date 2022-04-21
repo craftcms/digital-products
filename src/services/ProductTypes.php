@@ -34,12 +34,12 @@ class ProductTypes extends Component
     /**
      * @event ProductTypeEvent The event that is triggered before a category group is saved.
      */
-    const EVENT_BEFORE_SAVE_PRODUCTTYPE = 'beforeSaveProductType';
+    public const EVENT_BEFORE_SAVE_PRODUCTTYPE = 'beforeSaveProductType';
 
     /**
      * @event ProductTypeEvent The event that is triggered after a product type is saved.
      */
-    const EVENT_AFTER_SAVE_PRODUCTTYPE = 'afterSaveProductType';
+    public const EVENT_AFTER_SAVE_PRODUCTTYPE = 'afterSaveProductType';
 
     /**
      * @var bool
@@ -71,7 +71,7 @@ class ProductTypes extends Component
      */
     private $_siteSettingsByProductId = [];
 
-    const CONFIG_PRODUCTTYPES_KEY = 'digital-products.productTypes';
+    public const CONFIG_PRODUCTTYPES_KEY = 'digital-products.productTypes';
 
     /**
      * Returns all editable product types.

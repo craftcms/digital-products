@@ -31,7 +31,7 @@ class License extends Element
     /**
      * @event GenerateKeyEvent The event that is triggered after a payment request is being built
      */
-    const EVENT_GENERATE_LICENSE_KEY = 'beforeGenerateLicenseKey';
+    public const EVENT_GENERATE_LICENSE_KEY = 'beforeGenerateLicenseKey';
 
     /**
      * @var int ID
