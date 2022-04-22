@@ -1,5 +1,6 @@
 name: ci
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -9,8 +10,8 @@ on:
       - develop
       - 'testing-workflow'
 jobs:
-  workflow:
-    name: Workflow
-    uses: craftcms/.github/.github/workflows/plugins.yml@5a832ef04a107ef53d3837d5f2e7d96656f63d54
+  ci:
+    name: CI
+    uses: craftcms/.github/.github/workflows/plugins.yml@plugins
     with:
       craft_version: '3'
