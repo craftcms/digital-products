@@ -11,6 +11,6 @@ on:
 jobs:
   workflow:
     name: Workflow
-    uses: craftcms/.github/.github/workflows/plugins.yml@plugins-workflow
+    uses: craftcms/.github/.github/workflows/plugins.yml@pluginsworkflow
     with:
       craft_version: '3'
