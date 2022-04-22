@@ -9,8 +9,8 @@ on:
       - develop
       - 'testing-workflow'
 jobs:
-  ecs:
-    name: ECS
-    uses: craftcms/.github/.github/workflows/ecs.yml@plugins-workflow
+  workflow:
+    name: Workflow
+    uses: craftcms/.github/.github/workflows/plugins.yml@plugins-workflow
     with:
       craft_version: '3'
