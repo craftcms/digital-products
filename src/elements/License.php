@@ -34,64 +34,64 @@ class License extends Element
     public const EVENT_GENERATE_LICENSE_KEY = 'beforeGenerateLicenseKey';
 
     /**
-     * @var int ID
+     * @var int|null ID
      */
-    public $id;
+    public ?int $id  = null;
 
     /**
      * @var int|null Product id
      */
-    public $productId;
+    public ?int $productId = null;
 
     /**
      * @var int|null Order id
      */
-    public $orderId;
+    public ?int $orderId = null;
 
     /**
-     * @var string the license key
+     * @var string|null the license key
      */
-    public $licenseKey;
+    public ?string $licenseKey = null;
 
     /**
      * @var string|null License owner name
      */
-    public $ownerName;
+    public ?string $ownerName = null;
 
     /**
      * @var string|null License owner email
      */
-    public $ownerEmail;
+    public ?string $ownerEmail = null;
 
     /**
      * @var int|null License owner user id
      */
-    public $userId;
+    public ?int $userId = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $_licensedTo;
+    private ?string $_licensedTo = null;
 
     /**
      * @var Product|null
      */
-    private $_product;
+    private ?Product $_product = null;
 
     /**
      * @var User|null
      */
-    private $_user;
+    private ?User $_user = null;
 
     /**
      * @var Order|null
      */
-    private $_order;
+    private ?Order $_order = null;
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return Craft::t('digital-products', 'License for “{product}”', ['product' => $this->getProductName()]);
     }
@@ -125,34 +125,31 @@ class License extends Element
      *
      * @return Product|null
      */
-    public function getProduct()
+    public function getProduct(): ?Product
     {
-        if ($this->_product) {
-            return $this->_product;
+        if ($this->_product === null) {
+            $this->_product = Product::find()
+                ->id($this->productId)
+                ->status(null)
+                ->one();
         }
 
-        return $this->_product = Product::find()
-            ->id($this->productId)
-            ->anyStatus()
-            ->one();
+        return $this->_product;
     }
 
     /**
      * Return the order tied to the license.
      *
      * @return null|Order
+     * @throws InvalidConfigException
      */
-    public function getOrder()
+    public function getOrder(): ?Order
     {
-        if ($this->_order) {
-            return $this->_order;
+        if ($this->_order === null && $this->orderId) {
+            $this->_order = Commerce::getInstance()->getOrders()->getOrderById($this->orderId);
         }
 
-        if ($this->orderId) {
-            return $this->_order = Commerce::getInstance()->getOrders()->getOrderById($this->orderId);
-        }
-
-        return null;
+        return $this->_order;
     }
 
     /**
@@ -160,15 +157,9 @@ class License extends Element
      *
      * @return ProductType|null
      */
-    public function getProductType()
+    public function getProductType(): ?ProductType
     {
-        $product = $this->getProduct();
-
-        if ($product) {
-            return $product->getType();
-        }
-
-        return null;
+        return $this->getProduct()?->getType();
     }
 
     /**
@@ -206,7 +197,7 @@ class License extends Element
     /**
      * @return null|string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return Craft::t('digital-products', 'License');
     }
@@ -261,7 +252,7 @@ class License extends Element
     /**
      * @inheritdoc
      */
-    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    public static function eagerLoadingMap(array $sourceElements, string $handle): array|false|null
     {
         $sourceElementIds = ArrayHelper::getColumn($sourceElements, 'id');
 
