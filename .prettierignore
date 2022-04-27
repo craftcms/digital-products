@@ -1,0 +1,7 @@
+*.md
+*.php
+composer.lock
+lib/*
+vendor/*
+src/templates/*
+src/web/assets/cp/dist/*
