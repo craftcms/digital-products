@@ -10,6 +10,7 @@ use craft\commerce\services\Payments as PaymentService;
 use craft\commerce\services\Purchasables;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\fieldlayoutelements\ProductTitleField;
 use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\gql\interfaces\elements\Product as GqlProductInterface;
 use craft\digitalproducts\helpers\ProjectConfigData;
@@ -18,12 +19,14 @@ use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
 use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
+use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterGqlSchemaComponentsEvent;
 use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\Gql;
@@ -88,6 +91,7 @@ class Plugin extends BasePlugin
         $this->_registerElementTypes();
         $this->_registerGqlInterfaces();
         $this->_registerGqlComponents();
+        $this->_defineFieldLayoutElements();
     }
 
     /**
@@ -149,6 +153,18 @@ class Plugin extends BasePlugin
 
     // Private Methods
     // =========================================================================
+
+    private function _defineFieldLayoutElements(): void
+    {
+        Event::on(FieldLayout::class, FieldLayout::EVENT_DEFINE_NATIVE_FIELDS, static function(DefineFieldLayoutFieldsEvent $e) {
+            /** @var FieldLayout $fieldLayout */
+            $fieldLayout = $e->sender;
+
+            if ($fieldLayout->type == Product::class) {
+                $e->fields[] = ProductTitleField::class;
+            }
+        });
+    }
 
     /**
      * Register the event handlers.

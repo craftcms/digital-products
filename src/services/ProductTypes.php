@@ -354,7 +354,9 @@ class ProductTypes extends Component
                 $fields = Craft::$app->getFields();
 
                 // Delete the field layout
-                $fields->deleteLayoutById($productTypeRecord->fieldLayoutId);
+                if ($productTypeRecord->fieldLayoutId) {
+                    $fields->deleteLayoutById($productTypeRecord->fieldLayoutId);
+                }
 
                 //Create the new layout
                 $layout = FieldLayout::createFromConfig(reset($data['fieldLayouts']));

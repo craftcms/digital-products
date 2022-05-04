@@ -352,8 +352,6 @@ class ProductsController extends BaseController
      */
     private function _prepareVariableArray(array &$variables): void
     {
-        $variables['tabs'] = [];
-
         // Locale related checks
         if (Craft::$app->getIsMultiSite()) {
             // Only use the sites that the user has access to
@@ -404,6 +402,9 @@ class ProductsController extends BaseController
 
         /** @var Product $product */
         $product = $variables['product'];
+        $form = $productType->getFieldLayout()->createForm($product);
+        $variables['tabs'] = $form->getTabMenu();
+        $variables['fieldsHtml'] = $form->render();
 
         // Enable locales
         if ($variables['product']->id) {
@@ -428,12 +429,6 @@ class ProductsController extends BaseController
                     }
                 }
             }
-
-            $variables['tabs'][] = [
-                'label' => Craft::t('commerce', $tab->name),
-                'url' => '#tab' . ($index + 1),
-                'class' => $hasErrors ? 'error' : null,
-            ];
         }
     }
 
@@ -508,7 +503,7 @@ class ProductsController extends BaseController
         $product->typeId = $request->getBodyParam('typeId');
         $product->enabled = $request->getBodyParam('enabled');
 
-        $product->price = Localization::normalizeNumber($request->getBodyParam('price'));
+        $product->price = (float)Localization::normalizeNumber($request->getBodyParam('price', 0));
         $product->sku = $request->getBodyParam('sku');
 
         $product->postDate = (($date = $request->getParam('postDate')) !== false ? (DateTimeHelper::toDateTime($date) ?: null) : $product->postDate);
