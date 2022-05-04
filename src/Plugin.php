@@ -3,28 +3,30 @@
 namespace craft\digitalproducts;
 
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
 use craft\commerce\services\Purchasables;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\fieldlayoutelements\ProductTitleField;
 use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\gql\interfaces\elements\Product as GqlProductInterface;
-use craft\digitalproducts\gql\queries\Product as GqlProductQueries;
 use craft\digitalproducts\helpers\ProjectConfigData;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
 use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
+use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterGqlPermissionsEvent;
-use craft\events\RegisterGqlQueriesEvent;
+use craft\events\RegisterGqlSchemaComponentsEvent;
 use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\Gql;
@@ -42,23 +44,32 @@ use yii\base\Event;
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  *
  * @method Settings getSettings()
+ *
+ * @property-read Settings $settings
+ * @property-read array $cpNavItem
+ * @property-read mixed $settingsResponse
  */
 class Plugin extends BasePlugin
 {
     /**
      * @inheritDoc
      */
-    public $hasCpSection = true;
+    public bool $hasCpSection = true;
 
     /**
      * @inheritDoc
      */
-    public $hasCpSettings = true;
+    public bool $hasCpSettings = true;
 
     /**
      * @inheritDoc
      */
-    public $schemaVersion = '2.1.0';
+    public string $schemaVersion = '3.0.0';
+
+    /**
+     * @inheritDoc
+     */
+    public string $minVersionRequired = '2.4.3.2';
 
     use Services;
     use Routes;
@@ -66,7 +77,7 @@ class Plugin extends BasePlugin
     /**
      * Initialize the plugin.
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -79,8 +90,8 @@ class Plugin extends BasePlugin
         $this->_registerPermissions();
         $this->_registerElementTypes();
         $this->_registerGqlInterfaces();
-        $this->_registerGqlQueries();
-        $this->_registerGqlPermissions();
+        $this->_registerGqlComponents();
+        $this->_defineFieldLayoutElements();
     }
 
     /**
@@ -124,7 +135,7 @@ class Plugin extends BasePlugin
     /**
      * @inheritdoc
      */
-    public function getSettingsResponse()
+    public function getSettingsResponse(): mixed
     {
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('digital-products/settings'));
     }
@@ -135,7 +146,7 @@ class Plugin extends BasePlugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
@@ -143,10 +154,22 @@ class Plugin extends BasePlugin
     // Private Methods
     // =========================================================================
 
+    private function _defineFieldLayoutElements(): void
+    {
+        Event::on(FieldLayout::class, FieldLayout::EVENT_DEFINE_NATIVE_FIELDS, static function(DefineFieldLayoutFieldsEvent $e) {
+            /** @var FieldLayout $fieldLayout */
+            $fieldLayout = $e->sender;
+
+            if ($fieldLayout->type == Product::class) {
+                $e->fields[] = ProductTitleField::class;
+            }
+        });
+    }
+
     /**
      * Register the event handlers.
      */
-    private function _registerEventHandlers()
+    private function _registerEventHandlers(): void
     {
         Event::on(
             UsersService::class,
@@ -201,7 +224,7 @@ class Plugin extends BasePlugin
         Event::on(
             ProjectConfig::class,
             ProjectConfig::EVENT_REBUILD,
-            function(RebuildConfigEvent $event) {
+            static function(RebuildConfigEvent $event) {
                 $event->config['digital-products'] = ProjectConfigData::rebuildProjectConfig();
             }
         );
@@ -210,12 +233,12 @@ class Plugin extends BasePlugin
     /**
      * Register Commerce’s fields
      */
-    private function _registerFieldTypes()
+    private function _registerFieldTypes(): void
     {
         Event::on(
             Fields::class,
             Fields::EVENT_REGISTER_FIELD_TYPES,
-            function(RegisterComponentTypesEvent $event) {
+            static function(RegisterComponentTypesEvent $event) {
                 $event->types[] = Products::class;
             }
         );
@@ -224,12 +247,12 @@ class Plugin extends BasePlugin
     /**
      * Register Commerce’s purchasable
      */
-    private function _registerPurchasableTypes()
+    private function _registerPurchasableTypes(): void
     {
         Event::on(
             Purchasables::class,
             Purchasables::EVENT_REGISTER_PURCHASABLE_ELEMENT_TYPES,
-            function(RegisterComponentTypesEvent $event) {
+            static function(RegisterComponentTypesEvent $event) {
                 $event->types[] = Product::class;
             }
         );
@@ -238,7 +261,7 @@ class Plugin extends BasePlugin
     /**
      * Register Digital Product permissions
      */
-    private function _registerPermissions()
+    private function _registerPermissions(): void
     {
         Event::on(
             UserPermissions::class,
@@ -265,12 +288,12 @@ class Plugin extends BasePlugin
     /**
      * Register Digital Product template variable
      */
-    private function _registerVariable()
+    private function _registerVariable(): void
     {
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function(Event $event) {
+            static function(Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('digitalProducts', DigitalProducts::class);
@@ -281,12 +304,12 @@ class Plugin extends BasePlugin
     /**
      * Register the element types supplied by Digital Products
      */
-    private function _registerElementTypes()
+    private function _registerElementTypes(): void
     {
         Event::on(
             Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
-            function(RegisterComponentTypesEvent $e) {
+            static function(RegisterComponentTypesEvent $e) {
                 $e->types[] = Product::class;
                 $e->types[] = License::class;
             }
@@ -296,12 +319,12 @@ class Plugin extends BasePlugin
     /**
      * Register the Gql interfaces
      */
-    private function _registerGqlInterfaces()
+    private function _registerGqlInterfaces(): void
     {
         Event::on(
             Gql::class,
             Gql::EVENT_REGISTER_GQL_TYPES,
-            function(RegisterGqlTypesEvent $event) {
+            static function(RegisterGqlTypesEvent $event) {
                 // Add my GraphQL types
                 $types = $event->types;
                 $types[] = GqlProductInterface::class;
@@ -311,47 +334,30 @@ class Plugin extends BasePlugin
     }
 
     /**
-     * Register the Gql things
+     * Register the Gql components
+     *
+     * @return void
      */
-    private function _registerGqlQueries()
+    private function _registerGqlComponents(): void
     {
-        Event::on(
-            Gql::class,
-            Gql::EVENT_REGISTER_GQL_QUERIES,
-            function(RegisterGqlQueriesEvent $event) {
-                // Add my GraphQL queries
-                $event->queries = array_merge($event->queries, GqlProductQueries::getQueries());
-            }
-        );
-    }
+        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_SCHEMA_COMPONENTS, static function(RegisterGqlSchemaComponentsEvent $event) {
+            $queryComponents = [];
 
-    /**
-     * Register the Gql things
-     */
-    private function _registerGqlPermissions()
-    {
-        Event::on(
-            Gql::class,
-            Gql::EVENT_REGISTER_GQL_PERMISSIONS,
-            function(RegisterGqlPermissionsEvent $event) {
-                $permissions = [];
+            $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
 
-                $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
+            if (!empty($productTypes)) {
+                $label = Craft::t('digital-products', 'Digital Products');
+                $productPermissions = [];
 
-                if (!empty($productTypes)) {
-                    $label = Craft::t('digital-products', 'Digital Products');
-                    $productPermissions = [];
-
-                    foreach ($productTypes as $productType) {
-                        $suffix = 'digitalProductTypes.' . $productType->uid;
-                        $productPermissions[$suffix . ':read'] = ['label' => Craft::t('digital-products', 'View digital product type - {productType}', ['productType' => Craft::t('site', $productType->name)])];
-                    }
-
-                    $permissions[$label] = $productPermissions;
+                foreach ($productTypes as $productType) {
+                    $suffix = 'digitalProductTypes.' . $productType->uid;
+                    $productPermissions[$suffix . ':read'] = ['label' => Craft::t('digital-products', 'View digital product type - {productType}', ['productType' => Craft::t('site', $productType->name)])];
                 }
 
-                $event->permissions = array_merge($event->permissions, $permissions);
+                $queryComponents[$label] = $productPermissions;
             }
-        );
+
+            $event->queries = array_merge($event->queries, $queryComponents);
+        });
     }
 }

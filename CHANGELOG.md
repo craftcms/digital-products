@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## 3.0.0-RC1 - 2022-05-04
+
+### Changed
+- Digital Products for Craft Commerce now requires Craft Commerce 4.0.0-RC1 or later.
+
 ## 2.4.3.2 - 2021-08-18
 
 ### Fixed

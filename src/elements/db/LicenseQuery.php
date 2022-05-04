@@ -12,6 +12,7 @@ use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use DateTime;
+use DateTimeInterface;
 use yii\db\Connection;
 
 /**
@@ -27,49 +28,49 @@ use yii\db\Connection;
 class LicenseQuery extends ElementQuery
 {
     /**
-     * @var string Either owner or user email on the license
+     * @var string|null Either owner or user email on the license
      */
-    public $email;
+    public ?string $email = null;
 
     /**
-     * @var string Email of the license owner
+     * @var string|null Email of the license owner
      */
-    public $ownerEmail;
+    public ?string $ownerEmail = null;
 
     /**
-     * @var string Email of the user that owns the license
+     * @var string|null Email of the user that owns the license
      */
-    public $userEmail;
+    public ?string $userEmail = null;
 
     /**
      * @var int|int[]|null The user id for the user that the license belongs to.
      */
-    public $ownerId;
+    public array|int|null $ownerId = null;
 
     /**
      * @var int|int[]|null The product id for the product that is licensed
      */
-    public $productId;
+    public array|int|null $productId = null;
 
     /**
      * @var int|int[]|null The product type id for the product that is licensed
      */
-    public $typeId;
+    public array|int|null $typeId = null;
 
     /**
-     * @var int|string The license date on the license
+     * @var int|string|null The license date on the license
      */
-    public $licenseDate;
+    public int|string|null $licenseDate = null;
 
     /**
-     * @var int The id of the order that the license must be a part of.
+     * @var int|null The id of the order that the license must be a part of.
      */
-    public $orderId;
+    public ?int $orderId = null;
 
     /**
-     * @var string The license key.
+     * @var string|null The license key.
      */
-    public $licenseKey;
+    public ?string $licenseKey = null;
 
     /**
      * @inheritdoc
@@ -113,10 +114,10 @@ class LicenseQuery extends ElementQuery
     /**
      * Sets the [[email]] property.
      *
-     * @param string $value The property value
+     * @param string|null $value The property value
      * @return static self reference
      */
-    public function email($value)
+    public function email(?string $value): LicenseQuery
     {
         $this->email = $value;
         return $this;
@@ -125,10 +126,10 @@ class LicenseQuery extends ElementQuery
     /**
      * Sets the [[ownerEmail]] property.
      *
-     * @param string $value The property value
+     * @param string|null $value The property value
      * @return static self reference
      */
-    public function ownerEmail($value)
+    public function ownerEmail(?string $value): LicenseQuery
     {
         $this->ownerEmail = $value;
         return $this;
@@ -137,10 +138,10 @@ class LicenseQuery extends ElementQuery
     /**
      * Sets the [[userEmail]] property.
      *
-     * @param string $value The property value
+     * @param string|null $value The property value
      * @return static self reference
      */
-    public function userEmail($value)
+    public function userEmail(?string $value): LicenseQuery
     {
         $this->userEmail = $value;
         return $this;
@@ -152,7 +153,7 @@ class LicenseQuery extends ElementQuery
      * @param User|string|null $value
      * @return static self reference
      */
-    public function owner($value)
+    public function owner(User|string|null $value): LicenseQuery
     {
         if ($value instanceof User) {
             $this->ownerId = $value->id;
@@ -175,7 +176,7 @@ class LicenseQuery extends ElementQuery
      * @param Product|string|null $value
      * @return static self reference
      */
-    public function product($value)
+    public function product(Product|string|null $value): LicenseQuery
     {
         if ($value instanceof Product) {
             $this->productId = $value->id;
@@ -198,7 +199,7 @@ class LicenseQuery extends ElementQuery
      * @param string|string[]|ProductType|null $value The property value
      * @return static self reference
      */
-    public function type($value)
+    public function type(mixed $value): LicenseQuery
     {
         if ($value instanceof ProductType) {
             $this->typeId = $value->id;
@@ -221,7 +222,7 @@ class LicenseQuery extends ElementQuery
      * @param DateTime|string $value The property value
      * @return static self reference
      */
-    public function before($value)
+    public function before(DateTime|string $value): LicenseQuery
     {
         if ($value instanceof DateTime) {
             $value = $value->format(DateTime::W3C);
@@ -239,7 +240,7 @@ class LicenseQuery extends ElementQuery
      * @param DateTime|string $value The property value
      * @return static self reference
      */
-    public function after($value)
+    public function after(DateTime|string $value): LicenseQuery
     {
         if ($value instanceof DateTime) {
             $value = $value->format(DateTime::W3C);
@@ -257,7 +258,7 @@ class LicenseQuery extends ElementQuery
      * @param int|int[] $value The property value
      * @return static self reference
      */
-    public function typeId($value)
+    public function typeId(array|int|null $value): LicenseQuery
     {
         $this->typeId = $value;
         return $this;
@@ -269,7 +270,7 @@ class LicenseQuery extends ElementQuery
      * @param int|int[] $value The property value
      * @return static self reference
      */
-    public function ownerId($value)
+    public function ownerId(array|int|null $value): LicenseQuery
     {
         $this->ownerId = $value;
         return $this;
@@ -281,7 +282,7 @@ class LicenseQuery extends ElementQuery
      * @param int|int[] $value The property value
      * @return static self reference
      */
-    public function productId($value)
+    public function productId(array|int|null $value): LicenseQuery
     {
         $this->productId = $value;
         return $this;
@@ -293,7 +294,7 @@ class LicenseQuery extends ElementQuery
      * @param int|int[] $value The property value
      * @return static self reference
      */
-    public function orderId($value)
+    public function orderId(array|int|null $value): LicenseQuery
     {
         $this->orderId = $value;
         return $this;
@@ -305,7 +306,7 @@ class LicenseQuery extends ElementQuery
      * @param string|string[] $value The property value
      * @return static self reference
      */
-    public function licenseKey($value)
+    public function licenseKey(array|string|null $value): LicenseQuery
     {
         $this->licenseKey = $value;
         return $this;
@@ -317,10 +318,10 @@ class LicenseQuery extends ElementQuery
      * @param DateTime|string $value The property value
      * @return static self reference
      */
-    public function licenseDate($value)
+    public function licenseDate(DateTime|string $value): LicenseQuery
     {
         if ($value instanceof DateTime) {
-            $value = $value->format(DateTime::W3C);
+            $value = $value->format(DateTimeInterface::W3C);
         }
 
         $this->licenseDate = $value;
@@ -393,19 +394,16 @@ class LicenseQuery extends ElementQuery
     /**
      * @inheritdoc
      */
-    protected function statusCondition(string $status)
+    protected function statusCondition(string $status): mixed
     {
-        switch ($status) {
-            case License::STATUS_ENABLED:
-                return [
-                    'elements.enabled' => '1',
-                ];
-            case License::STATUS_DISABLED:
-                return [
-                    'elements.disabled' => '1',
-                ];
-            default:
-                return parent::statusCondition($status);
-        }
+        return match ($status) {
+            Element::STATUS_ENABLED => [
+                'elements.enabled' => '1',
+            ],
+            License::STATUS_DISABLED => [
+                'elements.disabled' => '1',
+            ],
+            default => parent::statusCondition($status),
+        };
     }
 }

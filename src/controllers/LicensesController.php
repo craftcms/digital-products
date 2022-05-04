@@ -6,9 +6,13 @@ use Craft;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use craft\web\Controller as BaseController;
 use craft\web\UrlManager;
+use Throwable;
 use yii\base\Exception;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -22,7 +26,7 @@ class LicensesController extends BaseController
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->requirePermission('digitalProducts-manageLicenses');
 
@@ -64,8 +68,12 @@ class LicensesController extends BaseController
      *
      * @return Response|null
      * @throws Exception if a non existing license id provided
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
-    public function actionSave()
+    public function actionSave(): ?Response
     {
         $this->requirePostRequest();
 
@@ -120,8 +128,11 @@ class LicensesController extends BaseController
      *
      * @return Response|null
      * @throws Exception if a non existing license id provided
+     * @throws Throwable
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
-    public function actionDelete()
+    public function actionDelete(): ?Response
     {
         $this->requirePostRequest();
 

@@ -23,7 +23,7 @@ class ProductTypesController extends BaseController
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->requirePermission('digitalProducts-manageProductTypes');
         parent::init();
