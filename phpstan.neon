@@ -3,7 +3,5 @@ includes:
 
 parameters:
     level: 5
-    stubFiles:
-        - stubs/Plugin.stub
     paths:
         - src
