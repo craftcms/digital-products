@@ -36,7 +36,7 @@ class License extends Element
     /**
      * @var int|null ID
      */
-    public ?int $id  = null;
+    public ?int $id = null;
 
     /**
      * @var int|null Product id
