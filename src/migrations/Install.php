@@ -153,15 +153,15 @@ class Install extends Migration
      */
     protected function dropForeignKeys(): void
     {
-        Db::dropForeignKeyIfExists( Table::LICENSES, ['id']);
-        Db::dropForeignKeyIfExists( Table::LICENSES, ['orderId']);
-        Db::dropForeignKeyIfExists( Table::LICENSES, ['productId']);
-        Db::dropForeignKeyIfExists( Table::LICENSES, ['userId']);
-        Db::dropForeignKeyIfExists( Table::PRODUCTS, ['id']);
-        Db::dropForeignKeyIfExists( Table::PRODUCTS, ['taxCategoryId']);
-        Db::dropForeignKeyIfExists( Table::PRODUCTS, ['typeId']);
-        Db::dropForeignKeyIfExists( Table::PRODUCT_TYPES, ['fieldLayoutId']);
-        Db::dropForeignKeyIfExists( Table::PRODUCT_TYPES_SITES, ['siteId']);
-        Db::dropForeignKeyIfExists( Table::PRODUCT_TYPES_SITES, ['productTypeId']);
+        Db::dropForeignKeyIfExists(Table::LICENSES, ['id']);
+        Db::dropForeignKeyIfExists(Table::LICENSES, ['orderId']);
+        Db::dropForeignKeyIfExists(Table::LICENSES, ['productId']);
+        Db::dropForeignKeyIfExists(Table::LICENSES, ['userId']);
+        Db::dropForeignKeyIfExists(Table::PRODUCTS, ['id']);
+        Db::dropForeignKeyIfExists(Table::PRODUCTS, ['taxCategoryId']);
+        Db::dropForeignKeyIfExists(Table::PRODUCTS, ['typeId']);
+        Db::dropForeignKeyIfExists(Table::PRODUCT_TYPES, ['fieldLayoutId']);
+        Db::dropForeignKeyIfExists(Table::PRODUCT_TYPES_SITES, ['siteId']);
+        Db::dropForeignKeyIfExists(Table::PRODUCT_TYPES_SITES, ['productTypeId']);
     }
 }
