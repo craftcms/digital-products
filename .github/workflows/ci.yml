@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-      - develop
+      - '3.0'
   pull_request:
 jobs:
   ecs:
     name: ECS
     uses: craftcms/.github/.github/workflows/ecs.yml@v2
     with:
-      php_version: '7.2'
+      php_version: '8.0'
   prettier:
     name: Prettier
     uses: craftcms/.github/.github/workflows/prettier.yml@v2
@@ -19,10 +19,10 @@ jobs:
     name: PHPStan
     uses: craftcms/.github/.github/workflows/phpstan.yml@v2
     with:
-      php_version: '7.2'
+      php_version: '8.0'
   notify-slack:
     name: Notify Slack
-    needs: [ecs, phpstan]
+    needs: [ecs, prettier, phpstan]
     if: ${{ always() }}
     uses: craftcms/.github/.github/workflows/notify-slack.yml@v2
     with:

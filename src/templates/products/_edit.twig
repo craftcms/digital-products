@@ -99,17 +99,7 @@
   {% if product.id %}<input type="hidden" name="productId" value="{{ product.id }}">{% endif %}
 
   <div id="fields">
-    {{ productFields.titleField(product) }}
-    <div>
-      {% for tab in productType.getFieldLayout().getTabs() %}
-        <div id="tab{{ loop.index }}" {% if not loop.first %} class="hidden" {% endif %}>
-          {% include "_includes/fields" with {
-            fields: tab.getFields(),
-            element: product,
-          } only %}
-        </div>
-      {% endfor %}
-    </div>
+    {{ fieldsHtml|raw }}
   </div>
 
   {% if not product.slug %}

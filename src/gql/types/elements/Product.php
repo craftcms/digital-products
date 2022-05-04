@@ -35,16 +35,14 @@ class Product extends ElementType
     /**
      * @inheritdoc
      */
-    protected function resolve($source, $arguments, $context, ResolveInfo $resolveInfo)
+    protected function resolve($source, $arguments, $context, ResolveInfo $resolveInfo): mixed
     {
         /** @var ProductElement $source */
         $fieldName = $resolveInfo->fieldName;
 
-        switch ($fieldName) {
-            case 'productTypeHandle':
-                return $source->getType()->handle;
-        }
-
-        return parent::resolve($source, $arguments, $context, $resolveInfo);
+        return match ($fieldName) {
+            'productTypeHandle' => $source->getType()->handle,
+            default => parent::resolve($source, $arguments, $context, $resolveInfo),
+        };
     }
 }

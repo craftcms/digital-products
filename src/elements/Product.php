@@ -17,6 +17,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use DateTime;
 use yii\base\Exception;
 
@@ -32,59 +33,59 @@ use yii\base\Exception;
  */
 class Product extends Purchasable
 {
-    const STATUS_LIVE = 'live';
-    const STATUS_PENDING = 'pending';
-    const STATUS_EXPIRED = 'expired';
+    public const STATUS_LIVE = 'live';
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_EXPIRED = 'expired';
 
     /**
      * @var int|null ID
      */
-    public $id;
+    public ?int $id = null;
 
     /**
-     * @var int Product type id
+     * @var int|null Product type id
      */
-    public $typeId;
+    public ?int $typeId = null;
 
     /**
-     * @var int Tax category id
+     * @var int|null Tax category id
      */
-    public $taxCategoryId;
+    public ?int $taxCategoryId = null;
 
     /**
      * @var DateTime|null Post date
      */
-    public $postDate;
+    public ?DateTime $postDate = null;
 
     /**
      * @var DateTime|null Expiry date
      */
-    public $expiryDate;
+    public ?DateTime $expiryDate = null;
 
     /**
      * @var bool Promotable
      */
-    public $promotable;
+    public bool $promotable = false;
 
     /**
-     * @var string SKU
+     * @var string|null SKU
      */
-    public $sku;
+    public ?string $sku = null;
 
     /**
-     * @var float $price
+     * @var float|null $price
      */
-    public $price;
+    public ?float $price = null;
 
     /**
      * @var ProductType|null
      */
-    private $_productType = null;
+    private ?ProductType $_productType = null;
 
     /**
      * @var License[]
      */
-    private $_existingLicenses;
+    private ?array $_existingLicenses = null;
 
     /**
      * @inheritdoc
@@ -105,7 +106,7 @@ class Product extends Purchasable
     /**
      * @return null|string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->title;
     }
@@ -213,22 +214,14 @@ class Product extends Purchasable
      */
     public function getEditorHtml(): string
     {
-        $viewService = Craft::$app->getView();
-        $html = $viewService->renderTemplateMacro('digital-products/products/_fields', 'titleField', [$this]);
-        $html .= parent::getEditorHtml();
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'generalFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'pricingFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'behavioralMetaFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'generalMetaFields', [$this]);
-
-        return $html;
+        return Craft::$app->getView()->renderTemplate('digital-products/products/_editor', ['product' => $this]);
     }
 
     /**
      * @param string $handle
      * @param array|License[] $elements
      */
-    public function setEagerLoadedElements(string $handle, array $elements)
+    public function setEagerLoadedElements(string $handle, array $elements): void
     {
         if ($handle === 'existingLicenses') {
             $this->_existingLicenses = $elements;
@@ -242,7 +235,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    public static function eagerLoadingMap(array $sourceElements, string $handle): array|null|false
     {
         if ($handle === 'existingLicenses') {
             $userId = Craft::$app->getUser()->getId();
@@ -278,7 +271,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getStatus()
+    public function getStatus(): ?string
     {
         $status = parent::getStatus();
 
@@ -354,7 +347,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getCpEditUrl()
+    public function getCpEditUrl(): ?string
     {
         $productType = $this->getType();
 
@@ -373,7 +366,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getFieldLayout()
+    public function getFieldLayout(): ?FieldLayout
     {
         $productType = $this->getType();
 
@@ -383,7 +376,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getUriFormat()
+    public function getUriFormat(): ?string
     {
         $productType = $this->getType();
 
@@ -417,7 +410,7 @@ class Product extends Purchasable
      *
      * @return ProductType|null
      */
-    public function getType()
+    public function getType(): ?ProductType
     {
         if ($this->_productType === null && $this->typeId) {
             $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
@@ -431,7 +424,7 @@ class Product extends Purchasable
      *
      * @return TaxCategory|null
      */
-    public function getTaxCategory()
+    public function getTaxCategory(): ?TaxCategory
     {
         if ($this->taxCategoryId) {
             return Commerce::getInstance()->getTaxCategories()->getTaxCategoryById($this->taxCategoryId);
@@ -493,7 +486,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         if (!$isNew) {
             $productRecord = ProductRecord::findOne($this->id);
@@ -533,7 +526,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getPurchasableId(): int
+    public function getPurchasableId(): ?int
     {
         return $this->id;
     }
@@ -559,7 +552,7 @@ class Product extends Purchasable
      */
     public function getSku(): string
     {
-        return $this->sku;
+        return $this->sku ?? '';
     }
 
     /**
@@ -599,13 +592,13 @@ class Product extends Purchasable
      */
     public function getIsPromotable(): bool
     {
-        return (bool)$this->promotable;
+        return $this->promotable;
     }
 
     /**
      * @inheritdoc
      */
-    protected function route()
+    protected function route(): array|string|null
     {
         // Make sure the product type is set to have URLs for this site
         $siteId = Craft::$app->getSites()->currentSite->id;
