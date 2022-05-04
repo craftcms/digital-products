@@ -214,15 +214,7 @@ class Product extends Purchasable
      */
     public function getEditorHtml(): string
     {
-        $viewService = Craft::$app->getView();
-        $html = $viewService->renderTemplateMacro('digital-products/products/_fields', 'titleField', [$this]);
-        $html .= parent::getEditorHtml();
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'generalFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'pricingFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'behavioralMetaFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'generalMetaFields', [$this]);
-
-        return $html;
+        return Craft::$app->getView()->renderTemplate('digital-products/products/_editor', ['product' => $this]);
     }
 
     /**

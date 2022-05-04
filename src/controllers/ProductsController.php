@@ -141,16 +141,19 @@ class ProductsController extends BaseController
         $this->requirePostRequest();
 
         $productId = Craft::$app->getRequest()->getRequiredParam('productId');
+        /** @var Product|null $product */
         $product = Product::find()
             ->id($productId)
-            ->anyStatus()
+            ->status(null)
             ->one();
 
         if (!$product) {
             throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.', ['id' => $productId]));
         }
 
-        $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
+        /** @var ProductType $productType */
+        $productType = $product->getType();
+        $this->requirePermission('digitalProducts-manageProductType:' . $productType->uid);
 
         if (!Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
@@ -418,7 +421,7 @@ class ProductsController extends BaseController
             $hasErrors = false;
 
             if ($product->hasErrors()) {
-                foreach ($tab->getFields() as $field) {
+                foreach ($tab->getLayout()->getCustomFields() as $field) {
                     /** @var Field $field */
                     if ($hasErrors = $product->hasErrors($field->handle . '.*')) {
                         break;

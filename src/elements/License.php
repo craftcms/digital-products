@@ -128,10 +128,12 @@ class License extends Element
     public function getProduct(): ?Product
     {
         if ($this->_product === null) {
-            $this->_product = Product::find()
+            /** @var Product|null $_product */
+            $_product = Product::find()
                 ->id($this->productId)
                 ->status(null)
                 ->one();
+            $this->_product = $_product;
         }
 
         return $this->_product;
@@ -303,7 +305,7 @@ class License extends Element
      * @param string $handle
      * @param array|Product[]|User[]|Order[] $elements
      */
-    public function setEagerLoadedElements(string $handle, array $elements)
+    public function setEagerLoadedElements(string $handle, array $elements): void
     {
         if ($handle === 'product') {
             $this->_product = $elements[0] ?? null;
@@ -355,7 +357,7 @@ class License extends Element
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         if (!$isNew) {
             $licenseRecord = LicenseRecord::findOne($this->id);
@@ -506,7 +508,7 @@ class License extends Element
     /**
      * @inheritdoc
      */
-    protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, string $attribute)
+    protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, string $attribute): void
     {
         /** @var ElementQuery $elementQuery */
         if ($attribute === 'product') {
