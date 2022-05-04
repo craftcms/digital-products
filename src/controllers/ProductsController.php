@@ -9,6 +9,8 @@ use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\web\assets\cp\Bundle;
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\helpers\Localization;
@@ -17,7 +19,9 @@ use craft\models\Site;
 use craft\web\Controller as BaseController;
 use craft\web\UrlManager;
 use DateTime;
+use Throwable;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -34,12 +38,12 @@ class ProductsController extends BaseController
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = ['actionViewSharedProduct'];
+    protected int|bool|array $allowAnonymous = ['actionViewSharedProduct'];
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->requirePermission('digitalProducts-manageProducts');
         parent::init();
@@ -49,6 +53,7 @@ class ProductsController extends BaseController
      * Index of digital products
      *
      * @return Response
+     * @throws InvalidConfigException
      */
     public function actionIndex(): Response
     {
@@ -125,9 +130,13 @@ class ProductsController extends BaseController
      * Delete a product.
      *
      * @return Response|null
+     * @throws BadRequestHttpException
      * @throws Exception if no product found
+     * @throws ForbiddenHttpException
+     * @throws Throwable
+     * @throws MissingComponentException
      */
-    public function actionDeleteProduct()
+    public function actionDeleteProduct(): ?Response
     {
         $this->requirePostRequest();
 
@@ -171,8 +180,14 @@ class ProductsController extends BaseController
      * Save a new or an existing product.
      *
      * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws MissingComponentException
      */
-    public function actionSave()
+    public function actionSave(): ?Response
     {
         $this->requirePostRequest();
 
@@ -209,6 +224,10 @@ class ProductsController extends BaseController
      * Previews a product.
      *
      * @return Response
+     * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws Throwable
      */
     public function actionPreviewProduct(): Response
     {
@@ -256,7 +275,7 @@ class ProductsController extends BaseController
     }
 
     /**
-     * Shows an product/draft/version based on a token.
+     * Shows a product/draft/version based on a token.
      *
      * @param int $productId
      * @param int|null $siteId
@@ -264,7 +283,7 @@ class ProductsController extends BaseController
      * @return Response
      * @throws Exception if product not found
      */
-    public function actionViewSharedProduct($productId, $siteId = null): Response
+    public function actionViewSharedProduct(int $productId, ?int $siteId = null): Response
     {
         $this->requireToken();
 
@@ -328,7 +347,7 @@ class ProductsController extends BaseController
      * @throws ForbiddenHttpException if missing permissions
      * @throws Exception if data ir missing or corrupt
      */
-    private function _prepareVariableArray(&$variables)
+    private function _prepareVariableArray(array &$variables): void
     {
         $variables['tabs'] = [];
 
@@ -419,8 +438,10 @@ class ProductsController extends BaseController
      * Enable live preview for products with valid templates on desktop browsers.
      *
      * @param array $variables
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    private function _maybeEnableLivePreview(array &$variables)
+    private function _maybeEnableLivePreview(array &$variables): void
     {
         if (
             !Craft::$app->getRequest()->isMobileBrowser(true) &&
@@ -462,6 +483,7 @@ class ProductsController extends BaseController
      *
      * @return Product
      * @throws Exception if product cannot be found
+     * @throws Throwable
      */
     private function _buildProductFromPost(): Product
     {
