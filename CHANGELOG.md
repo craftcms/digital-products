@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed a PHP error that occurred when trying to manage permissions.
+
 ## 3.0.0 - 2022-05-04
 
 ### Added
