@@ -97,7 +97,7 @@ class Plugin extends BasePlugin
         $this->_registerGqlComponents();
         $this->_defineFieldLayoutElements();
 
-        if (Craft::$app instanceof ConsoleApplication) {
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->_defineResaveCommand();
         }
     }
@@ -177,18 +177,19 @@ class Plugin extends BasePlugin
     /**
      * Defines the `resave/digital-products` command.
      */
-    private function _defineResaveCommand()
+    private function _defineResaveCommand(): void
     {
         Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, static function (DefineConsoleActionsEvent $e) {
             $e->actions['digital-products'] = [
                 'action' => function (): int {
                     /** @var ResaveController $controller */
                     $controller = Craft::$app->controller;
-                    $query = Product::find();
+                    $criteria = [];
                     if ($controller->type !== null) {
-                        $query->type(explode(',', $controller->type));
+                        $criteria['type'] = explode(',', $controller->type);
                     }
-                    return $controller->saveElements($query);
+
+                    return $controller->resaveElements(Product::class, $criteria);
                 },
                 'options' => ['type'],
                 'helpSummary' => 'Re-saves Commerce digital products.',
