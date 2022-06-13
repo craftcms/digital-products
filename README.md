@@ -6,7 +6,7 @@ This plugin makes it possible to sell licenses for digital products with [Craft 
 
 ## Requirements
 
-Digital Products requires Craft 3.1.20 and Craft Commerce 2.1.0 or later.
+Digital Products requires Craft 4.0.0 and Craft Commerce 4.0.0 or later.
 
 ## Installation
 
