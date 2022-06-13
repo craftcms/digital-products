@@ -8,6 +8,8 @@ use craft\base\Plugin as BasePlugin;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
 use craft\commerce\services\Purchasables;
+use craft\console\Controller as ConsoleController;
+use craft\console\controllers\ResaveController;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fieldlayoutelements\ProductTitleField;
@@ -19,6 +21,7 @@ use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
 use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
+use craft\events\DefineConsoleActionsEvent;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -92,6 +95,10 @@ class Plugin extends BasePlugin
         $this->_registerGqlInterfaces();
         $this->_registerGqlComponents();
         $this->_defineFieldLayoutElements();
+
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->_defineResaveCommand();
+        }
     }
 
     /**
@@ -163,6 +170,34 @@ class Plugin extends BasePlugin
             if ($fieldLayout->type == Product::class) {
                 $e->fields[] = ProductTitleField::class;
             }
+        });
+    }
+
+    /**
+     * Defines the `resave/digital-products` command.
+     *
+     * @since 3.0.1
+     */
+    private function _defineResaveCommand(): void
+    {
+        Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, static function(DefineConsoleActionsEvent $e) {
+            $e->actions['digital-products'] = [
+                'action' => function(): int {
+                    /** @var ResaveController $controller */
+                    $controller = Craft::$app->controller;
+                    $criteria = [];
+                    if ($controller->type !== null) {
+                        $criteria['type'] = explode(',', $controller->type);
+                    }
+
+                    return $controller->resaveElements(Product::class, $criteria);
+                },
+                'options' => ['type'],
+                'helpSummary' => 'Re-saves Commerce digital products.',
+                'optionsHelp' => [
+                    'type' => 'The product type handle(s) of the digital products to resave.',
+                ],
+            ];
         });
     }
 
