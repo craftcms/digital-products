@@ -8,6 +8,8 @@ use craft\base\Plugin as BasePlugin;
 use craft\commerce\elements\Order;
 use craft\commerce\services\Payments as PaymentService;
 use craft\commerce\services\Purchasables;
+use craft\console\Controller as ConsoleController;
+use craft\console\controllers\ResaveController;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fieldlayoutelements\ProductTitleField;
@@ -19,16 +21,13 @@ use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
 use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
+use craft\events\DefineConsoleActionsEvent;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterGqlSchemaComponentsEvent;
 use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
-use craft\events\DefineConsoleActionsEvent;
-use craft\console\Application as ConsoleApplication;
-use craft\console\Controller as ConsoleController;
-use craft\console\controllers\ResaveController;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craft\services\Elements;
@@ -181,9 +180,9 @@ class Plugin extends BasePlugin
      */
     private function _defineResaveCommand(): void
     {
-        Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, static function (DefineConsoleActionsEvent $e) {
+        Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, static function(DefineConsoleActionsEvent $e) {
             $e->actions['digital-products'] = [
-                'action' => function (): int {
+                'action' => function(): int {
                     /** @var ResaveController $controller */
                     $controller = Craft::$app->controller;
                     $criteria = [];
@@ -302,7 +301,7 @@ class Plugin extends BasePlugin
         Event::on(
             UserPermissions::class,
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
-            function (RegisterUserPermissionsEvent $event) {
+            function(RegisterUserPermissionsEvent $event) {
                 $productTypes = $this->getProductTypes()->getAllProductTypes();
 
                 $productTypePermissions = [];
