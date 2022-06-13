@@ -176,6 +176,8 @@ class Plugin extends BasePlugin
 
     /**
      * Defines the `resave/digital-products` command.
+     *
+     * @since 3.0.1
      */
     private function _defineResaveCommand(): void
     {
