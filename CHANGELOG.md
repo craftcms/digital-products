@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 3.0.1
 
 ### Added
 - Added the `resave/digital-products` command.
