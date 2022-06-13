@@ -8,7 +8,9 @@
 namespace craft\digitalproducts\gql\arguments\elements;
 
 use Craft;
+use craft\behaviors\FieldLayoutBehavior;
 use craft\digitalproducts\elements\Product as ProductElement;
+use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin;
 use craft\gql\base\ElementArguments;
 use craft\gql\types\DateTime;
@@ -32,7 +34,7 @@ class Product extends ElementArguments
             'sku' => [
                 'name' => 'sku',
                 'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Narrows the query results based on the SKU of the digital product.'
+                'description' => 'Narrows the query results based on the SKU of the digital product.',
             ],
             'before' => [
                 'name' => 'before',
@@ -47,12 +49,12 @@ class Product extends ElementArguments
             'type' => [
                 'name' => 'type',
                 'type' => Type::listOf(Type::string()),
-                'description' => 'Narrows the query results based on the product type the products belong to per the product type’s handles.'
+                'description' => 'Narrows the query results based on the product type the products belong to per the product type’s handles.',
             ],
             'typeId' => [
                 'name' => 'typeId',
                 'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Narrows the query results based on the product types the products belong to, per the product type IDs.'
+                'description' => 'Narrows the query results based on the product types the products belong to, per the product type IDs.',
             ],
         ]);
     }
@@ -62,7 +64,9 @@ class Product extends ElementArguments
      */
     public static function getContentArguments(): array
     {
-        $productTypeFieldArguments = Craft::$app->getGql()->getContentArguments(Plugin::getInstance()->getProductTypes()->getAllProductTypes(), ProductElement::class);
+        /** @var ProductType[]|FieldLayoutBehavior[] $productTypes */
+        $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
+        $productTypeFieldArguments = Craft::$app->getGql()->getContentArguments($productTypes, ProductElement::class);
 
         return array_merge(parent::getContentArguments(), $productTypeFieldArguments);
     }

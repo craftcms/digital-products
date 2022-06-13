@@ -10,7 +10,7 @@ use yii\db\ActiveQueryInterface;
  * Product Type record.
  *
  * @property int $id            Product type id
- * @property int $fieldLayoutId Field layout id
+ * @property int|null $fieldLayoutId Field layout id
  * @property string $name          Product type name
  * @property string $handle        Product type handle
  * @property string $skuFormat     SKU format

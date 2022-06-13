@@ -8,9 +8,9 @@ use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\models\ProductTypeSite;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\web\Controller as BaseController;
+use craft\web\UrlManager;
 use yii\web\HttpException;
 use yii\web\Response;
-
 
 /**
  * Class DigitalProducts_ProductsController
@@ -23,7 +23,7 @@ class ProductTypesController extends BaseController
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->requirePermission('digitalProducts-manageProductTypes');
         parent::init();
@@ -121,8 +121,10 @@ class ProductTypesController extends BaseController
         Craft::$app->getSession()->setError(Craft::t('commerce', 'Couldn’t save product type.'));
 
         // Send the productType back to the template
-        Craft::$app->getUrlManager()->setRouteParams([
-            'productType' => $productType
+        /** @var UrlManager $urlManager */
+        $urlManager = Craft::$app->getUrlManager();
+        $urlManager->setRouteParams([
+            'productType' => $productType,
         ]);
 
         return null;

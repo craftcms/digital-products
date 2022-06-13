@@ -25,7 +25,7 @@ class Products extends BaseRelationField
     /**
      * @inheritdoc
      */
-    protected static function elementType(): string
+    public static function elementType(): string
     {
         return Product::class;
     }

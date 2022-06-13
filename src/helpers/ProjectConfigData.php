@@ -47,7 +47,7 @@ class ProjectConfigData
                 'name',
                 'handle',
                 'skuFormat',
-                'uid'
+                'uid',
             ])
             ->from(['{{%digitalproducts_producttypes}} productTypes'])
             ->all();

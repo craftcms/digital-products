@@ -29,27 +29,27 @@ class ProductQuery extends ElementQuery
     /**
      * @var bool Whether to only return products that the user has permission to edit.
      */
-    public $editable = false;
+    public bool $editable = false;
 
     /**
      * @var mixed The Post Date that the resulting products must have.
      */
-    public $expiryDate;
+    public mixed $expiryDate = null;
 
     /**
      * @var mixed The Post Date that the resulting products must have.
      */
-    public $postDate;
+    public mixed $postDate = null;
 
     /**
      * @var mixed The sku the resulting products must have.
      */
-    public $sku;
+    public mixed $sku = null;
 
     /**
      * @var int|int[]|null The product type ID(s) that the resulting products must have.
      */
-    public $typeId;
+    public array|int|null $typeId = null;
 
     /**
      * @inheritdoc
@@ -90,7 +90,7 @@ class ProductQuery extends ElementQuery
      * @param DateTime|string $value The property value
      * @return static self reference
      */
-    public function before($value)
+    public function before(DateTime|string $value): ProductQuery
     {
         if ($value instanceof DateTime) {
             $value = $value->format(DateTime::W3C);
@@ -108,7 +108,7 @@ class ProductQuery extends ElementQuery
      * @param DateTime|string $value The property value
      * @return static self reference
      */
-    public function after($value)
+    public function after(DateTime|string $value): ProductQuery
     {
         if ($value instanceof DateTime) {
             $value = $value->format(DateTime::W3C);
@@ -126,7 +126,7 @@ class ProductQuery extends ElementQuery
      * @param bool $value The property value (defaults to true)
      * @return static self reference
      */
-    public function editable(bool $value = true)
+    public function editable(bool $value = true): ProductQuery
     {
         $this->editable = $value;
         return $this;
@@ -138,7 +138,7 @@ class ProductQuery extends ElementQuery
      * @param mixed $value The property value
      * @return static self reference
      */
-    public function expiryDate($value)
+    public function expiryDate(mixed $value): ProductQuery
     {
         $this->expiryDate = $value;
         return $this;
@@ -150,7 +150,7 @@ class ProductQuery extends ElementQuery
      * @param mixed $value The property value
      * @return static self reference
      */
-    public function postDate($value)
+    public function postDate(mixed $value): ProductQuery
     {
         $this->postDate = $value;
         return $this;
@@ -162,7 +162,7 @@ class ProductQuery extends ElementQuery
      * @param mixed $value The property value
      * @return static self reference
      */
-    public function sku($value)
+    public function sku(mixed $value): ProductQuery
     {
         $this->sku = $value;
         return $this;
@@ -171,14 +171,14 @@ class ProductQuery extends ElementQuery
     /**
      * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
      *
-     * @param string|string[]|ProductType|null $value The property value
+     * @param mixed $value The property value
      * @return static self reference
      */
-    public function type($value)
+    public function type(mixed $value): ProductQuery
     {
         if ($value instanceof ProductType) {
             $this->typeId = $value->id;
-        } else if ($value !== null) {
+        } elseif ($value !== null) {
             $this->typeId = (new Query())
                 ->select(['id'])
                 ->from(['{{%digitalproducts_producttypes}}'])
@@ -197,7 +197,7 @@ class ProductQuery extends ElementQuery
      * @param int|int[]|null $value The property value
      * @return static self reference
      */
-    public function typeId($value)
+    public function typeId(array|int|null $value): ProductQuery
     {
         $this->typeId = $value;
         return $this;
@@ -226,7 +226,7 @@ class ProductQuery extends ElementQuery
             'digitalproducts_products.promotable',
             'digitalproducts_products.sku',
             'digitalproducts_products.taxCategoryId',
-            'digitalproducts_products.typeId'
+            'digitalproducts_products.typeId',
         ]);
 
         if ($this->expiryDate) {
@@ -253,7 +253,7 @@ class ProductQuery extends ElementQuery
     /**
      * @inheritdoc
      */
-    protected function statusCondition(string $status)
+    protected function statusCondition(string $status): mixed
     {
         $currentTimeDb = Db::prepareDateForDb(new DateTime());
 
@@ -263,14 +263,14 @@ class ProductQuery extends ElementQuery
                     'and',
                     [
                         'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1'
+                        'elements_sites.enabled' => '1',
                     ],
                     ['<=', 'digitalproducts_products.postDate', $currentTimeDb],
                     [
                         'or',
                         ['digitalproducts_products.expiryDate' => null],
-                        ['>', 'digitalproducts_products.expiryDate', $currentTimeDb]
-                    ]
+                        ['>', 'digitalproducts_products.expiryDate', $currentTimeDb],
+                    ],
                 ];
             case Product::STATUS_PENDING:
                 return [
@@ -279,17 +279,17 @@ class ProductQuery extends ElementQuery
                         'elements.enabled' => '1',
                         'elements_sites.enabled' => '1',
                     ],
-                    ['>', 'digitalproducts_products.postDate', $currentTimeDb]
+                    ['>', 'digitalproducts_products.postDate', $currentTimeDb],
                 ];
             case Product::STATUS_EXPIRED:
                 return [
                     'and',
                     [
                         'elements.enabled' => '1',
-                        'elements_sites.enabled' => '1'
+                        'elements_sites.enabled' => '1',
                     ],
                     ['not', ['digitalproducts_products.expiryDate' => null]],
-                    ['<=', 'digitalproducts_products.expiryDate', $currentTimeDb]
+                    ['<=', 'digitalproducts_products.expiryDate', $currentTimeDb],
                 ];
             default:
                 return parent::statusCondition($status);
@@ -302,7 +302,7 @@ class ProductQuery extends ElementQuery
      * @return void
      * @throws QueryAbortedException
      */
-    private function _applyEditableParam()
+    private function _applyEditableParam(): void
     {
         if (!$this->editable) {
             return;
@@ -316,7 +316,7 @@ class ProductQuery extends ElementQuery
 
         // Limit the query to only the sections the user has permission to edit
         $this->subQuery->andWhere([
-            'digitalproducts_products.typeId' => DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypeIds()
+            'digitalproducts_products.typeId' => DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypeIds(),
         ]);
     }
 }

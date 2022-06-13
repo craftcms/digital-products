@@ -9,14 +9,19 @@ use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\web\assets\cp\Bundle;
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\helpers\Localization;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
 use craft\web\Controller as BaseController;
+use craft\web\UrlManager;
 use DateTime;
+use Throwable;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -30,16 +35,15 @@ use yii\web\ServerErrorHttpException;
  */
 class ProductsController extends BaseController
 {
+    /**
+     * @inheritdoc
+     */
+    protected int|bool|array $allowAnonymous = ['actionViewSharedProduct'];
 
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = ['actionViewSharedProduct'];
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
+    public function init(): void
     {
         $this->requirePermission('digitalProducts-manageProducts');
         parent::init();
@@ -49,6 +53,7 @@ class ProductsController extends BaseController
      * Index of digital products
      *
      * @return Response
+     * @throws InvalidConfigException
      */
     public function actionIndex(): Response
     {
@@ -74,7 +79,7 @@ class ProductsController extends BaseController
         $variables = [
             'productTypeHandle' => $productTypeHandle,
             'productId' => $productId,
-            'product' => $product
+            'product' => $product,
         ];
 
         // Make sure a correct product type handle was passed so we can check permissions
@@ -99,8 +104,10 @@ class ProductsController extends BaseController
 
         $this->_prepareVariableArray($variables);
 
-        if (!empty($variables['product']->id)) {
-            $variables['title'] = $variables['product']->title;
+        /** @var Product $product */
+        $product = $variables['product'];
+        if (!empty($product->id)) {
+            $variables['title'] = $product->title;
         } else {
             $variables['title'] = Craft::t('digital-products', 'Create a new product');
         }
@@ -123,23 +130,30 @@ class ProductsController extends BaseController
      * Delete a product.
      *
      * @return Response|null
+     * @throws BadRequestHttpException
      * @throws Exception if no product found
+     * @throws ForbiddenHttpException
+     * @throws Throwable
+     * @throws MissingComponentException
      */
-    public function actionDeleteProduct()
+    public function actionDeleteProduct(): ?Response
     {
         $this->requirePostRequest();
 
         $productId = Craft::$app->getRequest()->getRequiredParam('productId');
+        /** @var Product|null $product */
         $product = Product::find()
             ->id($productId)
-            ->anyStatus()
+            ->status(null)
             ->one();
 
         if (!$product) {
             throw new Exception(Craft::t('digital-products', 'No product exists with the ID “{id}”.', ['id' => $productId]));
         }
 
-        $this->requirePermission('digitalProducts-manageProductType:' . $product->getType()->uid);
+        /** @var ProductType $productType */
+        $productType = $product->getType();
+        $this->requirePermission('digitalProducts-manageProductType:' . $productType->uid);
 
         if (!Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
@@ -147,8 +161,10 @@ class ProductsController extends BaseController
             }
 
             Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete product.'));
-            Craft::$app->getUrlManager()->setRouteParams([
-                'product' => $product
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
+                'product' => $product,
             ]);
 
             return null;
@@ -167,8 +183,14 @@ class ProductsController extends BaseController
      * Save a new or an existing product.
      *
      * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws MissingComponentException
      */
-    public function actionSave()
+    public function actionSave(): ?Response
     {
         $this->requirePostRequest();
 
@@ -187,8 +209,10 @@ class ProductsController extends BaseController
             }
 
             Craft::$app->getSession()->setError(Craft::t('app', 'Couldn’t save product.'));
-            Craft::$app->getUrlManager()->setRouteParams([
-                'product' => $product
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
+                'product' => $product,
             ]);
 
             return null;
@@ -203,6 +227,10 @@ class ProductsController extends BaseController
      * Previews a product.
      *
      * @return Response
+     * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws Throwable
      */
     public function actionPreviewProduct(): Response
     {
@@ -225,7 +253,7 @@ class ProductsController extends BaseController
      */
     public function actionShareProduct(int $productId, int $siteId = null): Response
     {
-        /** @var Product $product */
+        /** @var Product|null $product */
         $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
         if (!$product) {
@@ -241,7 +269,7 @@ class ProductsController extends BaseController
         // Create the token and redirect to the product URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
             'action' => 'digital-products/products/viewSharedProduct',
-            'params' => ['productId' => $productId, 'site' => $product->getSite()]
+            'params' => ['productId' => $productId, 'site' => $product->getSite()],
         ]);
 
         $url = UrlHelper::urlWithToken($product->getUrl(), $token);
@@ -250,7 +278,7 @@ class ProductsController extends BaseController
     }
 
     /**
-     * Shows an product/draft/version based on a token.
+     * Shows a product/draft/version based on a token.
      *
      * @param int $productId
      * @param int|null $siteId
@@ -258,11 +286,11 @@ class ProductsController extends BaseController
      * @return Response
      * @throws Exception if product not found
      */
-    public function actionViewSharedProduct($productId, $siteId = null): Response
+    public function actionViewSharedProduct(int $productId, ?int $siteId = null): Response
     {
         $this->requireToken();
 
-        /** @var Product $product */
+        /** @var Product|null $product */
         $product = Craft::$app->getElements()->getElementById($productId, Product::class, $siteId);
 
         if (!$product) {
@@ -282,7 +310,6 @@ class ProductsController extends BaseController
      */
     private function _showProduct(Product $product): Response
     {
-
         $productType = $product->getType();
 
         if (!$productType) {
@@ -311,7 +338,7 @@ class ProductsController extends BaseController
         $this->getView()->getTwig()->disableStrictVariables();
 
         return $this->renderTemplate($siteSettings[$product->siteId]->template, [
-            'product' => $product
+            'product' => $product,
         ]);
     }
 
@@ -323,10 +350,8 @@ class ProductsController extends BaseController
      * @throws ForbiddenHttpException if missing permissions
      * @throws Exception if data ir missing or corrupt
      */
-    private function _prepareVariableArray(&$variables)
+    private function _prepareVariableArray(array &$variables): void
     {
-        $variables['tabs'] = [];
-
         // Locale related checks
         if (Craft::$app->getIsMultiSite()) {
             // Only use the sites that the user has access to
@@ -377,6 +402,9 @@ class ProductsController extends BaseController
 
         /** @var Product $product */
         $product = $variables['product'];
+        $form = $productType->getFieldLayout()->createForm($product);
+        $variables['tabs'] = $form->getTabMenu();
+        $variables['fieldsHtml'] = $form->render();
 
         // Enable locales
         if ($variables['product']->id) {
@@ -394,19 +422,13 @@ class ProductsController extends BaseController
             $hasErrors = false;
 
             if ($product->hasErrors()) {
-                foreach ($tab->getFields() as $field) {
+                foreach ($tab->getLayout()->getCustomFields() as $field) {
                     /** @var Field $field */
                     if ($hasErrors = $product->hasErrors($field->handle . '.*')) {
                         break;
                     }
                 }
             }
-
-            $variables['tabs'][] = [
-                'label' => Craft::t('commerce', $tab->name),
-                'url' => '#tab' . ($index + 1),
-                'class' => $hasErrors ? 'error' : null
-            ];
         }
     }
 
@@ -414,8 +436,10 @@ class ProductsController extends BaseController
      * Enable live preview for products with valid templates on desktop browsers.
      *
      * @param array $variables
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    private function _maybeEnableLivePreview(array &$variables)
+    private function _maybeEnableLivePreview(array &$variables): void
     {
         if (
             !Craft::$app->getRequest()->isMobileBrowser(true) &&
@@ -430,7 +454,7 @@ class ProductsController extends BaseController
                         'typeId' => $variables['productType']->id,
                         'productId' => $variables['product']->id,
                         'siteId' => $variables['product']->siteId,
-                    ]
+                    ],
                 ]) . ');');
 
             $variables['showPreviewBtn'] = true;
@@ -443,7 +467,7 @@ class ProductsController extends BaseController
                 } else {
                     $variables['shareUrl'] = UrlHelper::actionUrl('digital-products/products/share-product', [
                         'productId' => $variables['product']->id,
-                        'siteId' => $variables['product']->siteId
+                        'siteId' => $variables['product']->siteId,
                     ]);
                 }
             }
@@ -457,6 +481,7 @@ class ProductsController extends BaseController
      *
      * @return Product
      * @throws Exception if product cannot be found
+     * @throws Throwable
      */
     private function _buildProductFromPost(): Product
     {
@@ -465,6 +490,7 @@ class ProductsController extends BaseController
         $site = $request->getParam('siteId');
 
         if ($productId) {
+            /** @var Product|null $product */
             $product = Craft::$app->getElements()->getElementById($productId, Product::class, $site);
 
             if (!$product) {
@@ -477,7 +503,7 @@ class ProductsController extends BaseController
         $product->typeId = $request->getBodyParam('typeId');
         $product->enabled = $request->getBodyParam('enabled');
 
-        $product->price = Localization::normalizeNumber($request->getBodyParam('price'));
+        $product->price = (float)Localization::normalizeNumber($request->getBodyParam('price', 0));
         $product->sku = $request->getBodyParam('sku');
 
         $product->postDate = (($date = $request->getParam('postDate')) !== false ? (DateTimeHelper::toDateTime($date) ?: null) : $product->postDate);

@@ -17,6 +17,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use DateTime;
 use yii\base\Exception;
 
@@ -32,59 +33,59 @@ use yii\base\Exception;
  */
 class Product extends Purchasable
 {
-    const STATUS_LIVE = 'live';
-    const STATUS_PENDING = 'pending';
-    const STATUS_EXPIRED = 'expired';
+    public const STATUS_LIVE = 'live';
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_EXPIRED = 'expired';
 
     /**
-     * @var int ID
+     * @var int|null ID
      */
-    public $id;
+    public ?int $id = null;
 
     /**
-     * @var int Product type id
+     * @var int|null Product type id
      */
-    public $typeId;
+    public ?int $typeId = null;
 
     /**
-     * @var int Tax category id
+     * @var int|null Tax category id
      */
-    public $taxCategoryId;
+    public ?int $taxCategoryId = null;
 
     /**
-     * @var DateTime Post date
+     * @var DateTime|null Post date
      */
-    public $postDate;
+    public ?DateTime $postDate = null;
 
     /**
-     * @var DateTime Expiry date
+     * @var DateTime|null Expiry date
      */
-    public $expiryDate;
+    public ?DateTime $expiryDate = null;
 
     /**
      * @var bool Promotable
      */
-    public $promotable;
+    public bool $promotable = false;
 
     /**
-     * @var string SKU
+     * @var string|null SKU
      */
-    public $sku;
+    public ?string $sku = null;
 
     /**
-     * @var float $price
+     * @var float|null $price
      */
-    public $price;
+    public ?float $price = null;
 
     /**
-     * @var ProductType
+     * @var ProductType|null
      */
-    private $_productType;
+    private ?ProductType $_productType = null;
 
     /**
      * @var License[]
      */
-    private $_existingLicenses;
+    private ?array $_existingLicenses = null;
 
     /**
      * @inheritdoc
@@ -105,7 +106,7 @@ class Product extends Purchasable
     /**
      * @return null|string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->title;
     }
@@ -168,10 +169,10 @@ class Product extends Purchasable
                 'label' => Craft::t('digital-products', 'All products'),
                 'criteria' => [
                     'typeId' => $productTypeIds,
-                    'editable' => $editable
+                    'editable' => $editable,
                 ],
-                'defaultSort' => ['postDate', 'desc']
-            ]
+                'defaultSort' => ['postDate', 'desc'],
+            ],
         ];
 
         $sources[] = ['heading' => Craft::t('digital-products', 'Product Types')];
@@ -185,9 +186,9 @@ class Product extends Purchasable
                 'label' => $productType->name,
                 'data' => [
                     'handle' => $productType->handle,
-                    'editable' => $canEditProducts
+                    'editable' => $canEditProducts,
                 ],
-                'criteria' => ['typeId' => $productType->id, 'editable' => $editable]
+                'criteria' => ['typeId' => $productType->id, 'editable' => $editable],
             ];
         }
 
@@ -203,7 +204,7 @@ class Product extends Purchasable
             self::STATUS_LIVE => Craft::t('digital-products', 'Live'),
             self::STATUS_PENDING => Craft::t('digital-products', 'Pending'),
             self::STATUS_EXPIRED => Craft::t('digital-products', 'Expired'),
-            self::STATUS_DISABLED => Craft::t('digital-products', 'Disabled')
+            self::STATUS_DISABLED => Craft::t('digital-products', 'Disabled'),
         ];
     }
 
@@ -213,21 +214,14 @@ class Product extends Purchasable
      */
     public function getEditorHtml(): string
     {
-        $viewService = Craft::$app->getView();
-        $html = $viewService->renderTemplateMacro('digital-products/products/_fields', 'titleField', [$this]);
-        $html .= parent::getEditorHtml();
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'generalFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'pricingFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'behavioralMetaFields', [$this]);
-        $html .= $viewService->renderTemplateMacro('digital-products/products/_fields', 'generalMetaFields', [$this]);
-
-        return $html;
+        return Craft::$app->getView()->renderTemplate('digital-products/products/_editor', ['product' => $this]);
     }
 
     /**
-     * @inheritdoc
+     * @param string $handle
+     * @param array|License[] $elements
      */
-    public function setEagerLoadedElements(string $handle, array $elements)
+    public function setEagerLoadedElements(string $handle, array $elements): void
     {
         if ($handle === 'existingLicenses') {
             $this->_existingLicenses = $elements;
@@ -241,7 +235,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    public static function eagerLoadingMap(array $sourceElements, string $handle): array|null|false
     {
         if ($handle === 'existingLicenses') {
             $userId = Craft::$app->getUser()->getId();
@@ -258,7 +252,7 @@ class Product extends Purchasable
 
                 return [
                     'elementType' => License::class,
-                    'map' => $map
+                    'map' => $map,
                 ];
             }
         }
@@ -277,7 +271,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getStatus()
+    public function getStatus(): ?string
     {
         $status = parent::getStatus();
 
@@ -353,7 +347,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getCpEditUrl()
+    public function getCpEditUrl(): ?string
     {
         $productType = $this->getType();
 
@@ -372,7 +366,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getFieldLayout()
+    public function getFieldLayout(): ?FieldLayout
     {
         $productType = $this->getType();
 
@@ -382,9 +376,13 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getUriFormat()
+    public function getUriFormat(): ?string
     {
         $productType = $this->getType();
+
+        if ($productType === null) {
+            return null;
+        }
 
         $siteId = $this->siteId ?: Craft::$app->getSites()->currentSite->id;
 
@@ -410,15 +408,15 @@ class Product extends Purchasable
     /**
      * Returns the product's product type model.
      *
-     * @return ProductType
+     * @return ProductType|null
      */
-    public function getType()
+    public function getType(): ?ProductType
     {
-        if ($this->_productType) {
-            return $this->_productType;
+        if ($this->_productType === null && $this->typeId) {
+            $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
         }
 
-        return $this->typeId ? $this->_productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId) : null;
+        return $this->_productType;
     }
 
     /**
@@ -426,7 +424,7 @@ class Product extends Purchasable
      *
      * @return TaxCategory|null
      */
-    public function getTaxCategory()
+    public function getTaxCategory(): ?TaxCategory
     {
         if ($this->taxCategoryId) {
             return Commerce::getInstance()->getTaxCategories()->getTaxCategoryById($this->taxCategoryId);
@@ -447,7 +445,9 @@ class Product extends Purchasable
             $userId = Craft::$app->getUser()->getId();
 
             if ($userId) {
-                $this->_existingLicenses = License::find()->ownerId($userId)->all();
+                /** @var License[]|null $existingLicenses */
+                $existingLicenses = License::find()->ownerId($userId)->all();
+                $this->_existingLicenses = $existingLicenses;
             }
         }
 
@@ -486,7 +486,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         if (!$isNew) {
             $productRecord = ProductRecord::findOne($this->id);
@@ -526,7 +526,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getPurchasableId(): int
+    public function getPurchasableId(): ?int
     {
         return $this->id;
     }
@@ -552,7 +552,7 @@ class Product extends Purchasable
      */
     public function getSku(): string
     {
-        return $this->sku;
+        return $this->sku ?? '';
     }
 
     /**
@@ -592,13 +592,13 @@ class Product extends Purchasable
      */
     public function getIsPromotable(): bool
     {
-        return (bool)$this->promotable;
+        return $this->promotable;
     }
 
     /**
      * @inheritdoc
      */
-    protected function route()
+    protected function route(): array|string|null
     {
         // Make sure the product type is set to have URLs for this site
         $siteId = Craft::$app->getSites()->currentSite->id;
@@ -613,8 +613,8 @@ class Product extends Purchasable
                 'template' => (string)$productTypeSiteSettings[$siteId]->template,
                 'variables' => [
                     'product' => $this,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -676,7 +676,7 @@ class Product extends Purchasable
 
                 return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
 
-            case 'defaultPrice':
+            case 'price':
                 $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
 
                 return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
@@ -721,13 +721,13 @@ class Product extends Purchasable
         // Get the section(s) we need to check permissions on
         if ($source == '*') {
             $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
-        } else if (preg_match('/^productType:(\d+)$/', $source, $matches)) {
+        } elseif (preg_match('/^productType:(\d+)$/', $source, $matches)) {
             $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($matches[1]);
 
             if ($productType) {
                 $productTypes = [$productType];
             }
-        } else if (preg_match('/^productType:(.+)$/', $source, $matches)) {
+        } elseif (preg_match('/^productType:(.+)$/', $source, $matches)) {
             $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeByUid($matches[1]);
 
             if ($productType) {

@@ -1,5 +1,15 @@
 # Release Notes for Digital Products
 
+## 3.0.0.1 - 2022-05-05
+
+### Fixed
+- Fixed a PHP error that occurred when trying to manage permissions.
+
+## 3.0.0 - 2022-05-04
+
+### Added
+- Added Craft CMS 4 and Craft Commerce 4 compatibility.
+
 ## 2.4.3.2 - 2021-08-18
 
 ### Fixed

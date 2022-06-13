@@ -25,8 +25,9 @@
     "rss": "https://github.com/craftcms/commerce-digital-products/commits/master.atom"
   },
   "require": {
-    "craftcms/commerce": "^2.1|^3.0",
-    "craftcms/cms": "^3.1.20"
+    "php": "^8.0.2",
+    "craftcms/commerce": "^4.0.0",
+    "craftcms/cms": "^4.0.0"
   },
   "autoload": {
     "psr-4": {
@@ -37,5 +38,25 @@
     "handle": "digital-products",
     "name": "Digital Products",
     "documentationUrl": "https://github.com/craftcms/digital-products/blob/master/README.md"
+  },
+  "require-dev": {
+    "craftcms/phpstan": "dev-main",
+    "craftcms/ecs": "dev-main"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    },
+    "platform": {
+      "php": "8.0.2"
+    }
+  },
+  "scripts": {
+    "phpstan": "phpstan --memory-limit=1G",
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix"
   }
 }

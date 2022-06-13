@@ -43,7 +43,7 @@ class Product extends Query
                 'args' => ProductArguments::getArguments(),
                 'resolve' => ProductResolver::class . '::resolveOne',
                 'description' => 'Used to query for a digital product.',
-            ]
+            ],
         ];
     }
 }

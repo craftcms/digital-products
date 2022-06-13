@@ -6,8 +6,13 @@ use Craft;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use craft\web\Controller as BaseController;
+use craft\web\UrlManager;
+use Throwable;
 use yii\base\Exception;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -21,7 +26,7 @@ class LicensesController extends BaseController
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->requirePermission('digitalProducts-manageLicenses');
 
@@ -41,6 +46,7 @@ class LicensesController extends BaseController
             if ($licenseId === null) {
                 $license = new License();
             } else {
+                /** @var License|null $license */
                 $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
                 if (!$license) {
@@ -49,7 +55,7 @@ class LicensesController extends BaseController
             }
         }
 
-        $variables['title'] = $license->id ? (string)$license : Craft::t('digital-products', 'Create a new License');
+        $variables['title'] = $license->id ? $license->__toString() : Craft::t('digital-products', 'Create a new License');
         $variables['license'] = $license;
         $variables['userElementType'] = User::class;
         $variables['productElementType'] = Product::class;
@@ -62,21 +68,26 @@ class LicensesController extends BaseController
      *
      * @return Response|null
      * @throws Exception if a non existing license id provided
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
-    public function actionSave()
+    public function actionSave(): ?Response
     {
         $this->requirePostRequest();
 
         $request = Craft::$app->getRequest();
 
+        /** @var int|string $licenseId */
         $licenseId = $request->getBodyParam('licenseId');
 
         if ($licenseId) {
-            /** @var License $license */
+            /** @var License|null $license */
             $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
             if (!$license) {
-                throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
+                throw new Exception(Craft::t('digital-products','No license with the ID “{id}”', ['id' => $licenseId]));
             }
         } else {
             $license = new License();
@@ -101,7 +112,9 @@ class LicensesController extends BaseController
         // Save it
         if (!Craft::$app->getElements()->saveElement($license)) {
             Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t save license.'));
-            Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams(['license' => $license]);
 
             return null;
         }
@@ -115,17 +128,21 @@ class LicensesController extends BaseController
      *
      * @return Response|null
      * @throws Exception if a non existing license id provided
+     * @throws Throwable
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
-    public function actionDelete()
+    public function actionDelete(): ?Response
     {
         $this->requirePostRequest();
 
+        /** @var int|string $licenseId */
         $licenseId = Craft::$app->getRequest()->getRequiredBodyParam('licenseId');
-        /** @var License $license */
+        /** @var License|null $license */
         $license = Craft::$app->getElements()->getElementById($licenseId, License::class);
 
         if (!$license) {
-            throw new Exception('No license with the ID “{id}”', ['id' => $licenseId]);
+            throw new Exception(Craft::t('digital-products','No license with the ID “{id}”', ['id' => $licenseId]));
         }
 
         if (Craft::$app->getElements()->deleteElement($license)) {
@@ -142,7 +159,10 @@ class LicensesController extends BaseController
         }
 
         Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete license.'));
-        Craft::$app->getUrlManager()->setRouteParams(['license' => $license]);
+
+        /** @var UrlManager $urlManager */
+        $urlManager = Craft::$app->getUrlManager();
+        $urlManager->setRouteParams(['license' => $license]);
 
         return null;
     }

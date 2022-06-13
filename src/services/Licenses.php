@@ -5,7 +5,6 @@ namespace craft\digitalproducts\services;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\events\ProcessPaymentEvent;
-use craft\commerce\models\LineItem;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\Plugin as DigitalProducts;
@@ -31,22 +30,21 @@ class Licenses extends Component
     {
         return !License::find()
             ->licenseKey($licenseKey)
-            ->anyStatus()
+            ->status(null)
             ->exists();
     }
 
     /**
-     * Sort trough the ordered items and generate Licenses for Digital Products.
+     * Sort through the ordered items and generate Licenses for Digital Products.
      *
      * @param Event $event
      */
-    public static function handleCompletedOrder(Event $event)
+    public static function handleCompletedOrder(Event $event): void
     {
         /** @var Order $order */
         $order = $event->sender;
         $lineItems = $order->getLineItems();
 
-        /** @var LineItem $lineItem */
         foreach ($lineItems as $lineItem) {
             $itemId = $lineItem->purchasableId;
             $element = Craft::$app->getElements()->getElementById($itemId);
@@ -66,12 +64,13 @@ class Licenses extends Component
      *
      * @param ProcessPaymentEvent $event
      */
-    public static function maybePreventPayment(ProcessPaymentEvent $event)
+    public static function maybePreventPayment(ProcessPaymentEvent $event): void
     {
         if (!DigitalProducts::getInstance()->getSettings()->requireLoggedInUser || !Craft::$app->getUser()->getIsGuest()) {
             return;
         }
 
+        /** @var Order|null $order */
         $order = $event->order;
 
         if (!$order) {
@@ -97,7 +96,7 @@ class Licenses extends Component
      *
      * @param UserEvent $event
      */
-    public static function handleUserActivation(UserEvent $event)
+    public static function handleUserActivation(UserEvent $event): void
     {
         if (!DigitalProducts::getInstance()->getSettings()->autoAssignLicensesOnUserRegistration) {
             return;
@@ -128,13 +127,13 @@ class Licenses extends Component
         $license->productId = $product->id;
         $customer = $order->getCustomer();
 
-        if ($customer && $user = $customer->getUser()) {
-            $license->ownerEmail = $user->email;
-            $license->ownerName = $user->getName();
-            $license->userId = $user->id;
-        } else {
-            $license->ownerEmail = $order->email;
+        if (!$customer) {
+            return false;
         }
+
+        $license->ownerEmail = $customer->email;
+        $license->ownerName = $customer->getName();
+        $license->userId = $customer->id;
 
         $license->orderId = $order->id;
 

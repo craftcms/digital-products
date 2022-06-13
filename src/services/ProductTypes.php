@@ -3,9 +3,9 @@
 namespace craft\digitalproducts\services;
 
 use Craft;
-use craft\digitalproducts\events\ProductTypeEvent;
 use craft\db\Query;
 use craft\digitalproducts\elements\Product;
+use craft\digitalproducts\events\ProductTypeEvent;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\models\ProductTypeSite;
 use craft\digitalproducts\records\ProductType as ProductTypeRecord;
@@ -34,12 +34,12 @@ class ProductTypes extends Component
     /**
      * @event ProductTypeEvent The event that is triggered before a category group is saved.
      */
-    const EVENT_BEFORE_SAVE_PRODUCTTYPE = 'beforeSaveProductType';
+    public const EVENT_BEFORE_SAVE_PRODUCTTYPE = 'beforeSaveProductType';
 
     /**
      * @event ProductTypeEvent The event that is triggered after a product type is saved.
      */
-    const EVENT_AFTER_SAVE_PRODUCTTYPE = 'afterSaveProductType';
+    public const EVENT_AFTER_SAVE_PRODUCTTYPE = 'afterSaveProductType';
 
     /**
      * @var bool
@@ -71,7 +71,7 @@ class ProductTypes extends Component
      */
     private $_siteSettingsByProductId = [];
 
-    const CONFIG_PRODUCTTYPES_KEY = 'digital-products.productTypes';
+    public const CONFIG_PRODUCTTYPES_KEY = 'digital-products.productTypes';
 
     /**
      * Returns all editable product types.
@@ -209,7 +209,7 @@ class ProductTypes extends Component
                     'siteId',
                     'uriFormat',
                     'template',
-                    'hasUrls'
+                    'hasUrls',
                 ])
                 ->from('{{%digitalproducts_producttypes_sites}}')
                 ->where(['productTypeId' => $productTypeId])
@@ -283,7 +283,7 @@ class ProductTypes extends Component
             }
 
             $configData['fieldLayouts'] = [
-                $layoutUid => $fieldLayoutConfig
+                $layoutUid => $fieldLayoutConfig,
             ];
         }
 
@@ -332,7 +332,6 @@ class ProductTypes extends Component
      */
     public function handleChangedProductType(ConfigEvent $event)
     {
-
         ProjectConfigHelper::ensureAllSitesProcessed();
         ProjectConfigHelper::ensureAllFieldsProcessed();
 
@@ -355,7 +354,9 @@ class ProductTypes extends Component
                 $fields = Craft::$app->getFields();
 
                 // Delete the field layout
-                $fields->deleteLayoutById($productTypeRecord->fieldLayoutId);
+                if ($productTypeRecord->fieldLayoutId) {
+                    $fields->deleteLayoutById($productTypeRecord->fieldLayoutId);
+                }
 
                 //Create the new layout
                 $layout = FieldLayout::createFromConfig(reset($data['fieldLayouts']));
@@ -388,10 +389,12 @@ class ProductTypes extends Component
             $siteIdMap = Db::idsByUids('{{%sites}}', array_keys($siteSettingData));
 
             foreach ($siteSettingData as $siteUid => $siteSettings) {
+                /** @var int $siteId */
                 $siteId = $siteIdMap[$siteUid];
 
                 // Was this already selected?
                 if (!$isNewProductType && isset($allOldSiteSettingsRecords[$siteId])) {
+                    /** @var ProductTypeSiteRecord $siteSettingsRecord */
                     $siteSettingsRecord = $allOldSiteSettingsRecords[$siteId];
                 } else {
                     $siteSettingsRecord = new ProductTypeSiteRecord();
@@ -438,7 +441,7 @@ class ProductTypes extends Component
                             'typeId' => $productTypeRecord->id,
                             'status' => null,
                             'enabledForSite' => false,
-                        ]
+                        ],
                     ]));
                 }
             }
@@ -474,7 +477,6 @@ class ProductTypes extends Component
      */
     public function handleDeletedProductType(ConfigEvent $event)
     {
-
         $productTypeUid = $event->tokenMatches[0];
         $productTypeRecord = $this->_getProductTypeRecord($productTypeUid);
 
@@ -543,7 +545,7 @@ class ProductTypes extends Component
                     'productTypes.uid productTypeUid',
                     'producttypes_sites.uriFormat',
                     'producttypes_sites.template',
-                    'producttypes_sites.hasUrls'
+                    'producttypes_sites.hasUrls',
                 ])
                 ->from(['{{%digitalproducts_producttypes_sites}} producttypes_sites'])
                 ->innerJoin(['{{%digitalproducts_producttypes}} productTypes'], '[[producttypes_sites.productTypeId]] = [[productTypes.id]]')
@@ -554,7 +556,7 @@ class ProductTypes extends Component
                 $newSiteSettings = [
                     'uriFormat' => $primarySiteSettings['uriFormat'],
                     'template' => $primarySiteSettings['template'],
-                    'hasUrls' => $primarySiteSettings['hasUrls']
+                    'hasUrls' => $primarySiteSettings['hasUrls'],
                 ];
 
                 Craft::$app->getProjectConfig()->set(self::CONFIG_PRODUCTTYPES_KEY . '.' . $primarySiteSettings['productTypeUid'] . '.siteSettings.' . $event->site->uid, $newSiteSettings);
@@ -645,7 +647,7 @@ class ProductTypes extends Component
                         $event->site->id,
                         $siteSettings['uriFormat'],
                         $siteSettings['template'],
-                        $siteSettings['hasUrls']
+                        $siteSettings['hasUrls'],
                     ];
                 }
 
@@ -684,7 +686,7 @@ class ProductTypes extends Component
                 'name',
                 'handle',
                 'skuFormat',
-                'uid'
+                'uid',
             ])
             ->from(['{{%digitalproducts_producttypes}}']);
     }
