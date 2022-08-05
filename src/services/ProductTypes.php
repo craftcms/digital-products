@@ -440,7 +440,6 @@ class ProductTypes extends Component
                             'siteId' => $siteIdMap[$siteUid],
                             'typeId' => $productTypeRecord->id,
                             'status' => null,
-                            'enabledForSite' => false,
                         ],
                     ]));
                 }
