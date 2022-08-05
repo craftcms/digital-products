@@ -1,11 +1,11 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 3.0.2 - 2022-08-05
 
 ### Fixed
 - Fixed a PHP error that occurred when creating a new site.
 
-## 3.0.1
+## 3.0.1 - 2022-06-13
 
 ### Added
 - Added the `resave/digital-products` command.
