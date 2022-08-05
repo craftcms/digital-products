@@ -1,5 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+### Fixed
+- Fixed a PHP error that occurred when creating a new site.
+
 ## 3.0.1
 
 ### Added
