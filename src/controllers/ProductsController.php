@@ -5,6 +5,7 @@ namespace craft\digitalproducts\controllers;
 use Craft;
 use craft\base\Element;
 use craft\base\Field;
+use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
@@ -155,12 +156,16 @@ class ProductsController extends BaseController
         $productType = $product->getType();
         $this->requirePermission('digitalProducts-manageProductType:' . $productType->uid);
 
-        if (!Craft::$app->getElements()->deleteElement($product)) {
+        $licensesExist = License::find()->product($product)->exists();
+
+        if ($licensesExist || !Craft::$app->getElements()->deleteElement($product)) {
             if (Craft::$app->getRequest()->getAcceptsJson()) {
                 $this->asJson(['success' => false]);
             }
 
-            Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn’t delete product.'));
+            $error = $licensesExist ? Craft::t('digital-products', 'Couldn’t delete product with existing licenses.') : Craft::t('digital-products', 'Couldn’t delete product.');
+
+            Craft::$app->getSession()->setError($error);
             /** @var UrlManager $urlManager */
             $urlManager = Craft::$app->getUrlManager();
             $urlManager->setRouteParams([

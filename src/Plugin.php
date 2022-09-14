@@ -10,6 +10,7 @@ use craft\commerce\services\Payments as PaymentService;
 use craft\commerce\services\Purchasables;
 use craft\console\Controller as ConsoleController;
 use craft\console\controllers\ResaveController;
+use craft\digitalproducts\db\Table;
 use craft\digitalproducts\elements\License;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fieldlayoutelements\ProductTitleField;
@@ -32,6 +33,7 @@ use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\services\Gc;
 use craft\services\Gql;
 use craft\services\ProjectConfig;
 use craft\services\Sites;
@@ -67,7 +69,7 @@ class Plugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    public string $schemaVersion = '3.0.0';
+    public string $schemaVersion = '3.0.3';
 
     /**
      * @inheritDoc
@@ -396,6 +398,23 @@ class Plugin extends BasePlugin
             }
 
             $event->queries = array_merge($event->queries, $queryComponents);
+        });
+    }
+
+    /**
+     * Register the things that need to be garbage collected
+     *
+     * @since 3.1
+     */
+    private function _registerGarbageCollection(): void
+    {
+        Event::on(Gc::class, Gc::EVENT_RUN, function(Event $event) {
+
+            // Delete partial elements
+            /** @var Gc $gc */
+            $gc = $event->sender;
+            $gc->deletePartialElements(Product::class, Table::PRODUCTS, 'id');
+            $gc->deletePartialElements(License::class, Table::LICENSES, 'id');
         });
     }
 }
