@@ -1,5 +1,9 @@
 # Release Notes for Digital Products
 
+
+### Fixed
+- Fixed a PHP error that occurred on garbage collection if a deleted product with a license is deleted.
+
 ## 3.0.2 - 2022-08-05
 
 ### Fixed
