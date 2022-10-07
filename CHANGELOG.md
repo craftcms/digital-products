@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## 3.0.3 - 2022-08-05
+## 3.1.0 - 2022-08-05
 
 ### Fixed
 - Fixed a bug where products could be soft-deleted with active licenses.
