@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Fixed
-- Fixed a bug where products could be soft-deleted with active licenses.
+- Fixed a bug where products could be soft-deleted with active licenses. ([#75](https://github.com/craftcms/digital-products/issues/75), [#78](https://github.com/craftcms/digital-products/pull/78))
 
 ## 3.0.2 - 2022-08-05
 
