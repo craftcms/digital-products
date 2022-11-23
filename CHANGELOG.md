@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 3.1.0 - 2022-11-23
 
 ### Fixed
 - Fixed a bug where it was possible to soft-delete digital products with active licenses. ([#75](https://github.com/craftcms/digital-products/issues/75), [#78](https://github.com/craftcms/digital-products/pull/78))
