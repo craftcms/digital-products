@@ -691,7 +691,7 @@ class ProductTypes extends Component
     }
 
     /**
-     * Gets a sections's record by uid.
+     * Gets a section's record by uid.
      *
      * @param string $uid
      * @return ProductTypeRecord

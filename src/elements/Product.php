@@ -722,7 +722,7 @@ class Product extends Purchasable
         if ($source == '*') {
             $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
         } elseif (preg_match('/^productType:(\d+)$/', $source, $matches)) {
-            $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($matches[1]);
+            $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById((int)$matches[1]);
 
             if ($productType) {
                 $productTypes = [$productType];
