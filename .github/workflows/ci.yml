@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
       - develop
+      - main
   pull_request:
 permissions:
   contents: read
@@ -22,4 +22,4 @@ jobs:
       slack_subteam: <!subteam^S01CWPYH9D5>
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_PLUGIN_WEBHOOK_URL }}
+      slack_webhook_url: ${{ secrets.SLACK_COMMERCE_WEBHOOK_URL }}
