@@ -2,8 +2,6 @@
 
 namespace craft\digitalproducts\migrations;
 
-use craft\commerce\elements\Order;
-use craft\commerce\elements\Product;
 use craft\db\Migration;
 use craft\digitalproducts\db\Table;
 use craft\helpers\Db;
