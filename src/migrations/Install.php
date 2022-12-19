@@ -36,8 +36,6 @@ class Install extends Migration
         $this->dropForeignKeys();
         $this->dropTables();
 
-        $this->delete('{{%elementindexsettings}}', ['type' => [Order::class, Product::class]]);
-
         return true;
     }
 
