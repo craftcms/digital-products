@@ -1,5 +1,9 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+- Fixed a PHP error when uninstalling the plugin. ([#80](https://github.com/craftcms/digital-products/issues/80))
+
 ## 3.1.0 - 2022-11-23
 
 ### Fixed

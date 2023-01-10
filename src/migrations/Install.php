@@ -2,8 +2,6 @@
 
 namespace craft\digitalproducts\migrations;
 
-use craft\commerce\elements\Order;
-use craft\commerce\elements\Product;
 use craft\db\Migration;
 use craft\digitalproducts\db\Table;
 use craft\helpers\Db;
@@ -35,8 +33,6 @@ class Install extends Migration
     {
         $this->dropForeignKeys();
         $this->dropTables();
-
-        $this->delete('{{%elementindexsettings}}', ['type' => [Order::class, Product::class]]);
 
         return true;
     }
