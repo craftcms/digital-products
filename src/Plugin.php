@@ -316,7 +316,6 @@ class Plugin extends BasePlugin
                 $event->permissions[] = [
                     'heading' => Craft::t('digital-products', 'Digital Products'),
                     'permissions' => [
-                        'digitalProducts-manageProductTypes' => ['label' => Craft::t('digital-products', 'Manage product types')],
                         'digitalProducts-manageProducts' => ['label' => Craft::t('digital-products', 'Manage products'), 'nested' => $productTypePermissions],
                         'digitalProducts-manageLicenses' => ['label' => Craft::t('digital-products', 'Manage licenses')],
                     ],

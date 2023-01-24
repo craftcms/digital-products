@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a PHP error when uninstalling the plugin. ([#80](https://github.com/craftcms/digital-products/issues/80))
+- Fixed a bug where a digital product cannot be edit or deleted. ([#79](https://github.com/craftcms/digital-products/issues/79))
 
 ## 3.1.0 - 2022-11-23
 
