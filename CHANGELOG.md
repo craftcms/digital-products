@@ -1,5 +1,11 @@
 # Release Notes for Digital Products
 
+## 3.2.0 - 2023-01-25
+
+- Product type field layouts now support UI elements. ([#60](https://github.com/craftcms/digital-products/issues/60))
+- Fixed a PHP error that occurred when uninstalling the plugin. ([#80](https://github.com/craftcms/digital-products/issues/80))
+- Fixed a bug where digital products couldn’t be edited or deleted in Craft 4.3.2+. ([#79](https://github.com/craftcms/digital-products/issues/79))
+
 ## 3.1.0 - 2022-11-23
 
 ### Fixed
