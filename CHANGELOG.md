@@ -3,8 +3,8 @@
 ## Unreleased
 
 - Fixed a PHP error when uninstalling the plugin. ([#80](https://github.com/craftcms/digital-products/issues/80))
-- Fixed a bug where a digital product cannot be edit or deleted. ([#79](https://github.com/craftcms/digital-products/issues/79))
-- Product type field layout now supports UI elements. ([#60](https://github.com/craftcms/digital-products/issues/60))
+- Fixed a bug where a digital product could not be edited or deleted. ([#79](https://github.com/craftcms/digital-products/issues/79))
+- The product type field layout now supports UI elements. ([#60](https://github.com/craftcms/digital-products/issues/60))
 
 ## 3.1.0 - 2022-11-23
 
