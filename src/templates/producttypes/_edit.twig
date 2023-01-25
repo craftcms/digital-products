@@ -108,10 +108,11 @@
   }) }}
 
   <hr>
-
-  {% include "_includes/fieldlayoutdesigner" with {
+  
+  {{ forms.fieldLayoutDesignerField({
     fieldLayout: productType.getProductFieldLayout(),
-  } only %}
+  }) }}
+
 {% endblock %}
 
 {% if brandNewProductType %}
