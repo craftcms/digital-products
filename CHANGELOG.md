@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 3.2.0 - 2023-01-25
 
 - Product type field layouts now support UI elements. ([#60](https://github.com/craftcms/digital-products/issues/60))
 - Fixed a PHP error that occurred when uninstalling the plugin. ([#80](https://github.com/craftcms/digital-products/issues/80))
