@@ -14,6 +14,7 @@ use craft\digitalproducts\records\Product as ProductRecord;
 use craft\elements\actions\Delete;
 use craft\elements\actions\SetStatus;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
@@ -756,5 +757,48 @@ class Product extends Purchasable
         }
 
         return $actions;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canView(User $user): bool
+    {
+        return $this->_canManageProductType($user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canSave(User $user): bool
+    {
+        return $this->_canManageProductType($user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDelete(User $user): bool
+    {
+        return $this->_canManageProductType($user);
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    private function _canManageProductType(User $user): bool
+    {
+        if (parent::canView($user)) {
+            return true;
+        }
+
+        try {
+            $productType = $this->getType();
+        } catch (\Exception) {
+            return false;
+        }
+
+        return $user->can('digitalProducts-manageProductType:' . $productType->uid);
     }
 }
