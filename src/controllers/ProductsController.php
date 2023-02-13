@@ -506,7 +506,7 @@ class ProductsController extends BaseController
         }
 
         $product->typeId = $request->getBodyParam('typeId');
-        $product->enabled = $request->getBodyParam('enabled');
+        $product->enabled = (bool) $request->getBodyParam('enabled');
 
         $product->price = (float)Localization::normalizeNumber($request->getBodyParam('price', 0));
         $product->sku = $request->getBodyParam('sku');
