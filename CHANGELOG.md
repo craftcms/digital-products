@@ -1,5 +1,9 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+- Fixed a bug where digital product Licenses couldn’t be edited or deleted in Craft 4.3.2+.
+
 ## 3.2.0 - 2023-01-25
 
 - Product type field layouts now support UI elements. ([#60](https://github.com/craftcms/digital-products/issues/60))
