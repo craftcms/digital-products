@@ -97,6 +97,7 @@ class Plugin extends BasePlugin
         $this->_registerGqlInterfaces();
         $this->_registerGqlComponents();
         $this->_defineFieldLayoutElements();
+        $this->_registerGarbageCollection();
 
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->_defineResaveCommand();
@@ -408,7 +409,6 @@ class Plugin extends BasePlugin
     private function _registerGarbageCollection(): void
     {
         Event::on(Gc::class, Gc::EVENT_RUN, function(Event $event) {
-
             // Delete partial elements
             /** @var Gc $gc */
             $gc = $event->sender;

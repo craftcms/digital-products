@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where digital product Licenses couldn’t be edited or deleted in Craft 4.3.2+.
+- Fixed a bug with element garbage collection.
 
 ## 3.2.0 - 2023-01-25
 
