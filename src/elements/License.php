@@ -527,4 +527,48 @@ class License extends Element
 
         parent::prepElementQueryForTableAttribute($elementQuery, $attribute);
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canView(User $user): bool
+    {
+        return $this->_canManageProductType($user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canSave(User $user): bool
+    {
+        return $this->_canManageProductType($user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDelete(User $user): bool
+    {
+        return $this->_canManageProductType($user);
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    private function _canManageProductType(User $user): bool
+    {
+        if (parent::canView($user)) {
+            return true;
+        }
+
+        try {
+            $productType = $this->getProductType();
+        } catch (\Exception) {
+            return false;
+        }
+
+        return $user->can('digitalProducts-manageLicenses:' . $productType->uid);
+    }
 }
