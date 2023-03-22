@@ -1,8 +1,10 @@
 # Release Notes for Digital Products
 
+## Unreleased
+- Fixed a PHP error that would occur when doing a live preview on digital products. ([#84](https://github.com/craftcms/digital-products/issues/84))
+
 ## 3.2.1 - 2023-03-09
 
-- Fixed a PHP error that would occur when doing a live preview on digital products. ([#84](https://github.com/craftcms/digital-products/issues/84))
 - Fixed a bug where digital product Licenses couldn’t be edited or deleted in Craft 4.3.2+.
 - Fixed a bug where garbage collection wasn’t running.
 
