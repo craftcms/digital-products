@@ -1,5 +1,9 @@
 # Release Notes for Digital Products
 
+## 3.2.2 - 2023-03-22
+
+- Fixed a PHP error that occurred when live previewing a digital product. ([#84](https://github.com/craftcms/digital-products/issues/84))
+
 ## 3.2.1 - 2023-03-09
 
 - Fixed a bug where digital product Licenses couldn’t be edited or deleted in Craft 4.3.2+.
