@@ -1,7 +1,8 @@
 # Release Notes for Digital Products
 
 ## Unreleased
-- Fixed a PHP error that would occur when doing a live preview on digital products. ([#84](https://github.com/craftcms/digital-products/issues/84))
+
+- Fixed a PHP error that occurred when live previewing a digital product. ([#84](https://github.com/craftcms/digital-products/issues/84))
 
 ## 3.2.1 - 2023-03-09
 
