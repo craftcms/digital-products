@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 3.2.3 - 2023-09-11
 
 - Fixed an XSS vulnerability.
 
