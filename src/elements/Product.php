@@ -17,6 +17,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
+use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use DateTime;
@@ -670,12 +671,12 @@ class Product extends Purchasable
 
         switch ($attribute) {
             case 'type':
-                return ($productType ? Craft::t('site', $productType->name) : '');
+                return ($productType ? Craft::t('site', Html::encode($productType->name)) : '');
 
             case 'taxCategory':
                 $taxCategory = $this->getTaxCategory();
 
-                return ($taxCategory ? Craft::t('site', $taxCategory->name) : '');
+                return ($taxCategory ? Craft::t('site', Html::encode($taxCategory->name)) : '');
 
             case 'price':
                 $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
