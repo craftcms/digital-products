@@ -1,5 +1,9 @@
 # Release Notes for Digital Products
 
+## Unreleased
+
+- Fixed an XSS vulnerability.
+
 ## 3.2.2 - 2023-03-22
 
 - Fixed a PHP error that occurred when live previewing a digital product. ([#84](https://github.com/craftcms/digital-products/issues/84))
