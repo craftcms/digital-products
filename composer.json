@@ -24,9 +24,9 @@
     "rss": "https://github.com/craftcms/commerce-digital-products/commits/master.atom"
   },
   "require": {
-    "php": "^8.0.2",
-    "craftcms/commerce": "^4.0.0",
-    "craftcms/cms": "^4.0.0"
+    "php": "^8.2",
+    "craftcms/cms": "^5.0.0-beta.7",
+    "craftcms/commerce": "^5.0.0-beta.1"
   },
   "autoload": {
     "psr-4": {
@@ -40,7 +40,8 @@
   },
   "require-dev": {
     "craftcms/phpstan": "dev-main",
-    "craftcms/ecs": "dev-main"
+    "craftcms/ecs": "dev-main",
+    "craftcms/rector": "dev-main"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
@@ -50,7 +51,7 @@
       "craftcms/plugin-installer": true
     },
     "platform": {
-      "php": "8.0.2"
+      "php": "8.2"
     }
   },
   "scripts": {

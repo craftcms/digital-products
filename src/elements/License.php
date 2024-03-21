@@ -12,6 +12,7 @@ use craft\digitalproducts\events\GenerateKeyEvent;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\License as LicenseRecord;
+use craft\elements\db\EagerLoadPlan;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
@@ -304,8 +305,9 @@ class License extends Element
     /**
      * @param string $handle
      * @param array|Product[]|User[]|Order[] $elements
+     * @param EagerLoadPlan $plan
      */
-    public function setEagerLoadedElements(string $handle, array $elements): void
+    public function setEagerLoadedElements(string $handle, array $elements, EagerLoadPlan $plan): void
     {
         if ($handle === 'product') {
             $this->_product = $elements[0] ?? null;
@@ -322,7 +324,7 @@ class License extends Element
             return;
         }
 
-        parent::setEagerLoadedElements($handle, $elements);
+        parent::setEagerLoadedElements($handle, $elements, $plan);
     }
 
     /**
@@ -468,7 +470,7 @@ class License extends Element
     /**
      * @inheritdoc
      */
-    protected function tableAttributeHtml(string $attribute): string
+    protected function attributeHtml(string $attribute): string
     {
         switch ($attribute) {
             case 'productType':
@@ -484,7 +486,7 @@ class License extends Element
 
             default:
                 {
-                    return parent::tableAttributeHtml($attribute);
+                    return parent::attributeHtml($attribute);
                 }
         }
     }
