@@ -1,5 +1,9 @@
 # Release Notes for Digital Products
 
+## 4.0.0 - 2024-03-20
+
+- Added Craft CMS 5 and Craft Commerce 5 compatibility.
+
 ## 3.2.3 - 2023-09-11
 
 - Fixed an XSS vulnerability.
