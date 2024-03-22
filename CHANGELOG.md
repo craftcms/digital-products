@@ -2,7 +2,7 @@
 
 ## 4.0.0 - 2024-03-20
 
-- Digital Products now requires Craft Commerce 5.0.0-beta.2 or later.
+- Digital Products now requires Craft Commerce 5.0.0-beta.1 or later.
 
 ## 3.2.3 - 2023-09-11
 
