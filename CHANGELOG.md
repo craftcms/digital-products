@@ -2,7 +2,7 @@
 
 ## 4.0.0 - 2024-03-20
 
-- Added Craft CMS 5 and Craft Commerce 5 compatibility.
+- Digital Products now requires Craft Commerce 5.0.0-beta.2 or later.
 
 ## 3.2.3 - 2023-09-11
 
