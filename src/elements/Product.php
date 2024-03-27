@@ -13,6 +13,7 @@ use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\digitalproducts\records\Product as ProductRecord;
 use craft\elements\actions\Delete;
 use craft\elements\actions\SetStatus;
+use craft\elements\db\EagerLoadPlan;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
@@ -222,8 +223,9 @@ class Product extends Purchasable
     /**
      * @param string $handle
      * @param array|License[] $elements
+     * @param EagerLoadPlan $plan
      */
-    public function setEagerLoadedElements(string $handle, array $elements): void
+    public function setEagerLoadedElements(string $handle, array $elements, EagerLoadPlan $plan): void
     {
         if ($handle === 'existingLicenses') {
             $this->_existingLicenses = $elements;
@@ -231,7 +233,7 @@ class Product extends Purchasable
             return;
         }
 
-        parent::setEagerLoadedElements($handle, $elements);
+        parent::setEagerLoadedElements($handle, $elements, $plan);
     }
 
     /**
@@ -424,15 +426,15 @@ class Product extends Purchasable
     /**
      * Gets the tax category
      *
-     * @return TaxCategory|null
+     * @return TaxCategory
      */
-    public function getTaxCategory(): ?TaxCategory
+    public function getTaxCategory(): TaxCategory
     {
         if ($this->taxCategoryId) {
             return Commerce::getInstance()->getTaxCategories()->getTaxCategoryById($this->taxCategoryId);
         }
 
-        return null;
+        return Commerce::getInstance()->getTaxCategories()->getDefaultTaxCategory();
     }
 
     /**
@@ -479,7 +481,7 @@ class Product extends Purchasable
      * @inheritdoc
      * @since 2.4
      */
-    public static function gqlScopesByContext($context): array
+    public static function gqlScopesByContext(mixed $context): array
     {
         /** @var ProductType $context */
         return ['digitalProductTypes.' . $context->uid];
@@ -664,7 +666,7 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    protected function tableAttributeHtml(string $attribute): string
+    protected function attributeHtml(string $attribute): string
     {
         /* @var $productType ProductType */
         $productType = $this->getType();
@@ -676,7 +678,7 @@ class Product extends Purchasable
             case 'taxCategory':
                 $taxCategory = $this->getTaxCategory();
 
-                return ($taxCategory ? Craft::t('site', Html::encode($taxCategory->name)) : '');
+                return Craft::t('site', Html::encode($taxCategory->name));
 
             case 'price':
                 $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
@@ -687,7 +689,7 @@ class Product extends Purchasable
                 return ($this->$attribute ? '<span data-icon="check" title="' . Craft::t('digital-products', 'Yes') . '"></span>' : '');
 
             default:
-                return parent::tableAttributeHtml($attribute);
+                return parent::attributeHtml($attribute);
         }
     }
 
