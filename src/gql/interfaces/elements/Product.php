@@ -7,6 +7,7 @@
 
 namespace craft\digitalproducts\gql\interfaces\elements;
 
+use Craft;
 use craft\digitalproducts\elements\Product as ProductElement;
 use craft\digitalproducts\gql\types\generators\ProductType;
 use craft\gql\GqlEntityRegistry;
@@ -67,7 +68,7 @@ class Product extends Element
      */
     public static function getFieldDefinitions(): array
     {
-        return TypeManager::prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), [
+        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), [
             'price' => [
                 'name' => 'price',
                 'type' => Type::float(),
