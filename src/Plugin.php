@@ -16,6 +16,7 @@ use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\fieldlayoutelements\ProductTitleField;
 use craft\digitalproducts\fields\Products;
 use craft\digitalproducts\gql\interfaces\elements\Product as GqlProductInterface;
+use craft\digitalproducts\gql\queries\Product as GqlProductQueries;
 use craft\digitalproducts\helpers\ProjectConfigData;
 use craft\digitalproducts\models\Settings;
 use craft\digitalproducts\plugin\Routes;
@@ -27,6 +28,7 @@ use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RebuildConfigEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterGqlSchemaComponentsEvent;
+use craft\events\RegisterGqlQueriesEvent;
 use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
@@ -95,6 +97,7 @@ class Plugin extends BasePlugin
         $this->_registerPermissions();
         $this->_registerElementTypes();
         $this->_registerGqlInterfaces();
+        $this->_registerGqlQueries();
         $this->_registerGqlComponents();
         $this->_defineFieldLayoutElements();
         $this->_registerGarbageCollection();
@@ -371,6 +374,19 @@ class Plugin extends BasePlugin
                 $event->types = $types;
             }
         );
+    }
+
+    /**
+     * Register the Gql queries
+     */
+    private function _registerGqlQueries(): void
+    {
+        Event::on(Gql::class, Gql::EVENT_REGISTER_GQL_QUERIES, static function(RegisterGqlQueriesEvent $event) {
+            $event->queries = array_merge(
+                $event->queries,
+                GqlProductQueries::getQueries(),
+            );
+        });
     }
 
     /**
