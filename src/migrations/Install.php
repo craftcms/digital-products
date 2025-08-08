@@ -42,6 +42,7 @@ class Install extends Migration
      */
     protected function createTables(): void
     {
+        $this->archiveTableIfExists(Table::LICENSES);
         $this->createTable(Table::LICENSES, [
             'id' => $this->primaryKey(),
             'productId' => $this->integer()->notNull(),
@@ -55,6 +56,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
+        $this->archiveTableIfExists(Table::PRODUCTS);
         $this->createTable(Table::PRODUCTS, [
             'id' => $this->primaryKey(),
             'typeId' => $this->integer()->notNull(),
@@ -69,6 +71,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
+        $this->archiveTableIfExists(Table::PRODUCT_TYPES);
         $this->createTable(Table::PRODUCT_TYPES, [
             'id' => $this->primaryKey(),
             'fieldLayoutId' => $this->integer(),
@@ -80,6 +83,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
+        $this->archiveTableIfExists(Table::PRODUCT_TYPES_SITES);
         $this->createTable(Table::PRODUCT_TYPES_SITES, [
             'id' => $this->primaryKey(),
             'productTypeId' => $this->integer()->notNull(),
