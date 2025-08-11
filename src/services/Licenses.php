@@ -47,8 +47,7 @@ class Licenses extends Component
 
         foreach ($lineItems as $lineItem) {
             // Could be deleted line item
-            if($itemId = $lineItem->purchasableId) {
-
+            if ($itemId = $lineItem->purchasableId) {
                 $element = Craft::$app->getElements()->getElementById($itemId);
                 $quantity = $lineItem->qty;
 
