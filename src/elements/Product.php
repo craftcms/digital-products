@@ -546,6 +546,14 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
+    public function getBasePrice(): ?float
+    {
+        return $this->price;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getPrice(): float
     {
         return (float)$this->price;
