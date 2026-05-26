@@ -4,6 +4,7 @@ namespace craft\digitalproducts\elements;
 
 use Craft;
 use craft\commerce\base\Purchasable;
+use craft\commerce\behaviors\CurrencyAttributeBehavior;
 use craft\commerce\models\TaxCategory;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
@@ -14,7 +15,6 @@ use craft\digitalproducts\records\Product as ProductRecord;
 use craft\elements\actions\Delete;
 use craft\elements\actions\SetStatus;
 use craft\elements\db\EagerLoadPlan;
-use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
@@ -71,16 +71,6 @@ class Product extends Purchasable
     public bool $promotable = false;
 
     /**
-     * @var string|null SKU
-     */
-    public ?string $sku = null;
-
-    /**
-     * @var float|null $price
-     */
-    public ?float $price = null;
-
-    /**
      * @var ProductType|null
      */
     private ?ProductType $_productType = null;
@@ -104,6 +94,19 @@ class Product extends Purchasable
     public function __toString(): string
     {
         return (string)$this->title;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors(): array
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['currencyAttributes'] = [
+            'class' => CurrencyAttributeBehavior::class,
+            'currencyAttributes' => $this->currencyAttributes(),
+        ];
+        return $behaviors;
     }
 
     /**
@@ -305,7 +308,7 @@ class Product extends Purchasable
     {
         $rules = parent::defineRules();
 
-        $rules[] = [['typeId', 'sku', 'price'], 'required'];
+        $rules[] = [['typeId'], 'required'];
         $rules[] = [['sku'], 'string', 'max' => 255];
 
         return $rules;
@@ -317,7 +320,7 @@ class Product extends Purchasable
      *
      * @return ProductQuery The newly created [[ProductQuery]] instance.
      */
-    public static function find(): ElementQueryInterface
+    public static function find(): ProductQuery
     {
         return new ProductQuery(static::class);
     }
@@ -492,37 +495,42 @@ class Product extends Purchasable
      */
     public function afterSave(bool $isNew): void
     {
-        if (!$isNew) {
-            $productRecord = ProductRecord::findOne($this->id);
+        if (!$this->propagating) {
+            if (!$isNew) {
+                $productRecord = ProductRecord::findOne($this->id);
 
-            if (!$productRecord) {
-                throw new Exception('Invalid product id: ' . $this->id);
+                if (!$productRecord) {
+                    throw new Exception('Invalid product id: ' . $this->id);
+                }
+            } else {
+                $productRecord = new ProductRecord();
+                $productRecord->id = $this->id;
             }
-        } else {
-            $productRecord = new ProductRecord();
-            $productRecord->id = $this->id;
-        }
 
-        $productRecord->postDate = $this->postDate;
-        $productRecord->expiryDate = $this->expiryDate;
-        $productRecord->typeId = $this->typeId;
-        $productRecord->promotable = (bool)$this->promotable;
-        $productRecord->taxCategoryId = $this->taxCategoryId;
-        $productRecord->price = $this->price;
+            $productRecord->postDate = $this->postDate;
+            $productRecord->expiryDate = $this->expiryDate;
+            $productRecord->typeId = $this->typeId;
+            $productRecord->promotable = (bool)$this->promotable;
+            $productRecord->taxCategoryId = $this->taxCategoryId;
 
-        // Generate SKU if empty
-        if (empty($this->sku)) {
-            try {
-                $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
-                $this->sku = Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $this);
-            } catch (\Exception $e) {
-                $this->sku = '';
+            // Generate SKU if empty
+            if (empty($this->getSku())) {
+                try {
+                    $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
+                    $this->setSku(Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $this));
+                } catch (\Exception $e) {
+                    $this->setSku('');
+                }
             }
+
+            $productRecord->dateUpdated = $this->dateUpdated;
+            $productRecord->dateCreated = $this->dateCreated;
+
+            $dirtyAttributes = array_keys($productRecord->getDirtyAttributes());
+            $productRecord->save(false);
+
+            $this->setDirtyAttributes($dirtyAttributes);
         }
-
-        $productRecord->sku = $this->sku;
-
-        $productRecord->save(false);
 
         parent::afterSave($isNew);
     }
@@ -541,30 +549,6 @@ class Product extends Purchasable
     public function getSnapshot(): array
     {
         return $this->getAttributes();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getBasePrice(): ?float
-    {
-        return $this->price;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPrice(): float
-    {
-        return (float)$this->price;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSku(): string
-    {
-        return $this->sku ?? '';
     }
 
     /**
@@ -691,7 +675,7 @@ class Product extends Purchasable
             case 'price':
                 $code = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
 
-                return Craft::$app->getLocale()->getFormatter()->asCurrency($this->$attribute, strtoupper($code));
+                return Craft::$app->getLocale()->getFormatter()->asCurrency($this->basePrice, strtoupper($code));
 
             case 'promotable':
                 return ($this->$attribute ? '<span data-icon="check" title="' . Craft::t('digital-products', 'Yes') . '"></span>' : '');
@@ -718,7 +702,11 @@ class Product extends Purchasable
                 'orderBy' => 'expiryDate',
                 'defaultDir' => 'desc',
             ],
-            'price' => Craft::t('digital-products', 'Price'),
+            [
+                'label' => Craft::t('digital-products', 'Price'),
+                'orderBy' => 'purchasables_stores.basePrice',
+                'defaultDir' => 'asc',
+            ],
         ];
     }
 

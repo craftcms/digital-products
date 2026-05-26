@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+- Added a `digital-products/download/download` action that streams a licensed asset to the browser without exposing the underlying file URL. ([#109](https://github.com/craftcms/commerce-digital-products/issues/109))
 - Fixed a PHP error that could occur when paying for a completed order that contains deleted digital products.
 - Fixed an SQL error that could occur when saving a new digital product. ([#110](https://github.com/craftcms/commerce-digital-products/issues/110))
+- Fixed a bug where the Price field was not editable in the element index inline editor. ([#112](https://github.com/craftcms/commerce-digital-products/issues/112))
+- Fixed an error that occurred when viewing digital products in "Display as cards" view. ([#111](https://github.com/craftcms/commerce-digital-products/issues/111))
 
 ## 4.0.3 - 2025-02-03
 

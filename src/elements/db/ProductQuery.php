@@ -3,12 +3,12 @@
 namespace craft\digitalproducts\elements\db;
 
 use Craft;
+use craft\commerce\elements\db\PurchasableQuery;
 use craft\db\Query;
 use craft\db\QueryAbortedException;
 use craft\digitalproducts\elements\Product;
 use craft\digitalproducts\models\ProductType;
 use craft\digitalproducts\Plugin as DigitalProducts;
-use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use DateTime;
@@ -24,7 +24,7 @@ use yii\db\Connection;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since  2.0
  */
-class ProductQuery extends ElementQuery
+class ProductQuery extends PurchasableQuery
 {
     /**
      * @var bool Whether to only return products that the user has permission to edit.
@@ -40,11 +40,6 @@ class ProductQuery extends ElementQuery
      * @var mixed The Post Date that the resulting products must have.
      */
     public mixed $postDate = null;
-
-    /**
-     * @var mixed The sku the resulting products must have.
-     */
-    public mixed $sku = null;
 
     /**
      * @var int|int[]|null The product type ID(s) that the resulting products must have.
@@ -157,19 +152,7 @@ class ProductQuery extends ElementQuery
     }
 
     /**
-     * Sets the [[sku]] property.
-     *
-     * @param mixed $value The property value
-     * @return static self reference
-     */
-    public function sku(mixed $value): ProductQuery
-    {
-        $this->sku = $value;
-        return $this;
-    }
-
-    /**
-     * Sets the [[typeId]] property based on a given product types(s)’s handle(s).
+     * Sets the [[typeId]] property based on a given product types(s)'s handle(s).
      *
      * @param mixed $value The property value
      * @return static self reference
@@ -218,13 +201,11 @@ class ProductQuery extends ElementQuery
 
         $this->joinElementTable('digitalproducts_products');
 
-        $this->query->select([
+        $this->query->addSelect([
             'digitalproducts_products.expiryDate',
             'digitalproducts_products.id',
             'digitalproducts_products.postDate',
-            'digitalproducts_products.price',
             'digitalproducts_products.promotable',
-            'digitalproducts_products.sku',
             'digitalproducts_products.taxCategoryId',
             'digitalproducts_products.typeId',
         ]);
@@ -235,10 +216,6 @@ class ProductQuery extends ElementQuery
 
         if ($this->postDate) {
             $this->subQuery->andWhere(Db::parseDateParam('digitalproducts_products.postDate', $this->postDate));
-        }
-
-        if ($this->sku) {
-            $this->subQuery->andWhere(Db::parseParam('digitalproducts_products.sku', $this->sku));
         }
 
         if ($this->typeId) {

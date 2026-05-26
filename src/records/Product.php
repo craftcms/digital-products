@@ -17,8 +17,6 @@ use yii\db\ActiveQueryInterface;
  * @property DateTime $postDate      Product post date
  * @property DateTime $expiryDate    Product expiry date
  * @property bool $promotable    Can sales/discounts be applied?
- * @property string $sku           Product SKU
- * @property float $price         Product price
  * @property Element $element       Element
  * @property ProductType $type          Product type
  * @property TaxCategory $taxCategory   Tax category

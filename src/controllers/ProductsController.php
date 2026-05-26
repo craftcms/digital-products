@@ -508,8 +508,8 @@ class ProductsController extends BaseController
         $product->typeId = $request->getBodyParam('typeId');
         $product->enabled = (bool) $request->getBodyParam('enabled');
 
-        $product->price = (float)Localization::normalizeNumber($request->getBodyParam('price', 0));
-        $product->sku = $request->getBodyParam('sku');
+        $product->basePrice = (float)Localization::normalizeNumber($request->getBodyParam('basePrice', 0));
+        $product->setSku($request->getBodyParam('sku'));
 
         $product->postDate = (($date = $request->getParam('postDate')) !== false ? (DateTimeHelper::toDateTime($date) ?: null) : $product->postDate);
         $product->expiryDate = (($date = $request->getParam('expiryDate')) !== false ? (DateTimeHelper::toDateTime($date) ?: null) : $product->expiryDate);
@@ -523,9 +523,9 @@ class ProductsController extends BaseController
         $product->setFieldValuesFromRequest('fields');
 
         // Last checks
-        if (empty($product->sku)) {
+        if (empty($product->getSku())) {
             $productType = $product->getType();
-            $product->sku = Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $product);
+            $product->setSku(Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $product));
         }
 
         if (!$product->postDate) {
