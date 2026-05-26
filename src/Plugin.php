@@ -115,7 +115,7 @@ class Plugin extends BasePlugin
         $navItems = parent::getCpNavItem();
 
         $productTypes = Plugin::getInstance()->getProductTypes()->getAllProductTypes();
-        if(count($productTypes) > 0) {
+        if (count($productTypes) > 0) {
             if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProducts')) {
                 $navItems['subnav']['products'] = [
                     'label' => Craft::t('digital-products', 'Products'),
