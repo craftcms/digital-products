@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a PHP error that could occur when paying for a completed order that contains deleted digital products.
+- Fixed an SQL error that could occur when saving a new digital product. ([#110](https://github.com/craftcms/commerce-digital-products/issues/110))
 
 ## 4.0.3 - 2025-02-03
 
