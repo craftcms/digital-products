@@ -45,11 +45,11 @@ class Install extends Migration
         $this->archiveTableIfExists(Table::LICENSES);
         $this->createTable(Table::LICENSES, [
             'id' => $this->primaryKey(),
-            'productId' => $this->integer()->notNull(),
+            'productId' => $this->integer()->null(),
             'orderId' => $this->integer()->null(),
             'licenseKey' => $this->string()->notNull(),
             'ownerName' => $this->string(),
-            'ownerEmail' => $this->string()->notNull(),
+            'ownerEmail' => $this->string()->null(),
             'userId' => $this->integer()->null(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),

@@ -1,7 +1,6 @@
-{% extends "_layouts/cp" %}
+{% extends "digital-products/settings/_layout" %}
 
 {% set title = "Product Types"|t('digital-products') %}
-{% set selectedSubnavItem = "productTypes" %}
 
 {% set productTypes = craft.digitalProducts.getProductTypes() %}
 {% set content %}

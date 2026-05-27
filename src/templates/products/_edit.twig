@@ -61,32 +61,6 @@
   </div>
 {% endblock %}
 
-{% block contextMenu %}
-  {% if craft.app.getIsMultiSite() %}
-    <div class="btn menubtn" data-icon="world">{{ product.site.name|t('site') }}</div>
-    <div class="menu">
-      <ul class="padded">
-        {% for siteId in siteIds %}
-          {% set site = craft.app.sites.getSiteById(siteId) %}
-          {% set status = siteId in enabledSiteIds ? 'enabled' : 'disabled' %}
-          <li>
-            {% if siteId == product.siteId %}
-              <a class="sel">
-                <div class="status {{ status }}"></div>{{ site.name|t('site') }}
-              </a>
-            {% else %}
-              {% set url = url("digital-products/products/#{productTypeHandle}/#{craft.app.request.getSegment(4)}/#{site.handle}") %}
-              <a href="{{ url }}">
-                <div class="status {{ status }}"></div>{{ site.name|t('site') }}
-              </a>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
-{% endblock %}
-
 {% block content %}
   <input type="hidden" name="action" value="digital-products/products/save">
   <input type="hidden" name="redirect" value="{{ 'digital-products/products'|hash }}">

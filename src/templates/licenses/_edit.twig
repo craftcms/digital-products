@@ -14,6 +14,12 @@
 
   <div id="fields">
     {% include 'digital-products/licenses/_fields' %}
+
+    {% set fieldLayout = license.getFieldLayout() %}
+    {% if fieldLayout and fieldLayout.getCustomFields()|length %}
+      <hr>
+      {{ fieldLayout.createForm(license).render()|raw }}
+    {% endif %}
   </div>
 {% endblock %}
 

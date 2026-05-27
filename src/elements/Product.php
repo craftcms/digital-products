@@ -17,10 +17,11 @@ use craft\elements\actions\SetStatus;
 use craft\elements\db\EagerLoadPlan;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Html;
-use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
+use craft\validators\DateTimeValidator;
 use DateTime;
 use yii\base\Exception;
 
@@ -216,14 +217,6 @@ class Product extends Purchasable
 
 
     /**
-     * @inheritdoc
-     */
-    public function getEditorHtml(): string
-    {
-        return Craft::$app->getView()->renderTemplate('digital-products/products/_editor', ['product' => $this]);
-    }
-
-    /**
      * @param string $handle
      * @param array|License[] $elements
      * @param EagerLoadPlan $plan
@@ -310,6 +303,7 @@ class Product extends Purchasable
 
         $rules[] = [['typeId'], 'required'];
         $rules[] = [['sku'], 'string', 'max' => 255];
+        $rules[] = [['postDate', 'expiryDate'], DateTimeValidator::class];
 
         return $rules;
     }
@@ -354,20 +348,111 @@ class Product extends Purchasable
     /**
      * @inheritdoc
      */
-    public function getCpEditUrl(): ?string
+    public static function hasDrafts(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function cpEditUrl(): ?string
     {
         $productType = $this->getType();
 
-        $url = '';
-        if ($productType) {
-            $url = UrlHelper::cpUrl('digital-products/products/' . $productType->handle . '/' . $this->id);
+        if (!$productType) {
+            return null;
         }
 
-        if (Craft::$app->getIsMultiSite()) {
-            $url .= '/' . $this->getSite()->handle;
+        return sprintf('digital-products/products/%s/%s', $productType->handle, $this->getCanonicalId());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function crumbs(): array
+    {
+        $productType = $this->getType();
+
+        $productTypes = DigitalProducts::getInstance()->getProductTypes()->getEditableProductTypes();
+        $productTypeItems = array_map(fn(ProductType $t) => [
+            'label' => Craft::t('site', $t->name),
+            'url' => 'digital-products/products/' . $t->handle,
+            'selected' => $productType && $t->id === $productType->id,
+        ], $productTypes);
+
+        return [
+            [
+                'label' => Craft::t('digital-products', 'Products'),
+                'url' => 'digital-products/products',
+            ],
+            [
+                'menu' => [
+                    'label' => Craft::t('digital-products', 'Select product type'),
+                    'items' => $productTypeItems,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function metaFieldsHtml(bool $static): string
+    {
+        $fields = [];
+
+        $fields[] = $this->slugFieldHtml($static);
+
+        $fields[] = Cp::dateTimeFieldHtml([
+            'status' => $this->getAttributeStatus('postDate'),
+            'label' => Craft::t('digital-products', 'Post Date'),
+            'id' => 'postDate',
+            'name' => 'postDate',
+            'value' => $this->postDate,
+            'errors' => $this->getErrors('postDate'),
+            'disabled' => $static,
+        ]);
+
+        $fields[] = Cp::dateTimeFieldHtml([
+            'status' => $this->getAttributeStatus('expiryDate'),
+            'label' => Craft::t('digital-products', 'Expiry Date'),
+            'id' => 'expiryDate',
+            'name' => 'expiryDate',
+            'value' => $this->expiryDate,
+            'errors' => $this->getErrors('expiryDate'),
+            'disabled' => $static,
+        ]);
+
+        $fields[] = parent::metaFieldsHtml($static);
+
+        $fields[] = Cp::lightswitchFieldHtml([
+            'label' => Craft::t('digital-products', 'Promotable'),
+            'id' => 'promotable',
+            'name' => 'promotable',
+            'on' => $this->promotable,
+            'disabled' => $static,
+        ]);
+
+        return implode("\n", $fields);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesFromRequest(array $values): void
+    {
+        if (isset($values['taxCategoryId'])) {
+            $this->taxCategoryId = (int)$values['taxCategoryId'] ?: null;
+            unset($values['taxCategoryId']);
         }
 
-        return $url;
+        if (array_key_exists('promotable', $values)) {
+            $this->promotable = (bool)$values['promotable'];
+            unset($values['promotable']);
+        }
+
+        parent::setAttributesFromRequest($values);
     }
 
     /**

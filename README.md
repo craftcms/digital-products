@@ -177,6 +177,37 @@ Both licenses and products have several eager-loadable properties.
 {% endif %}
 ```
 
+## Serving licensed file downloads
+
+To let customers download a file after purchasing a digital product, add an Assets field to your product type and attach the downloadable file to each product. Then use the `digital-products/download/download` action to stream the file to the browser — the underlying asset URL is never exposed.
+
+The action accepts two required parameters:
+
+- `licenseKey` — the customer's license key
+- `assetId` — the ID of the asset to download
+
+The asset must be related to the product associated with the license. If either the license key is invalid or the asset is not related to that product, a 404 is returned.
+
+### Example
+
+In a Twig template (e.g. an order confirmation page or the customer's account area):
+
+```twig
+{% for license in licenses %}
+    {% set product = license.product %}
+    {% set file = product.downloadFile.one() %}
+
+    {% if file %}
+        <a href="{{ actionUrl('digital-products/download/download', {
+            licenseKey: license.licenseKey,
+            assetId: file.id
+        }) }}">Download {{ product.title }}</a>
+    {% endif %}
+{% endfor %}
+```
+
+This works with assets stored anywhere — local volumes, private S3 buckets, or any other filesystem — because the file is streamed through Craft rather than redirected to a signed URL.
+
 ## GraphQL
 
 Digital products may be queried with GraphQL. Please read the [getting started docs](https://docs.craftcms.com/v3/graphql.html) to get up to speed with how Craft CMS handles GraphQL requests.

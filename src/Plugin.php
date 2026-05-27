@@ -23,6 +23,7 @@ use craft\digitalproducts\plugin\Routes;
 use craft\digitalproducts\plugin\Services;
 use craft\digitalproducts\services\ProductTypes;
 use craft\digitalproducts\variables\DigitalProducts;
+use craft\events\ConfigEvent;
 use craft\events\DefineConsoleActionsEvent;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RebuildConfigEvent;
@@ -31,6 +32,7 @@ use craft\events\RegisterGqlQueriesEvent;
 use craft\events\RegisterGqlSchemaComponentsEvent;
 use craft\events\RegisterGqlTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craft\services\Elements;
@@ -71,7 +73,7 @@ class Plugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    public string $schemaVersion = '4.0.0.3';
+    public string $schemaVersion = '4.0.0.4';
 
     /**
      * @inheritDoc
@@ -124,13 +126,6 @@ class Plugin extends BasePlugin
             }
         }
 
-        if (Craft::$app->getUser()->checkPermission('digitalProducts-manageProductTypes')) {
-            $navItems['subnav']['productTypes'] = [
-                'label' => Craft::t('digital-products', 'Product Types'),
-                'url' => 'digital-products/producttypes',
-            ];
-        }
-
         if (Craft::$app->getUser()->checkPermission('digitalProducts-manageLicenses')) {
             $navItems['subnav']['licenses'] = [
                 'label' => Craft::t('digital-products', 'Licenses'),
@@ -154,6 +149,30 @@ class Plugin extends BasePlugin
     public function getSettingsResponse(): mixed
     {
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('digital-products/settings'));
+    }
+
+    /**
+     * Handle a changed license field layout from project config.
+     */
+    public function handleChangedLicenseFieldLayout(ConfigEvent $event): void
+    {
+        $data = $event->newValue;
+        $fieldsService = Craft::$app->getFields();
+
+        if (empty($data) || empty($config = reset($data))) {
+            $fieldsService->deleteLayoutsByType(License::class);
+            return;
+        }
+
+        ProjectConfigHelper::ensureAllFieldsProcessed();
+
+        $layout = FieldLayout::createFromConfig($config);
+        $layout->id = $fieldsService->getLayoutByType(License::class)->id;
+        $layout->type = License::class;
+        $layout->uid = key($data);
+        $fieldsService->saveLayout($layout, false);
+
+        Craft::$app->getElements()->invalidateCachesForElementType(License::class);
     }
 
     // Protected Methods
@@ -258,6 +277,10 @@ class Plugin extends BasePlugin
         $projectConfigService->onAdd(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
             ->onUpdate(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleChangedProductType'])
             ->onRemove(ProductTypes::CONFIG_PRODUCTTYPES_KEY . '.{uid}', [$productTypeService, 'handleDeletedProductType']);
+
+        $projectConfigService->onAdd('digital-products.licenseFieldLayouts', [$this, 'handleChangedLicenseFieldLayout'])
+            ->onUpdate('digital-products.licenseFieldLayouts', [$this, 'handleChangedLicenseFieldLayout'])
+            ->onRemove('digital-products.licenseFieldLayouts', [$this, 'handleChangedLicenseFieldLayout']);
 
         Event::on(
             Sites::class,

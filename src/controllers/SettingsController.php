@@ -3,6 +3,7 @@
 namespace craft\digitalproducts\controllers;
 
 use Craft;
+use craft\digitalproducts\elements\License;
 use craft\digitalproducts\models\Settings as SettingsModel;
 use craft\digitalproducts\Plugin as DigitalProducts;
 use craft\web\Controller as BaseController;
@@ -16,6 +17,41 @@ use yii\web\Response;
  */
 class SettingsController extends BaseController
 {
+    /**
+     * @return Response
+     */
+    public function actionEditLicenses(): Response
+    {
+        $this->requireAdmin();
+        return $this->renderTemplate('digital-products/settings/licenses');
+    }
+
+    /**
+     * @return Response
+     */
+    public function actionSaveLicenseFieldLayout(): Response
+    {
+        $this->requireAdmin();
+        $this->requirePostRequest();
+
+        $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost();
+        $fieldLayout->type = License::class;
+
+        if (!Craft::$app->getFields()->saveLayout($fieldLayout)) {
+            Craft::$app->getSession()->setError(Craft::t('digital-products', 'Couldn\'t save license fields.'));
+            return $this->renderTemplate('digital-products/settings/licenses');
+        }
+
+        // Save to project config
+        $projectConfig = Craft::$app->getProjectConfig();
+        $projectConfig->set('digital-products.licenseFieldLayouts', [
+            $fieldLayout->uid => $fieldLayout->getConfig(),
+        ], 'Save the license field layout');
+
+        Craft::$app->getSession()->setNotice(Craft::t('digital-products', 'License fields saved.'));
+        return $this->redirectToPostedUrl();
+    }
+
     /**
      * @return Response
      */

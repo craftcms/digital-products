@@ -3,16 +3,21 @@
 namespace craft\digitalproducts\controllers;
 
 use Craft;
+use craft\base\Element;
 use craft\digitalproducts\elements\License;
+
 use craft\digitalproducts\elements\Product;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\errors\MissingComponentException;
+use craft\helpers\Cp;
+use craft\helpers\UrlHelper;
 use craft\web\Controller as BaseController;
 use craft\web\UrlManager;
 use Throwable;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 /**
@@ -31,6 +36,42 @@ class LicensesController extends BaseController
         $this->requirePermission('digitalProducts-manageLicenses');
 
         parent::init();
+    }
+
+    /**
+     * Create a new License and redirect to its edit page.
+     */
+    public function actionCreate(): ?Response
+    {
+        $site = Cp::requestedSite();
+        if (!$site) {
+            throw new ForbiddenHttpException('User not authorized to edit content in any sites.');
+        }
+
+        $license = Craft::createObject(License::class);
+        $license->siteId = $site->id;
+
+        $user = static::currentUser();
+        if (!Craft::$app->getElements()->canSave($license, $user)) {
+            throw new ForbiddenHttpException('User not authorized to create a license.');
+        }
+
+        $license->setScenario(Element::SCENARIO_ESSENTIALS);
+        if (!Craft::$app->getElements()->saveElement($license)) {
+            return $this->asModelFailure($license, Craft::t('digital-products', 'Couldn\'t create license.'), 'license');
+        }
+
+        $editUrl = $license->getCpEditUrl();
+
+        $response = $this->asModelSuccess($license, Craft::t('digital-products', 'License created.'), 'license', [
+            'cpEditUrl' => $this->request->getIsCpRequest() ? $editUrl : null,
+        ]);
+
+        if (!$this->request->getAcceptsJson()) {
+            $response->redirect(UrlHelper::urlWithParams($editUrl, ['fresh' => 1]));
+        }
+
+        return $response;
     }
 
     /**

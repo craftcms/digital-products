@@ -1,9 +1,8 @@
-{% extends "_layouts/cp" %}
-{% set selectedSubnavItem = "productTypes" %}
+{% extends "digital-products/settings/_layout" %}
 
 {% set crumbs = [
-  { label: "Digital Products"|t('digital-products'), url: url('digital-products/index') },
-  { label: "Product Types"|t('digital-products'), url: url('digital-products/producttypes/index') }
+  { label: "Settings"|t('app'), url: url('digital-products/settings') },
+  { label: "Product Types"|t('digital-products'), url: url('digital-products/producttypes') }
 ] %}
 
 {% set fullPageForm = true %}

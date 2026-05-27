@@ -9,6 +9,7 @@ namespace craft\digitalproducts\helpers;
 
 use Craft;
 use craft\db\Query;
+use craft\digitalproducts\elements\License;
 
 /**
  * Class ProjectConfigData
@@ -31,7 +32,26 @@ class ProjectConfigData
         $output = [];
         $output['productTypes'] = self::_getProductTypeData();
 
+        $licenseFieldLayout = self::_getLicenseFieldLayoutData();
+        if ($licenseFieldLayout !== null) {
+            $output['licenseFieldLayouts'] = $licenseFieldLayout;
+        }
+
         return $output;
+    }
+
+    /**
+     * Return license field layout data for project config.
+     *
+     * @return array|null
+     */
+    private static function _getLicenseFieldLayoutData(): ?array
+    {
+        $layout = Craft::$app->getFields()->getLayoutByType(License::class);
+        if ($layout->id) {
+            return [$layout->uid => $layout->getConfig()];
+        }
+        return null;
     }
 
     /**

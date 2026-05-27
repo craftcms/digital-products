@@ -171,12 +171,12 @@ class LicenseQuery extends ElementQuery
     }
 
     /**
-     * Sets the [[productId]] property based on a given product or the sku.
+     * Sets the [[productId]] property based on a given product or SKU(s).
      *
-     * @param Product|string|null $value
+     * @param Product|string|string[]|null $value
      * @return static self reference
      */
-    public function product(Product|string|null $value): LicenseQuery
+    public function product(Product|array|string|null $value): LicenseQuery
     {
         if ($value instanceof Product) {
             $this->productId = $value->id;
@@ -339,7 +339,7 @@ class LicenseQuery extends ElementQuery
         }
 
         $this->joinElementTable('digitalproducts_licenses');
-        $this->subQuery->innerJoin('{{%digitalproducts_products}} digitalproducts_products', '[[digitalproducts_licenses.productId]] = [[digitalproducts_products.id]]');
+        $this->subQuery->leftJoin('{{%digitalproducts_products}} digitalproducts_products', '[[digitalproducts_licenses.productId]] = [[digitalproducts_products.id]]');
         $this->subQuery->leftJoin('{{%users}} users', '[[digitalproducts_licenses.userId]] = [[users.id]]');
 
         $this->query->select([

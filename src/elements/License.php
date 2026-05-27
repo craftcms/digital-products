@@ -17,7 +17,9 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use yii\base\InvalidConfigException;
 
 /**
@@ -98,6 +100,14 @@ class License extends Element
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function displayName(): string
+    {
+        return Craft::t('digital-products', 'License');
+    }
+
+    /**
      * Return the email tied to the license.
      *
      * @return string
@@ -175,12 +185,153 @@ class License extends Element
 
     /**
      * @inheritdoc
-     *
-     * @return string
      */
-    public function getCpEditUrl(): string
+    protected function cpEditUrl(): ?string
     {
-        return UrlHelper::cpUrl('digital-products/licenses/' . $this->id);
+        return 'digital-products/licenses/' . $this->id;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function crumbs(): array
+    {
+        return [
+            [
+                'label' => Craft::t('digital-products', 'Licenses'),
+                'url' => 'digital-products/licenses',
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function metadata(): array
+    {
+        if (!$this->licenseKey) {
+            return [];
+        }
+
+        return [
+            Craft::t('digital-products', 'License Key') => Cp::renderTemplate('_includes/forms/copytextbtn.twig', [
+                'value' => $this->licenseKey,
+                'class' => 'code',
+            ]),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function metaFieldsHtml(bool $static): string
+    {
+        $fields = [];
+
+        // Product (immutable after creation)
+        $fields[] = Cp::elementSelectFieldHtml([
+            'label' => Craft::t('digital-products', 'Product'),
+            'id' => 'product',
+            'name' => 'product',
+            'elementType' => Product::class,
+            'elements' => $this->productId ? Product::find()->id($this->productId)->status(null)->all() : [],
+            'limit' => 1,
+            'required' => true,
+            'errors' => $this->getErrors('productId'),
+            'disabled' => $static || ($this->id && !$this->getIsFresh() && $this->productId !== null),
+        ]);
+
+        // License key — editable only on new licenses; existing keys are shown in metadata()
+        if (!$this->licenseKey) {
+            $fields[] = Cp::textFieldHtml([
+                'label' => Craft::t('digital-products', 'License Key'),
+                'instructions' => Craft::t('digital-products', 'Leave blank to generate automatically.'),
+                'id' => 'licenseKey',
+                'name' => 'licenseKey',
+                'class' => 'code',
+                'value' => $this->licenseKey,
+                'errors' => $this->getErrors('licenseKey'),
+                'disabled' => $static,
+            ]);
+        }
+
+        // Owner (user)
+        $fields[] = Cp::elementSelectFieldHtml([
+            'label' => Craft::t('digital-products', 'Owner'),
+            'id' => 'owner',
+            'name' => 'owner',
+            'elementType' => User::class,
+            'elements' => $this->userId ? User::find()->id($this->userId)->all() : [],
+            'limit' => 1,
+            'errors' => $this->getErrors('userId'),
+            'disabled' => $static,
+            'instructions' => Craft::t('digital-products', 'Required if Owner Email is blank.'),
+        ]);
+
+        // Owner name
+        $fields[] = Cp::textFieldHtml([
+            'label' => Craft::t('digital-products', 'Owner Name'),
+            'id' => 'ownerName',
+            'name' => 'ownerName',
+            'value' => $this->ownerName,
+            'errors' => $this->getErrors('ownerName'),
+            'disabled' => $static,
+        ]);
+
+        // Owner email — only shown when no owner user is set
+        if (!$this->userId) {
+            $fields[] = Cp::textFieldHtml([
+                'label' => Craft::t('digital-products', 'Owner Email'),
+                'id' => 'ownerEmail',
+                'name' => 'ownerEmail',
+                'value' => $this->ownerEmail,
+                'errors' => $this->getErrors('ownerEmail'),
+                'required' => true,
+                'disabled' => $static,
+                'instructions' => Craft::t('digital-products', 'Required if Owner is blank.'),
+            ]);
+        }
+
+        $fields[] = parent::metaFieldsHtml($static);
+
+        return implode("\n", $fields);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesFromRequest(array $values): void
+    {
+        // Element selects post as arrays of IDs
+        if (isset($values['product'])) {
+            $productIds = $values['product'];
+            $this->productId = is_array($productIds) ? (reset($productIds) ?: null) : ($productIds ?: null);
+            unset($values['product']);
+        }
+
+        if (isset($values['owner'])) {
+            $userIds = $values['owner'];
+            $this->userId = is_array($userIds) ? (reset($userIds) ?: null) : ($userIds ?: null);
+            unset($values['owner']);
+        }
+
+        // These string properties are not covered by validation rules so setAttributes() would drop them
+        if (array_key_exists('licenseKey', $values)) {
+            $this->licenseKey = $values['licenseKey'] ?: null;
+            unset($values['licenseKey']);
+        }
+
+        if (array_key_exists('ownerEmail', $values)) {
+            $this->ownerEmail = $values['ownerEmail'] ?: null;
+            unset($values['ownerEmail']);
+        }
+
+        if (array_key_exists('ownerName', $values)) {
+            $this->ownerName = $values['ownerName'] ?: null;
+            unset($values['ownerName']);
+        }
+
+        parent::setAttributesFromRequest($values);
     }
 
     /**
@@ -335,7 +486,7 @@ class License extends Element
     {
         $rules = parent::rules();
 
-        $rules[] = [['productId'], 'required'];
+        $rules[] = [['productId'], 'required', 'on' => self::SCENARIO_LIVE];
         $rules[] = [
             'userId',
             'required',
@@ -343,6 +494,7 @@ class License extends Element
             'when' => function($model) {
                 return empty($model->ownerEmail);
             },
+            'on' => self::SCENARIO_LIVE,
         ];
 
         return $rules;
@@ -350,9 +502,25 @@ class License extends Element
 
     /**
      * @inheritdoc
+     */
+    public static function hasContent(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFieldLayout(): ?FieldLayout
+    {
+        return Craft::$app->getFields()->getLayoutByType(self::class);
+    }
+
+    /**
+     * @inheritdoc
      * @return LicenseQuery The newly created [[LicenseQuery]] instance.
      */
-    public static function find(): ElementQueryInterface
+    public static function find(): LicenseQuery
     {
         return new LicenseQuery(static::class);
     }
@@ -362,40 +530,53 @@ class License extends Element
      */
     public function afterSave(bool $isNew): void
     {
-        if (!$isNew) {
-            $licenseRecord = LicenseRecord::findOne($this->id);
+        if (!$this->propagating) {
+            if (!$isNew) {
+                $licenseRecord = LicenseRecord::findOne($this->id);
 
-            if (!$licenseRecord) {
-                throw new InvalidConfigException('Invalid license id: ' . $this->id);
+                if (!$licenseRecord) {
+                    throw new InvalidConfigException('Invalid license id: ' . $this->id);
+                }
+            } else {
+                $licenseRecord = new LicenseRecord();
+                $licenseRecord->id = $this->id;
             }
-        } else {
-            $licenseRecord = new LicenseRecord();
-            $licenseRecord->id = $this->id;
+
+            if ($this->userId) {
+                $user = Craft::$app->getUsers()->getUserById($this->userId);
+            } elseif ($this->ownerEmail) {
+                $user = User::find()->email($this->ownerEmail)->one();
+            } else {
+                $user = null;
+            }
+
+            // Assign the license to a user if config allows for it, user id is left null and email matches
+            if (DigitalProducts::getInstance()->getSettings()->autoAssignUserOnPurchase && $this->userId === null && $user) {
+                $this->userId = $user->id;
+            }
+
+            $licenseRecord->ownerName = $user ? $user->name : $this->ownerName;
+            $licenseRecord->ownerEmail = $user ? $user->email : $this->ownerEmail;
+            $licenseRecord->userId = $this->userId;
+
+            // Some properties of the license are immutable once set
+            if ($isNew) {
+                $licenseRecord->orderId = $this->orderId;
+            }
+
+            if ($isNew || $licenseRecord->productId === null) {
+                $licenseRecord->productId = $this->productId;
+                $licenseRecord->licenseKey = $this->generateKey();
+            }
+
+            $licenseRecord->dateUpdated = $this->dateUpdated;
+            $licenseRecord->dateCreated = $this->dateCreated;
+
+            $dirtyAttributes = array_keys($licenseRecord->getDirtyAttributes());
+            $licenseRecord->save(false);
+
+            $this->setDirtyAttributes($dirtyAttributes);
         }
-
-        if ($this->userId) {
-            $user = Craft::$app->getUsers()->getUserById($this->userId);
-        } else {
-            $user = User::find()->email($this->ownerEmail)->one();
-        }
-
-        // Assign the license to a user if config allows for it, user id is left null and email matches
-        if (DigitalProducts::getInstance()->getSettings()->autoAssignUserOnPurchase && $this->userId === null && $user) {
-            $this->userId = $user->id;
-        }
-
-        $licenseRecord->ownerName = $user ? $user->name : $this->ownerName;
-        $licenseRecord->ownerEmail = $user ? $user->email : $this->ownerEmail;
-        $licenseRecord->userId = $this->userId;
-
-        // Some properties of the license are immutable
-        if ($isNew) {
-            $licenseRecord->orderId = $this->orderId;
-            $licenseRecord->productId = $this->productId;
-            $licenseRecord->licenseKey = $this->generateKey();
-        }
-
-        $licenseRecord->save(false);
 
         parent::afterSave($isNew);
     }
@@ -407,6 +588,11 @@ class License extends Element
      */
     protected function generateKey(): string
     {
+        // Use a manually-provided key if one was set before save
+        if ($this->licenseKey) {
+            return $this->licenseKey;
+        }
+
         $generateKeyEvent = new GenerateKeyEvent(['license' => $this]);
 
         // Raising the 'beforeGenerateLicenseKey' event
