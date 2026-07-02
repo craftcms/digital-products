@@ -525,7 +525,7 @@ class ProductsController extends BaseController
         // Last checks
         if (empty($product->sku)) {
             $productType = $product->getType();
-            $product->sku = Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $product);
+            $product->sku = Craft::$app->getView()->renderSandboxedObjectTemplate($productType->skuFormat, $product);
         }
 
         if (!$product->postDate) {
