@@ -514,7 +514,7 @@ class Product extends Purchasable
         if (empty($this->sku)) {
             try {
                 $productType = DigitalProducts::getInstance()->getProductTypes()->getProductTypeById($this->typeId);
-                $this->sku = Craft::$app->getView()->renderObjectTemplate($productType->skuFormat, $this);
+                $this->sku = Craft::$app->getView()->renderSandboxedObjectTemplate($productType->skuFormat, $this);
             } catch (\Exception $e) {
                 $this->sku = '';
             }
