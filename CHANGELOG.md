@@ -1,6 +1,6 @@
 # Release Notes for Digital Products
 
-## Unreleased
+## 4.1.0 - 2026-07-08
 
 - Fixed a [high-severity](https://github.com/craftcms/cms/security/policy#severity--remediation) RCE vulnerability. (HCKRT-1510)
 - Fixed a PHP error that could occur when paying for a completed order that contains deleted digital products.
