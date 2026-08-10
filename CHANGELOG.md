@@ -2,7 +2,7 @@
 
 ## 4.1.0 - 2026-07-08
 
-- Fixed a [high-severity](https://github.com/craftcms/cms/security/policy#severity--remediation) RCE vulnerability. (GHSA-46mx-jh57-9v4h)
+- Fixed a [high-severity](https://github.com/craftcms/cms/security/policy#severity--remediation) RCE vulnerability. ([GHSA-46mx-jh57-9v4h](https://github.com/craftcms/commerce-digital-products/security/advisories/GHSA-46mx-jh57-9v4h))
 - Fixed a PHP error that could occur when paying for a completed order that contains deleted digital products.
 - Fixed an SQL error that could occur when saving a new digital product. ([#110](https://github.com/craftcms/commerce-digital-products/issues/110))
 
